@@ -1,0 +1,34 @@
+sudo apt update
+sudo apt upgrade #no no de
+sudo apt-get update
+sudo apt-get -y install python3-pip
+sudo pip3 install scipy pandas urllib3
+sudo pip3 install gdown
+echo 'export PATH=$PATH:/home/username/.local/bin' >> ~/.bashrc
+source ~/.bashrc 
+sudo apt-get install -y libopenblas-base libopenmpi-dev
+wget https://nvidia.box.com/shared/static/fjtbno0vpo676a25cgvuqc1wty0fkkg6.whl -O torch-1.10.0-cp36-cp36m-linux_aarch64.whl
+sudo -H pip3 install torch-1.10.0-cp36-cp36m-linux_aarch64.whl
+sudo apt install -y cmake nano libjpeg-dev zlib1g-dev
+git clone --branch v0.11.1 https://github.com/pytorch/vision torchvision
+cd torchvision
+sudo python3 setup.py install
+cd ..
+sudo pip3 install cv2==(versiyon) #bunu hatırlamıyorum
+echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+git clone https://github.com/AlexeyAB/darknet.git
+cd darknet
+sed -i 's/GPU=0/GPU=1/' Makefile
+sed -i 's/CUDNN=0/CUDNN=1/' Makefile
+sed -i 's/OPENCV=0/OPENCV=1/' Makefile
+make -j$(nproc)
+
+ 
+
+
+
+
+
+
