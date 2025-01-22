@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
         'video = tramola.video:main',
-        'followPath = tramola.followPath:main',
+        'followPath = tramola.followPath2:main',
         'vision = tramola.vision:main',
         ],
     },

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 
 <sdf version="1.9">
-  <world name="practice_2023_follow_path0_task">
+  <world name="followPath">
 
     <physics name="4ms" type="dart">
       <max_step_size>0.004</max_step_size>
@@ -308,6 +308,7 @@
       filename="gz-sim-navsat-system"
       name="gz::sim::systems::NavSat">
     </plugin>
+
     <scene>
       <sky></sky>
       <grid>false</grid>
@@ -351,11 +352,7 @@
       <uri>coast_waves</uri>
     </include>
 
-    <include>
-      <name>platform</name>
-      <uri>platform</uri>
-    </include>
-
+    
     <!-- The VRX short navigation course -->
     <include>
       <uri>/home/efe/Desktop/tramola/simulation_ws/models/followPath</uri>
@@ -428,11 +425,10 @@
       </plugin>
     </include>
 
-    <!-- Load the plugin for the wind -->
+    <!-- Load the plugin for the wind --> 
     <plugin
-       filename="libUSVWind.so"
+      filename="libUSVWind.so"
       name="vrx::USVWind">
-     <!-- models to be effected by the wind -->
       <wind_obj>
         <name>wamv</name>
         <link_name>wamv/base_link</link_name>
@@ -449,9 +445,8 @@
       <update_rate>10</update_rate>
       <topic_wind_speed>/vrx/debug/wind/speed</topic_wind_speed>
       <topic_wind_direction>/vrx/debug/wind/direction</topic_wind_direction>
-    </plugin>
+     </plugin>
 
-   
     <!-- The wave field -->
     <plugin filename="libPublisherPlugin.so" name="vrx::PublisherPlugin">
       <message type="gz.msgs.Param" topic="/vrx/wavefield/parameters"
@@ -467,14 +462,14 @@
           key: "gain"
           value {
             type: DOUBLE
-            double_value: 0.0
+            double_value: 0.3
           }
         }
         params {
           key: "period"
           value {
             type: DOUBLE
-            double_value: 4
+            double_value: 5
           }
         }
         params {
