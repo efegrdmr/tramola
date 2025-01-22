@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/efe/Desktop/ros2_ws/src/tramolaa
+CMAKE_SOURCE_DIR = /home/efe/Desktop/tramola/simulation_ws/src/tramolaa
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/efe/Desktop/ros2_ws/build/tramolaa
+CMAKE_BINARY_DIR = /home/efe/Desktop/tramola/simulation_ws/build/tramolaa
 
 # Utility rule file for ament_cmake_python_copy_tramolaa.
 
@@ -67,7 +67,7 @@ include CMakeFiles/ament_cmake_python_copy_tramolaa.dir/compiler_depend.make
 include CMakeFiles/ament_cmake_python_copy_tramolaa.dir/progress.make
 
 CMakeFiles/ament_cmake_python_copy_tramolaa:
-	/usr/bin/cmake -E copy_directory /home/efe/Desktop/ros2_ws/build/tramolaa/rosidl_generator_py/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa/ament_cmake_python/tramolaa/tramolaa
+	/usr/bin/cmake -E copy_directory /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/rosidl_generator_py/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/ament_cmake_python/tramolaa/tramolaa
 
 ament_cmake_python_copy_tramolaa: CMakeFiles/ament_cmake_python_copy_tramolaa
 ament_cmake_python_copy_tramolaa: CMakeFiles/ament_cmake_python_copy_tramolaa.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/ament_cmake_python_copy_tramolaa.dir/clean:
 .PHONY : CMakeFiles/ament_cmake_python_copy_tramolaa.dir/clean
 
 CMakeFiles/ament_cmake_python_copy_tramolaa.dir/depend:
-	cd /home/efe/Desktop/ros2_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa/CMakeFiles/ament_cmake_python_copy_tramolaa.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/efe/Desktop/tramola/simulation_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/CMakeFiles/ament_cmake_python_copy_tramolaa.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ament_cmake_python_copy_tramolaa.dir/depend
 

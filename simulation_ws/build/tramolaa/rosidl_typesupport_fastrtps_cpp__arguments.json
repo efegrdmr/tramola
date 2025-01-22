@@ -1,10 +1,10 @@
 {
   "package_name": "tramolaa",
-  "output_dir": "/home/efe/Desktop/ros2_ws/build/tramolaa/rosidl_typesupport_fastrtps_cpp/tramolaa",
+  "output_dir": "/home/efe/Desktop/tramola/simulation_ws/build/tramolaa/rosidl_typesupport_fastrtps_cpp/tramolaa",
   "template_dir": "/opt/ros/humble/share/rosidl_typesupport_fastrtps_cpp/resource",
   "idl_tuples": [
-    "/home/efe/Desktop/ros2_ws/build/tramolaa/rosidl_adapter/tramolaa:msg/Detection.idl",
-    "/home/efe/Desktop/ros2_ws/build/tramolaa/rosidl_adapter/tramolaa:msg/DetectionList.idl"
+    "/home/efe/Desktop/tramola/simulation_ws/build/tramolaa/rosidl_adapter/tramolaa:msg/Detection.idl",
+    "/home/efe/Desktop/tramola/simulation_ws/build/tramolaa/rosidl_adapter/tramolaa:msg/DetectionList.idl"
   ],
   "ros_interface_dependencies": [
     "geometry_msgs:/opt/ros/humble/share/geometry_msgs/msg/Accel.idl",
@@ -77,8 +77,8 @@
     "/opt/ros/humble/share/rosidl_typesupport_fastrtps_cpp/resource/msg__type_support.cpp.em",
     "/opt/ros/humble/share/rosidl_typesupport_fastrtps_cpp/resource/srv__rosidl_typesupport_fastrtps_cpp.hpp.em",
     "/opt/ros/humble/share/rosidl_typesupport_fastrtps_cpp/resource/srv__type_support.cpp.em",
-    "/home/efe/Desktop/ros2_ws/build/tramolaa/rosidl_adapter/tramolaa/msg/Detection.idl",
-    "/home/efe/Desktop/ros2_ws/build/tramolaa/rosidl_adapter/tramolaa/msg/DetectionList.idl",
+    "/home/efe/Desktop/tramola/simulation_ws/build/tramolaa/rosidl_adapter/tramolaa/msg/Detection.idl",
+    "/home/efe/Desktop/tramola/simulation_ws/build/tramolaa/rosidl_adapter/tramolaa/msg/DetectionList.idl",
     "/opt/ros/humble/share/geometry_msgs/msg/Accel.idl",
     "/opt/ros/humble/share/geometry_msgs/msg/AccelStamped.idl",
     "/opt/ros/humble/share/geometry_msgs/msg/AccelWithCovariance.idl",

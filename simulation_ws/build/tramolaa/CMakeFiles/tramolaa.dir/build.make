@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/efe/Desktop/ros2_ws/src/tramolaa
+CMAKE_SOURCE_DIR = /home/efe/Desktop/tramola/simulation_ws/src/tramolaa
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/efe/Desktop/ros2_ws/build/tramolaa
+CMAKE_BINARY_DIR = /home/efe/Desktop/tramola/simulation_ws/build/tramolaa
 
 # Utility rule file for tramolaa.
 
@@ -66,8 +66,8 @@ include CMakeFiles/tramolaa.dir/compiler_depend.make
 # Include the progress variables for this target.
 include CMakeFiles/tramolaa.dir/progress.make
 
-CMakeFiles/tramolaa: /home/efe/Desktop/ros2_ws/src/tramolaa/msg/Detection.msg
-CMakeFiles/tramolaa: /home/efe/Desktop/ros2_ws/src/tramolaa/msg/DetectionList.msg
+CMakeFiles/tramolaa: /home/efe/Desktop/tramola/simulation_ws/src/tramolaa/msg/Detection.msg
+CMakeFiles/tramolaa: /home/efe/Desktop/tramola/simulation_ws/src/tramolaa/msg/DetectionList.msg
 CMakeFiles/tramolaa: /opt/ros/humble/share/geometry_msgs/msg/Accel.idl
 CMakeFiles/tramolaa: /opt/ros/humble/share/geometry_msgs/msg/AccelStamped.idl
 CMakeFiles/tramolaa: /opt/ros/humble/share/geometry_msgs/msg/AccelWithCovariance.idl
@@ -112,6 +112,6 @@ CMakeFiles/tramolaa.dir/clean:
 .PHONY : CMakeFiles/tramolaa.dir/clean
 
 CMakeFiles/tramolaa.dir/depend:
-	cd /home/efe/Desktop/ros2_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa/CMakeFiles/tramolaa.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/efe/Desktop/tramola/simulation_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/CMakeFiles/tramolaa.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tramolaa.dir/depend
 

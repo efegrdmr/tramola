@@ -14,7 +14,8 @@ test/test_copyright.py
 test/test_flake8.py
 test/test_pep257.py
 tramola/__init__.py
-tramola/followPath.py
+tramola/followPath2.py
+tramola/task2.py
 tramola/thruster.py
 tramola/video.py
 tramola/vision.py

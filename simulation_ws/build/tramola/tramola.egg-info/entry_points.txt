@@ -1,5 +1,5 @@
 [console_scripts]
-followPath = tramola.followPath:main
+followPath = tramola.followPath2:main
 video = tramola.video:main
 vision = tramola.vision:main
 

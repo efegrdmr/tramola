@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/efe/Desktop/ros2_ws/src/tramolaa
+CMAKE_SOURCE_DIR = /home/efe/Desktop/tramola/simulation_ws/src/tramolaa
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/efe/Desktop/ros2_ws/build/tramolaa
+CMAKE_BINARY_DIR = /home/efe/Desktop/tramola/simulation_ws/build/tramolaa
 
 # Utility rule file for tramolaa_uninstall.
 
@@ -67,7 +67,7 @@ include CMakeFiles/tramolaa_uninstall.dir/compiler_depend.make
 include CMakeFiles/tramolaa_uninstall.dir/progress.make
 
 CMakeFiles/tramolaa_uninstall:
-	/usr/bin/cmake -P /home/efe/Desktop/ros2_ws/build/tramolaa/ament_cmake_uninstall_target/ament_cmake_uninstall_target.cmake
+	/usr/bin/cmake -P /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/ament_cmake_uninstall_target/ament_cmake_uninstall_target.cmake
 
 tramolaa_uninstall: CMakeFiles/tramolaa_uninstall
 tramolaa_uninstall: CMakeFiles/tramolaa_uninstall.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/tramolaa_uninstall.dir/clean:
 .PHONY : CMakeFiles/tramolaa_uninstall.dir/clean
 
 CMakeFiles/tramolaa_uninstall.dir/depend:
-	cd /home/efe/Desktop/ros2_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa/CMakeFiles/tramolaa_uninstall.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/efe/Desktop/tramola/simulation_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/CMakeFiles/tramolaa_uninstall.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tramolaa_uninstall.dir/depend
 

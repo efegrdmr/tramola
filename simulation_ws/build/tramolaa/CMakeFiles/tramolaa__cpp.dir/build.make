@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/efe/Desktop/ros2_ws/src/tramolaa
+CMAKE_SOURCE_DIR = /home/efe/Desktop/tramola/simulation_ws/src/tramolaa
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/efe/Desktop/ros2_ws/build/tramolaa
+CMAKE_BINARY_DIR = /home/efe/Desktop/tramola/simulation_ws/build/tramolaa
 
 # Utility rule file for tramolaa__cpp.
 
@@ -155,8 +155,8 @@ rosidl_generator_cpp/tramolaa/msg/detection.hpp: /opt/ros/humble/share/std_msgs/
 rosidl_generator_cpp/tramolaa/msg/detection.hpp: /opt/ros/humble/share/std_msgs/msg/UInt64MultiArray.idl
 rosidl_generator_cpp/tramolaa/msg/detection.hpp: /opt/ros/humble/share/std_msgs/msg/UInt8.idl
 rosidl_generator_cpp/tramolaa/msg/detection.hpp: /opt/ros/humble/share/std_msgs/msg/UInt8MultiArray.idl
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/efe/Desktop/ros2_ws/build/tramolaa/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code for ROS interfaces"
-	/usr/bin/python3 /opt/ros/humble/share/rosidl_generator_cpp/cmake/../../../lib/rosidl_generator_cpp/rosidl_generator_cpp --generator-arguments-file /home/efe/Desktop/ros2_ws/build/tramolaa/rosidl_generator_cpp__arguments.json
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/efe/Desktop/tramola/simulation_ws/build/tramolaa/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code for ROS interfaces"
+	/usr/bin/python3 /opt/ros/humble/share/rosidl_generator_cpp/cmake/../../../lib/rosidl_generator_cpp/rosidl_generator_cpp --generator-arguments-file /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/rosidl_generator_cpp__arguments.json
 
 rosidl_generator_cpp/tramolaa/msg/detail/detection__builder.hpp: rosidl_generator_cpp/tramolaa/msg/detection.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/tramolaa/msg/detail/detection__builder.hpp
@@ -208,6 +208,6 @@ CMakeFiles/tramolaa__cpp.dir/clean:
 .PHONY : CMakeFiles/tramolaa__cpp.dir/clean
 
 CMakeFiles/tramolaa__cpp.dir/depend:
-	cd /home/efe/Desktop/ros2_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/src/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa /home/efe/Desktop/ros2_ws/build/tramolaa/CMakeFiles/tramolaa__cpp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/efe/Desktop/tramola/simulation_ws/build/tramolaa && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/src/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/CMakeFiles/tramolaa__cpp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tramolaa__cpp.dir/depend
 

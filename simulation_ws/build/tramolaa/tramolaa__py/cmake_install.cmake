@@ -1,8 +1,8 @@
-# Install script for directory: /home/efe/Desktop/ros2_ws/build/tramolaa/tramolaa__py
+# Install script for directory: /home/efe/Desktop/tramola/simulation_ws/build/tramolaa/tramolaa__py
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/efe/Desktop/ros2_ws/install/tramolaa")
+  set(CMAKE_INSTALL_PREFIX "/home/efe/Desktop/tramola/simulation_ws/install/tramolaa")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

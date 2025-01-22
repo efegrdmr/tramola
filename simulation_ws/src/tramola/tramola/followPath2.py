@@ -5,7 +5,7 @@ from tramola.thruster import Thrusters
 
 class DetectionListenerNode(Node):
     def __init__(self):
-        super().__init__('detection_listener')
+        super().__init__('detection_listener31')
         
         # Create a subscription to the detection topic
         self.subscription = self.create_subscription(
@@ -17,7 +17,7 @@ class DetectionListenerNode(Node):
         self.thrusters = Thrusters(self)
         
         # Constants for navigation
-        self.CONFIDENCE_THRESHOLD = 0.3
+        self.CONFIDENCE_THRESHOLD = 0.1
         self.TARGET_CENTER = 0.5  # Desired position in frame
         self.SPEED_BASE = 1000    # Base speed
         self.TURN_FACTOR = 400    # How much to reduce speed for turning
@@ -68,15 +68,17 @@ class DetectionListenerNode(Node):
 
     def detection_callback(self, msg):
         # Find nearest buoys
+
         nearest_blue = self.get_nearest_buoy(msg.detections, 0)
         nearest_red = self.get_nearest_buoy(msg.detections, 1)
-        
         # If only one buoy is visible, estimate the other's position
         if nearest_blue is None and nearest_red is not None:
+            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             nearest_blue = Detection()
             nearest_blue.x_center = max(0.0, min(1.0, 1 - nearest_red.x_center))
             nearest_blue.width = nearest_red.width
         elif nearest_red is None and nearest_blue is not None:
+            print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
             nearest_red = Detection()
             nearest_red.x_center = max(0.0, min(1.0, 1 - nearest_blue.x_center))
             nearest_red.width = nearest_blue.width
@@ -84,7 +86,7 @@ class DetectionListenerNode(Node):
             # No buoys visible - maintain straight course at full speed
             self.thrusters.setSpeedLeft(self.SPEED_BASE)
             self.thrusters.setSpeedRight(self.SPEED_BASE)
-            self.get_logger().warn('No buoys detected')
+            #self.get_logger().warn('No buoys detected')
             return
         
         # Calculate middle point between buoys
