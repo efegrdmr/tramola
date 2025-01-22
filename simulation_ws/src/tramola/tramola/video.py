@@ -4,6 +4,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
+import time
 
 from tramola.thruster import Thrusters
 
@@ -22,6 +23,27 @@ class ImageViewer(Node):
         cv2.namedWindow("Camera View", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Camera View", 1280, 720)  # Ensuring the window is a specific size
         cv2.imshow("Camera View", self.blank_image)
+        self.recording = False
+
+    def toggle_recording(self):
+        """Toggle video recording state."""
+        if self.recording:
+            # Stop recording
+            self.get_logger().info("Stopping video recording...")
+            self.recording = False
+            if self.video_writer is not None:
+                self.video_writer.release()
+                self.video_writer = None
+        else:
+            # Start recording
+            self.get_logger().info("Starting video recording...")
+            self.recording = True
+            self.video_writer = cv2.VideoWriter(
+                "video" + time.strftime(),
+                cv2.VideoWriter_fourcc(*'XVID'),
+                20,
+                (1280, 720)
+            )
 
     def image_callback(self, msg):
         try:
@@ -30,6 +52,9 @@ class ImageViewer(Node):
             cv2.imshow("Camera View", cv_image)
         except Exception as e:
             self.get_logger().error(f"Error displaying image: {str(e)}")
+        
+        if self.recording:
+            self.video_writer.write(cv_image)
 
     def handle_keypress(self, key):
         """Handle keypress for thruster control."""
@@ -41,6 +66,8 @@ class ImageViewer(Node):
             self.thrusters.turnLeft()
         elif key == ord('d'):
             self.thrusters.turnRight()
+        elif key == ord('c'):
+            self.toggle_recording()
         elif key == ord('q'):
             self.get_logger().info("Shutting down...")
             return True  # Return True to indicate quit request
