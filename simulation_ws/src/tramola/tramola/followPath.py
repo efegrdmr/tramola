@@ -24,7 +24,7 @@ class DetectionListenerNode(Node):
         nearestBlue = None
         nearestRed = None
         for detection in msg.detections:
-            if detection.confidence < 0.7:
+            if detection.confidence < 0.3:
                 self.get_logger().warn(f"Low confidence: {detection.confidence}. Ignoring detection.")
                 continue
 
@@ -56,23 +56,7 @@ class DetectionListenerNode(Node):
             self.thrusters.setSpeedLeft(1000)
             self.thrusters.setSpeedRight(600)
 
-        for detection in msg.detections:
-            # Check if the confidence score is above a threshold
-            if detection.confidence > 0.7:
-                self.get_logger().info(f"Detected object with class ID {detection.class_id} at center ({detection.x_center}, {detection.y_center}) with confidence {detection.confidence}")
-                
-                # Take action based on class_id
-                if detection.class_id == 1:
-                    self.get_logger().info("Object is a car. Triggering car-related action.")
-                    # Perform action related to car detection
-                
-                elif detection.class_id == 2:
-                    self.get_logger().info("Object is a pedestrian. Triggering pedestrian-related action.")
-                    # Perform action related to pedestrian detection
-                
-                # Add more actions for different class IDs as needed
-            else:
-                self.get_logger().warn(f"Low confidence: {detection.confidence}. Ignoring detection.")
+        
 
 def main(args=None):
     rclpy.init(args=args)
