@@ -13,7 +13,7 @@ class YoloNode(Node):
         self.get_logger().info('Init start')
 
         # Load the YOLO model (replace with your model path)
-        self.model = YOLO('/home/efe/best.pt')  # Ensure this path is correct and accessible
+        self.model = YOLO('best.pt')  # Ensure this path is correct and accessible
 
         # Subscription to the image topic
         self.subscription = self.create_subscription(
