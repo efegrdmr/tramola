@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "tramolaa__py",
+		"source" : "/home/efe/Desktop/ros2_ws/build/tramolaa/tramolaa__py"
+	}
+}

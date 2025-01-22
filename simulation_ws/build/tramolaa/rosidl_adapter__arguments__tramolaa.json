@@ -1,0 +1,7 @@
+{
+  "package_name": "tramolaa",
+  "non_idl_tuples": [
+    "/home/efe/Desktop/ros2_ws/src/tramolaa:msg/Detection.msg",
+    "/home/efe/Desktop/ros2_ws/src/tramolaa:msg/DetectionList.msg"
+  ]
+}

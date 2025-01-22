@@ -1,0 +1,345 @@
+[0.000000] (-) TimerEvent: {}
+[0.000492] (tramola) JobQueued: {'identifier': 'tramola', 'dependencies': OrderedDict()}
+[0.000907] (tramolaa) JobQueued: {'identifier': 'tramolaa', 'dependencies': OrderedDict()}
+[0.000946] (tramola) JobStarted: {'identifier': 'tramola'}
+[0.013227] (tramolaa) JobStarted: {'identifier': 'tramolaa'}
+[0.099644] (-) TimerEvent: {}
+[0.200210] (-) TimerEvent: {}
+[0.300879] (-) TimerEvent: {}
+[0.401549] (-) TimerEvent: {}
+[0.451949] (tramolaa) JobProgress: {'identifier': 'tramolaa', 'progress': 'cmake'}
+[0.457069] (tramolaa) JobProgress: {'identifier': 'tramolaa', 'progress': 'build'}
+[0.458165] (tramolaa) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/efe/Desktop/ros2_ws/build/tramolaa', '--', '-j16', '-l16'], 'cwd': '/home/efe/Desktop/ros2_ws/build/tramolaa', 'env': OrderedDict([('GZ_SIM_SYSTEM_PLUGIN_PATH', '/home/efe/vrx_ws/install/lib'), ('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('CUDACXX', '/usr/local/cuda-12.6/bin/nvcc'), ('GZ_SIM_RESOURCE_PATH', '/home/efe/Desktop/worlds:/home/efe/Desktop/worlds:/home/efe/vrx_ws/install/share/wamv_description/models:/home/efe/vrx_ws/install/share/vrx_gz/models/tmp:/home/efe/vrx_ws/install/share/vrx_gz/models:/home/efe/vrx_ws/install/share/vrx_gz/worlds/2023_practice:/home/efe/vrx_ws/install/share/vrx_gz/worlds:/home/efe/vrx_ws/install/share/vrx_gazebo/models:/home/efe/vrx_ws/install/share/'), ('USER', 'efe'), ('LC_TIME', 'tr_TR.UTF-8'), ('FONTCONFIG_PATH', '/etc/fonts'), ('GIO_MODULE_DIR', '/home/efe/snap/code/common/.cache/gio-modules'), ('XDG_SESSION_TYPE', 'x11'), ('GIT_ASKPASS', '/snap/code/181/usr/share/code/resources/app/extensions/git/dist/askpass.sh'), ('GTK_EXE_PREFIX_VSCODE_SNAP_ORIG', ''), ('GDK_BACKEND_VSCODE_SNAP_ORIG', ''), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/efe/Desktop/ros2_ws/install/tramolaa/lib:/home/efe/vrx_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/efe'), ('CHROME_DESKTOP', 'code.desktop'), ('LOCPATH_VSCODE_SNAP_ORIG', ''), ('TERM_PROGRAM_VERSION', '1.96.4'), ('DESKTOP_SESSION', 'ubuntu'), ('GTK_PATH', '/snap/code/181/usr/lib/x86_64-linux-gnu/gtk-3.0'), ('XDG_DATA_HOME_VSCODE_SNAP_ORIG', ''), ('GTK_IM_MODULE_FILE', '/home/efe/snap/code/common/.cache/immodules/immodules.cache'), ('GIO_LAUNCHED_DESKTOP_FILE', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('GSETTINGS_SCHEMA_DIR_VSCODE_SNAP_ORIG', ''), ('VSCODE_GIT_ASKPASS_MAIN', '/snap/code/181/usr/share/code/resources/app/extensions/git/dist/askpass-main.js'), ('LC_MONETARY', 'tr_TR.UTF-8'), ('VSCODE_GIT_ASKPASS_NODE', '/snap/code/181/usr/share/code/code'), ('MANAGERPID', '1600'), ('SYSTEMD_EXEC_PID', '1906'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2631'), ('COLCON_PREFIX_PATH', '/home/efe/Desktop/ros2_ws/install:/home/efe/vrx_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'efe'), ('JOURNAL_STREAM', '8:16252'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_CONFIG_DIRS_VSCODE_SNAP_ORIG', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_SESSION_CLASS', 'user'), ('XDG_DATA_DIRS_VSCODE_SNAP_ORIG', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('USERNAME', 'efe'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/usr/local/cuda-12.6/bin:/home/efe/.local/bin:/usr/local/cuda-12.6/bin:/opt/ros/humble/bin:/home/efe/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/efe-IdeaPad-5-Pro-16ACH6:@/tmp/.ICE-unix/1879,unix/efe-IdeaPad-5-Pro-16ACH6:/tmp/.ICE-unix/1879'), ('GTK_EXE_PREFIX', '/snap/code/181/usr'), ('INVOCATION_ID', 'd7ffaa7be8154269bcf16c49283e7bbc'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'tr_TR.UTF-8'), ('BAMF_DESKTOP_FILE_HINT', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'x11'), ('DISPLAY', ':1'), ('LOCPATH', '/snap/code/181/usr/lib/locale'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'Unity'), ('LC_TELEPHONE', 'tr_TR.UTF-8'), ('GIO_MODULE_DIR_VSCODE_SNAP_ORIG', ''), ('XDG_DATA_HOME', '/home/efe/snap/code/181/.local/share'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-61429622d0.sock'), ('TERM_PROGRAM', 'vscode'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('GSETTINGS_SCHEMA_DIR', '/home/efe/snap/code/181/.local/share/glib-2.0/schemas'), ('AMENT_PREFIX_PATH', '/home/efe/Desktop/ros2_ws/install/tramolaa:/home/efe/Desktop/ros2_ws/install/tramola:/home/efe/vrx_ws/install:/opt/ros/humble'), ('ORIGINAL_XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('SHELL', '/bin/bash'), ('LC_NAME', 'tr_TR.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GTK_PATH_VSCODE_SNAP_ORIG', ''), ('FONTCONFIG_FILE', '/etc/fonts/fonts.conf'), ('GTK_IM_MODULE_FILE_VSCODE_SNAP_ORIG', ''), ('LC_MEASUREMENT', 'tr_TR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'tr_TR.UTF-8'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/efe/Desktop/ros2_ws/build/tramolaa'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/home/efe/snap/code/181/.local/share:/home/efe/snap/code/181:/snap/code/181/usr/share:/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages:/home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages:/home/efe/vrx_ws/install/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'tr_TR.UTF-8'), ('LC_PAPER', 'tr_TR.UTF-8'), ('COLCON', '1'), ('CUDA_PATH', '/usr/local/cuda-12.6'), ('CMAKE_PREFIX_PATH', '/home/efe/Desktop/ros2_ws/install/tramolaa:/home/efe/vrx_ws/install:/home/efe/Desktop/ros2_ws/install/tramola:/opt/ros/humble')]), 'shell': False}
+[0.501681] (-) TimerEvent: {}
+[0.506727] (tramolaa) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.601837] (-) TimerEvent: {}
+[0.702535] (-) TimerEvent: {}
+[0.719000] (tramolaa) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.12.11 (/opt/ros/humble/share/ament_lint_auto/cmake)\n'}
+[0.802675] (-) TimerEvent: {}
+[0.842298] (tramolaa) StdoutLine: {'line': b'-- Found geometry_msgs: 4.2.4 (/opt/ros/humble/share/geometry_msgs/cmake)\n'}
+[0.872630] (tramolaa) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[0.875275] (tramolaa) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.880456] (tramolaa) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[0.889536] (tramolaa) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.902149] (tramolaa) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.902767] (-) TimerEvent: {}
+[0.946333] (tramolaa) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[0.982419] (tramola) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/tramola', 'build', '--build-base', '/home/efe/Desktop/ros2_ws/build/tramola/build', 'install', '--record', '/home/efe/Desktop/ros2_ws/build/tramola/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/efe/Desktop/ros2_ws/src/tramola', 'env': {'GZ_SIM_SYSTEM_PLUGIN_PATH': '/home/efe/vrx_ws/install/lib', 'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'CUDACXX': '/usr/local/cuda-12.6/bin/nvcc', 'GZ_SIM_RESOURCE_PATH': '/home/efe/Desktop/worlds:/home/efe/Desktop/worlds:/home/efe/vrx_ws/install/share/wamv_description/models:/home/efe/vrx_ws/install/share/vrx_gz/models/tmp:/home/efe/vrx_ws/install/share/vrx_gz/models:/home/efe/vrx_ws/install/share/vrx_gz/worlds/2023_practice:/home/efe/vrx_ws/install/share/vrx_gz/worlds:/home/efe/vrx_ws/install/share/vrx_gazebo/models:/home/efe/vrx_ws/install/share/', 'USER': 'efe', 'LC_TIME': 'tr_TR.UTF-8', 'FONTCONFIG_PATH': '/etc/fonts', 'GIO_MODULE_DIR': '/home/efe/snap/code/common/.cache/gio-modules', 'XDG_SESSION_TYPE': 'x11', 'GIT_ASKPASS': '/snap/code/181/usr/share/code/resources/app/extensions/git/dist/askpass.sh', 'GTK_EXE_PREFIX_VSCODE_SNAP_ORIG': '', 'GDK_BACKEND_VSCODE_SNAP_ORIG': '', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/efe/Desktop/ros2_ws/install/tramolaa/lib:/home/efe/vrx_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/home/efe', 'CHROME_DESKTOP': 'code.desktop', 'LOCPATH_VSCODE_SNAP_ORIG': '', 'TERM_PROGRAM_VERSION': '1.96.4', 'DESKTOP_SESSION': 'ubuntu', 'GTK_PATH': '/snap/code/181/usr/lib/x86_64-linux-gnu/gtk-3.0', 'XDG_DATA_HOME_VSCODE_SNAP_ORIG': '', 'GTK_IM_MODULE_FILE': '/home/efe/snap/code/common/.cache/immodules/immodules.cache', 'GIO_LAUNCHED_DESKTOP_FILE': '/var/lib/snapd/desktop/applications/code_code.desktop', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'GSETTINGS_SCHEMA_DIR_VSCODE_SNAP_ORIG': '', 'VSCODE_GIT_ASKPASS_MAIN': '/snap/code/181/usr/share/code/resources/app/extensions/git/dist/askpass-main.js', 'LC_MONETARY': 'tr_TR.UTF-8', 'VSCODE_GIT_ASKPASS_NODE': '/snap/code/181/usr/share/code/code', 'MANAGERPID': '1600', 'SYSTEMD_EXEC_PID': '1906', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'GIO_LAUNCHED_DESKTOP_FILE_PID': '2631', 'COLCON_PREFIX_PATH': '/home/efe/Desktop/ros2_ws/install:/home/efe/vrx_ws/install', 'ROS_DISTRO': 'humble', 'GTK_IM_MODULE': 'ibus', 'LOGNAME': 'efe', 'JOURNAL_STREAM': '8:16252', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_CONFIG_DIRS_VSCODE_SNAP_ORIG': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_SESSION_CLASS': 'user', 'XDG_DATA_DIRS_VSCODE_SNAP_ORIG': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'USERNAME': 'efe', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'ROS_LOCALHOST_ONLY': '0', 'WINDOWPATH': '2', 'PATH': '/usr/local/cuda-12.6/bin:/home/efe/.local/bin:/usr/local/cuda-12.6/bin:/opt/ros/humble/bin:/home/efe/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/efe-IdeaPad-5-Pro-16ACH6:@/tmp/.ICE-unix/1879,unix/efe-IdeaPad-5-Pro-16ACH6:/tmp/.ICE-unix/1879', 'GTK_EXE_PREFIX': '/snap/code/181/usr', 'INVOCATION_ID': 'd7ffaa7be8154269bcf16c49283e7bbc', 'XDG_MENU_PREFIX': 'gnome-', 'LC_ADDRESS': 'tr_TR.UTF-8', 'BAMF_DESKTOP_FILE_HINT': '/var/lib/snapd/desktop/applications/code_code.desktop', 'XDG_RUNTIME_DIR': '/run/user/1000', 'GDK_BACKEND': 'x11', 'DISPLAY': ':1', 'LOCPATH': '/snap/code/181/usr/lib/locale', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'Unity', 'LC_TELEPHONE': 'tr_TR.UTF-8', 'GIO_MODULE_DIR_VSCODE_SNAP_ORIG': '', 'XDG_DATA_HOME': '/home/efe/snap/code/181/.local/share', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'VSCODE_GIT_IPC_HANDLE': '/run/user/1000/vscode-git-61429622d0.sock', 'TERM_PROGRAM': 'vscode', 'SSH_AGENT_LAUNCHER': 'gnome-keyring', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'GSETTINGS_SCHEMA_DIR': '/home/efe/snap/code/181/.local/share/glib-2.0/schemas', 'AMENT_PREFIX_PATH': '/home/efe/Desktop/ros2_ws/install/tramolaa:/home/efe/Desktop/ros2_ws/install/tramola:/home/efe/vrx_ws/install:/opt/ros/humble', 'ORIGINAL_XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'SHELL': '/bin/bash', 'LC_NAME': 'tr_TR.UTF-8', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'GTK_PATH_VSCODE_SNAP_ORIG': '', 'FONTCONFIG_FILE': '/etc/fonts/fonts.conf', 'GTK_IM_MODULE_FILE_VSCODE_SNAP_ORIG': '', 'LC_MEASUREMENT': 'tr_TR.UTF-8', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'GJS_DEBUG_OUTPUT': 'stderr', 'LC_IDENTIFICATION': 'tr_TR.UTF-8', 'VSCODE_GIT_ASKPASS_EXTRA_ARGS': '', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/efe/Desktop/ros2_ws/build/tramola', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/home/efe/snap/code/181/.local/share:/home/efe/snap/code/181:/snap/code/181/usr/share:/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/efe/Desktop/ros2_ws/build/tramola/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages:/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages:/home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages:/home/efe/vrx_ws/install/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'LC_NUMERIC': 'tr_TR.UTF-8', 'LC_PAPER': 'tr_TR.UTF-8', 'COLCON': '1', 'CUDA_PATH': '/usr/local/cuda-12.6', 'CMAKE_PREFIX_PATH': '/home/efe/Desktop/ros2_ws/install/tramolaa:/home/efe/vrx_ws/install'}, 'shell': False}
+[1.002893] (-) TimerEvent: {}
+[1.103358] (-) TimerEvent: {}
+[1.204030] (-) TimerEvent: {}
+[1.294109] (tramola) StdoutLine: {'line': b'running egg_info\n'}
+[1.295144] (tramola) StdoutLine: {'line': b'writing ../../build/tramola/tramola.egg-info/PKG-INFO\n'}
+[1.295496] (tramola) StdoutLine: {'line': b'writing dependency_links to ../../build/tramola/tramola.egg-info/dependency_links.txt\n'}
+[1.295731] (tramola) StdoutLine: {'line': b'writing entry points to ../../build/tramola/tramola.egg-info/entry_points.txt\n'}
+[1.295930] (tramola) StdoutLine: {'line': b'writing requirements to ../../build/tramola/tramola.egg-info/requires.txt\n'}
+[1.296079] (tramola) StdoutLine: {'line': b'writing top-level names to ../../build/tramola/tramola.egg-info/top_level.txt\n'}
+[1.298929] (tramolaa) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[1.299285] (tramola) StdoutLine: {'line': b"reading manifest file '../../build/tramola/tramola.egg-info/SOURCES.txt'\n"}
+[1.299548] (tramola) StdoutLine: {'line': b"adding license file 'LICENSE'\n"}
+[1.300421] (tramola) StdoutLine: {'line': b"writing manifest file '../../build/tramola/tramola.egg-info/SOURCES.txt'\n"}
+[1.300603] (tramola) StdoutLine: {'line': b'running build\n'}
+[1.300683] (tramola) StdoutLine: {'line': b'running build_py\n'}
+[1.301339] (tramola) StdoutLine: {'line': b'running install\n'}
+[1.301789] (tramola) StdoutLine: {'line': b'running install_lib\n'}
+[1.303888] (tramola) StdoutLine: {'line': b'running install_data\n'}
+[1.304002] (-) TimerEvent: {}
+[1.304164] (tramola) StdoutLine: {'line': b'running install_egg_info\n'}
+[1.306751] (tramola) StdoutLine: {'line': b"removing '/home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola-0.0.0-py3.10.egg-info' (and everything under it)\n"}
+[1.307301] (tramola) StdoutLine: {'line': b'Copying ../../build/tramola/tramola.egg-info to /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola-0.0.0-py3.10.egg-info\n'}
+[1.308520] (tramola) StdoutLine: {'line': b'running install_scripts\n'}
+[1.347859] (tramola) StdoutLine: {'line': b'Installing followPath script to /home/efe/Desktop/ros2_ws/install/tramola/lib/tramola\n'}
+[1.348310] (tramola) StdoutLine: {'line': b'Installing video script to /home/efe/Desktop/ros2_ws/install/tramola/lib/tramola\n'}
+[1.348571] (tramola) StdoutLine: {'line': b'Installing vision script to /home/efe/Desktop/ros2_ws/install/tramola/lib/tramola\n'}
+[1.348895] (tramola) StdoutLine: {'line': b"writing list of installed files to '/home/efe/Desktop/ros2_ws/build/tramola/install.log'\n"}
+[1.404219] (-) TimerEvent: {}
+[1.457419] (tramola) CommandEnded: {'returncode': 0}
+[1.472375] (tramola) JobEnded: {'identifier': 'tramola', 'rc': 0}
+[1.504336] (-) TimerEvent: {}
+[1.605030] (-) TimerEvent: {}
+[1.705793] (-) TimerEvent: {}
+[1.806422] (-) TimerEvent: {}
+[1.906968] (-) TimerEvent: {}
+[1.922086] (tramolaa) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[2.007170] (-) TimerEvent: {}
+[2.107850] (-) TimerEvent: {}
+[2.149378] (tramolaa) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[2.183526] (tramolaa) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[2.207990] (-) TimerEvent: {}
+[2.221187] (tramolaa) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[2.221888] (tramolaa) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10\n'}
+[2.222143] (tramolaa) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so\n'}
+[2.266636] (tramolaa) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[2.268175] (tramolaa) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[2.272621] (tramolaa) StdoutLine: {'line': b'-- Configuring done\n'}
+[2.308163] (-) TimerEvent: {}
+[2.324415] (tramolaa) StdoutLine: {'line': b'-- Generating done\n'}
+[2.346675] (tramolaa) StdoutLine: {'line': b'-- Build files have been written to: /home/efe/Desktop/ros2_ws/build/tramolaa\n'}
+[2.409289] (tramolaa) StdoutLine: {'line': b'[  2%] \x1b[34m\x1b[1mGenerating C code for ROS interfaces\x1b[0m\n'}
+[2.409852] (-) TimerEvent: {}
+[2.424480] (tramolaa) StdoutLine: {'line': b'[  5%] \x1b[34m\x1b[1mGenerating C++ code for ROS interfaces\x1b[0m\n'}
+[2.447230] (tramolaa) StdoutLine: {'line': b'[  5%] Built target ament_cmake_python_copy_tramolaa\n'}
+[2.510018] (-) TimerEvent: {}
+[2.610607] (-) TimerEvent: {}
+[2.711216] (-) TimerEvent: {}
+[2.780239] (tramolaa) StdoutLine: {'line': b'running egg_info\n'}
+[2.781058] (tramolaa) StdoutLine: {'line': b'writing tramolaa.egg-info/PKG-INFO\n'}
+[2.781489] (tramolaa) StdoutLine: {'line': b'writing dependency_links to tramolaa.egg-info/dependency_links.txt\n'}
+[2.781740] (tramolaa) StdoutLine: {'line': b'writing top-level names to tramolaa.egg-info/top_level.txt\n'}
+[2.784930] (tramolaa) StdoutLine: {'line': b"reading manifest file 'tramolaa.egg-info/SOURCES.txt'\n"}
+[2.786104] (tramolaa) StdoutLine: {'line': b"writing manifest file 'tramolaa.egg-info/SOURCES.txt'\n"}
+[2.811363] (-) TimerEvent: {}
+[2.903484] (tramolaa) StdoutLine: {'line': b'[  5%] Built target ament_cmake_python_build_tramolaa_egg\n'}
+[2.911777] (-) TimerEvent: {}
+[2.923712] (tramolaa) StdoutLine: {'line': b'[  5%] Built target tramolaa__cpp\n'}
+[2.941662] (tramolaa) StdoutLine: {'line': b'[ 12%] \x1b[34m\x1b[1mGenerating C++ type support dispatch for ROS interfaces\x1b[0m\n'}
+[2.942149] (tramolaa) StdoutLine: {'line': b'[ 12%] \x1b[34m\x1b[1mGenerating C++ introspection for ROS interfaces\x1b[0m\n'}
+[2.942371] (tramolaa) StdoutLine: {'line': b'[ 12%] \x1b[34m\x1b[1mGenerating C++ type support for eProsima Fast-RTPS\x1b[0m\n'}
+[2.942914] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_generator_c\x1b[0m\n'}
+[2.966981] (tramolaa) StdoutLine: {'line': b'[ 17%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_generator_c.dir/rosidl_generator_c/tramolaa/msg/detail/detection__functions.c.o\x1b[0m\n'}
+[2.967532] (tramolaa) StdoutLine: {'line': b'[ 17%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_generator_c.dir/rosidl_generator_c/tramolaa/msg/detail/detection_list__functions.c.o\x1b[0m\n'}
+[3.011829] (-) TimerEvent: {}
+[3.046998] (tramolaa) StdoutLine: {'line': b'[ 20%] \x1b[32m\x1b[1mLinking C shared library libtramolaa__rosidl_generator_c.so\x1b[0m\n'}
+[3.112010] (-) TimerEvent: {}
+[3.128573] (tramolaa) StdoutLine: {'line': b'[ 20%] Built target tramolaa__rosidl_generator_c\n'}
+[3.154016] (tramolaa) StdoutLine: {'line': b'[ 28%] \x1b[34m\x1b[1mGenerating C type support dispatch for ROS interfaces\x1b[0m\n'}
+[3.154518] (tramolaa) StdoutLine: {'line': b'[ 28%] \x1b[34m\x1b[1mGenerating C introspection for ROS interfaces\x1b[0m\n'}
+[3.154720] (tramolaa) StdoutLine: {'line': b'[ 28%] \x1b[34m\x1b[1mGenerating C type support for eProsima Fast-RTPS\x1b[0m\n'}
+[3.212173] (-) TimerEvent: {}
+[3.312739] (-) TimerEvent: {}
+[3.413290] (-) TimerEvent: {}
+[3.462265] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_cpp\x1b[0m\n'}
+[3.462832] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_fastrtps_cpp\x1b[0m\n'}
+[3.478708] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_introspection_cpp\x1b[0m\n'}
+[3.490585] (tramolaa) StdoutLine: {'line': b'[ 35%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/tramolaa/msg/detail/dds_fastrtps/detection_list__type_support.cpp.o\x1b[0m\n'}
+[3.491091] (tramolaa) StdoutLine: {'line': b'[ 35%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/tramolaa/msg/detection_list__type_support.cpp.o\x1b[0m\n'}
+[3.491571] (tramolaa) StdoutLine: {'line': b'[ 35%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/tramolaa/msg/detection__type_support.cpp.o\x1b[0m\n'}
+[3.492643] (tramolaa) StdoutLine: {'line': b'[ 38%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/tramolaa/msg/detail/dds_fastrtps/detection__type_support.cpp.o\x1b[0m\n'}
+[3.511231] (tramolaa) StdoutLine: {'line': b'[ 43%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/tramolaa/msg/detail/detection__type_support.cpp.o\x1b[0m\n'}
+[3.511796] (tramolaa) StdoutLine: {'line': b'[ 43%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/tramolaa/msg/detail/detection_list__type_support.cpp.o\x1b[0m\n'}
+[3.513395] (-) TimerEvent: {}
+[3.615641] (-) TimerEvent: {}
+[3.668082] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_c\x1b[0m\n'}
+[3.698304] (tramolaa) StdoutLine: {'line': b'[ 46%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_c.dir/rosidl_typesupport_c/tramolaa/msg/detection__type_support.cpp.o\x1b[0m\n'}
+[3.707953] (tramolaa) StdoutLine: {'line': b'[ 48%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_c.dir/rosidl_typesupport_c/tramolaa/msg/detection_list__type_support.cpp.o\x1b[0m\n'}
+[3.712109] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_fastrtps_c\x1b[0m\n'}
+[3.715760] (-) TimerEvent: {}
+[3.717999] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_introspection_c\x1b[0m\n'}
+[3.750282] (tramolaa) StdoutLine: {'line': b'[ 53%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/tramolaa/msg/detail/detection__type_support.c.o\x1b[0m\n'}
+[3.750959] (tramolaa) StdoutLine: {'line': b'[ 56%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/tramolaa/msg/detail/detection_list__type_support_c.cpp.o\x1b[0m\n'}
+[3.751171] (tramolaa) StdoutLine: {'line': b'[ 58%] \x1b[32mBuilding CXX object CMakeFiles/tramolaa__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/tramolaa/msg/detail/detection__type_support_c.cpp.o\x1b[0m\n'}
+[3.751337] (tramolaa) StdoutLine: {'line': b'[ 58%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/tramolaa/msg/detail/detection_list__type_support.c.o\x1b[0m\n'}
+[3.783187] (tramolaa) StdoutLine: {'line': b'[ 61%] \x1b[32m\x1b[1mLinking CXX shared library libtramolaa__rosidl_typesupport_c.so\x1b[0m\n'}
+[3.815959] (-) TimerEvent: {}
+[3.834296] (tramolaa) StdoutLine: {'line': b'[ 64%] \x1b[32m\x1b[1mLinking C shared library libtramolaa__rosidl_typesupport_introspection_c.so\x1b[0m\n'}
+[3.882281] (tramolaa) StdoutLine: {'line': b'[ 64%] Built target tramolaa__rosidl_typesupport_c\n'}
+[3.916879] (-) TimerEvent: {}
+[3.920656] (tramolaa) StdoutLine: {'line': b'[ 64%] Built target tramolaa__rosidl_typesupport_introspection_c\n'}
+[4.017128] (-) TimerEvent: {}
+[4.035514] (tramolaa) StdoutLine: {'line': b'[ 66%] \x1b[32m\x1b[1mLinking CXX shared library libtramolaa__rosidl_typesupport_cpp.so\x1b[0m\n'}
+[4.117357] (-) TimerEvent: {}
+[4.138292] (tramolaa) StdoutLine: {'line': b'[ 66%] Built target tramolaa__rosidl_typesupport_cpp\n'}
+[4.217693] (-) TimerEvent: {}
+[4.279966] (tramolaa) StdoutLine: {'line': b'[ 69%] \x1b[32m\x1b[1mLinking CXX shared library libtramolaa__rosidl_typesupport_introspection_cpp.so\x1b[0m\n'}
+[4.306624] (tramolaa) StdoutLine: {'line': b'[ 71%] \x1b[32m\x1b[1mLinking CXX shared library libtramolaa__rosidl_typesupport_fastrtps_cpp.so\x1b[0m\n'}
+[4.317886] (-) TimerEvent: {}
+[4.359474] (tramolaa) StdoutLine: {'line': b'[ 74%] \x1b[32m\x1b[1mLinking CXX shared library libtramolaa__rosidl_typesupport_fastrtps_c.so\x1b[0m\n'}
+[4.418465] (-) TimerEvent: {}
+[4.520519] (-) TimerEvent: {}
+[4.554735] (tramolaa) StdoutLine: {'line': b'[ 74%] Built target tramolaa__rosidl_typesupport_introspection_cpp\n'}
+[4.570305] (tramolaa) StdoutLine: {'line': b'[ 74%] Built target tramolaa__rosidl_typesupport_fastrtps_cpp\n'}
+[4.617928] (tramolaa) StdoutLine: {'line': b'[ 74%] Built target tramolaa__rosidl_typesupport_fastrtps_c\n'}
+[4.620858] (-) TimerEvent: {}
+[4.661336] (tramolaa) StdoutLine: {'line': b'[ 74%] Built target tramolaa\n'}
+[4.707589] (tramolaa) StdoutLine: {'line': b'[ 76%] \x1b[34m\x1b[1mGenerating Python code for ROS interfaces\x1b[0m\n'}
+[4.720989] (-) TimerEvent: {}
+[4.821503] (-) TimerEvent: {}
+[4.922067] (-) TimerEvent: {}
+[5.022735] (-) TimerEvent: {}
+[5.123383] (-) TimerEvent: {}
+[5.223945] (-) TimerEvent: {}
+[5.324561] (-) TimerEvent: {}
+[5.341710] (tramolaa) StdoutLine: {'line': b'[ 76%] Built target tramolaa__py\n'}
+[5.363398] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_generator_py\x1b[0m\n'}
+[5.389510] (tramolaa) StdoutLine: {'line': b'[ 82%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_generator_py.dir/rosidl_generator_py/tramolaa/msg/_detection_s.c.o\x1b[0m\n'}
+[5.390028] (tramolaa) StdoutLine: {'line': b'[ 82%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_generator_py.dir/rosidl_generator_py/tramolaa/msg/_detection_list_s.c.o\x1b[0m\n'}
+[5.424761] (-) TimerEvent: {}
+[5.525630] (-) TimerEvent: {}
+[5.551768] (tramolaa) StdoutLine: {'line': b'[ 84%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/tramolaa/libtramolaa__rosidl_generator_py.so\x1b[0m\n'}
+[5.624063] (tramolaa) StdoutLine: {'line': b'[ 84%] Built target tramolaa__rosidl_generator_py\n'}
+[5.625622] (-) TimerEvent: {}
+[5.646879] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_fastrtps_c__pyext\x1b[0m\n'}
+[5.647309] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_introspection_c__pyext\x1b[0m\n'}
+[5.647488] (tramolaa) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target tramolaa__rosidl_typesupport_c__pyext\x1b[0m\n'}
+[5.673279] (tramolaa) StdoutLine: {'line': b'[ 92%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/tramolaa/_tramolaa_s.ep.rosidl_typesupport_introspection_c.c.o\x1b[0m\n'}
+[5.673829] (tramolaa) StdoutLine: {'line': b'[ 92%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/tramolaa/_tramolaa_s.ep.rosidl_typesupport_fastrtps_c.c.o\x1b[0m\n'}
+[5.674022] (tramolaa) StdoutLine: {'line': b'[ 92%] \x1b[32mBuilding C object CMakeFiles/tramolaa__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/tramolaa/_tramolaa_s.ep.rosidl_typesupport_c.c.o\x1b[0m\n'}
+[5.725919] (-) TimerEvent: {}
+[5.823622] (tramolaa) StdoutLine: {'line': b'[ 94%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/tramolaa/tramolaa_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[5.824227] (tramolaa) StdoutLine: {'line': b'[ 97%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/tramolaa/tramolaa_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[5.825970] (-) TimerEvent: {}
+[5.830837] (tramolaa) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/tramolaa/tramolaa_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[5.896178] (tramolaa) StdoutLine: {'line': b'[100%] Built target tramolaa__rosidl_typesupport_introspection_c__pyext\n'}
+[5.896775] (tramolaa) StdoutLine: {'line': b'[100%] Built target tramolaa__rosidl_typesupport_fastrtps_c__pyext\n'}
+[5.903589] (tramolaa) StdoutLine: {'line': b'[100%] Built target tramolaa__rosidl_typesupport_c__pyext\n'}
+[5.926205] (-) TimerEvent: {}
+[5.932618] (tramolaa) CommandEnded: {'returncode': 0}
+[5.934065] (tramolaa) JobProgress: {'identifier': 'tramolaa', 'progress': 'install'}
+[5.953392] (tramolaa) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/efe/Desktop/ros2_ws/build/tramolaa'], 'cwd': '/home/efe/Desktop/ros2_ws/build/tramolaa', 'env': OrderedDict([('GZ_SIM_SYSTEM_PLUGIN_PATH', '/home/efe/vrx_ws/install/lib'), ('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('CUDACXX', '/usr/local/cuda-12.6/bin/nvcc'), ('GZ_SIM_RESOURCE_PATH', '/home/efe/Desktop/worlds:/home/efe/Desktop/worlds:/home/efe/vrx_ws/install/share/wamv_description/models:/home/efe/vrx_ws/install/share/vrx_gz/models/tmp:/home/efe/vrx_ws/install/share/vrx_gz/models:/home/efe/vrx_ws/install/share/vrx_gz/worlds/2023_practice:/home/efe/vrx_ws/install/share/vrx_gz/worlds:/home/efe/vrx_ws/install/share/vrx_gazebo/models:/home/efe/vrx_ws/install/share/'), ('USER', 'efe'), ('LC_TIME', 'tr_TR.UTF-8'), ('FONTCONFIG_PATH', '/etc/fonts'), ('GIO_MODULE_DIR', '/home/efe/snap/code/common/.cache/gio-modules'), ('XDG_SESSION_TYPE', 'x11'), ('GIT_ASKPASS', '/snap/code/181/usr/share/code/resources/app/extensions/git/dist/askpass.sh'), ('GTK_EXE_PREFIX_VSCODE_SNAP_ORIG', ''), ('GDK_BACKEND_VSCODE_SNAP_ORIG', ''), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/efe/Desktop/ros2_ws/install/tramolaa/lib:/home/efe/vrx_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/efe'), ('CHROME_DESKTOP', 'code.desktop'), ('LOCPATH_VSCODE_SNAP_ORIG', ''), ('TERM_PROGRAM_VERSION', '1.96.4'), ('DESKTOP_SESSION', 'ubuntu'), ('GTK_PATH', '/snap/code/181/usr/lib/x86_64-linux-gnu/gtk-3.0'), ('XDG_DATA_HOME_VSCODE_SNAP_ORIG', ''), ('GTK_IM_MODULE_FILE', '/home/efe/snap/code/common/.cache/immodules/immodules.cache'), ('GIO_LAUNCHED_DESKTOP_FILE', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('GSETTINGS_SCHEMA_DIR_VSCODE_SNAP_ORIG', ''), ('VSCODE_GIT_ASKPASS_MAIN', '/snap/code/181/usr/share/code/resources/app/extensions/git/dist/askpass-main.js'), ('LC_MONETARY', 'tr_TR.UTF-8'), ('VSCODE_GIT_ASKPASS_NODE', '/snap/code/181/usr/share/code/code'), ('MANAGERPID', '1600'), ('SYSTEMD_EXEC_PID', '1906'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2631'), ('COLCON_PREFIX_PATH', '/home/efe/Desktop/ros2_ws/install:/home/efe/vrx_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'efe'), ('JOURNAL_STREAM', '8:16252'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_CONFIG_DIRS_VSCODE_SNAP_ORIG', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_SESSION_CLASS', 'user'), ('XDG_DATA_DIRS_VSCODE_SNAP_ORIG', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('USERNAME', 'efe'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/usr/local/cuda-12.6/bin:/home/efe/.local/bin:/usr/local/cuda-12.6/bin:/opt/ros/humble/bin:/home/efe/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/efe-IdeaPad-5-Pro-16ACH6:@/tmp/.ICE-unix/1879,unix/efe-IdeaPad-5-Pro-16ACH6:/tmp/.ICE-unix/1879'), ('GTK_EXE_PREFIX', '/snap/code/181/usr'), ('INVOCATION_ID', 'd7ffaa7be8154269bcf16c49283e7bbc'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'tr_TR.UTF-8'), ('BAMF_DESKTOP_FILE_HINT', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'x11'), ('DISPLAY', ':1'), ('LOCPATH', '/snap/code/181/usr/lib/locale'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'Unity'), ('LC_TELEPHONE', 'tr_TR.UTF-8'), ('GIO_MODULE_DIR_VSCODE_SNAP_ORIG', ''), ('XDG_DATA_HOME', '/home/efe/snap/code/181/.local/share'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-61429622d0.sock'), ('TERM_PROGRAM', 'vscode'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('GSETTINGS_SCHEMA_DIR', '/home/efe/snap/code/181/.local/share/glib-2.0/schemas'), ('AMENT_PREFIX_PATH', '/home/efe/Desktop/ros2_ws/install/tramolaa:/home/efe/Desktop/ros2_ws/install/tramola:/home/efe/vrx_ws/install:/opt/ros/humble'), ('ORIGINAL_XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('SHELL', '/bin/bash'), ('LC_NAME', 'tr_TR.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GTK_PATH_VSCODE_SNAP_ORIG', ''), ('FONTCONFIG_FILE', '/etc/fonts/fonts.conf'), ('GTK_IM_MODULE_FILE_VSCODE_SNAP_ORIG', ''), ('LC_MEASUREMENT', 'tr_TR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'tr_TR.UTF-8'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/efe/Desktop/ros2_ws/build/tramolaa'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/home/efe/snap/code/181/.local/share:/home/efe/snap/code/181:/snap/code/181/usr/share:/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages:/home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages:/home/efe/vrx_ws/install/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'tr_TR.UTF-8'), ('LC_PAPER', 'tr_TR.UTF-8'), ('COLCON', '1'), ('CUDA_PATH', '/usr/local/cuda-12.6'), ('CMAKE_PREFIX_PATH', '/home/efe/Desktop/ros2_ws/install/tramolaa:/home/efe/vrx_ws/install:/home/efe/Desktop/ros2_ws/install/tramola:/opt/ros/humble')]), 'shell': False}
+[5.970677] (tramolaa) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[5.971048] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/ament_index/resource_index/rosidl_interfaces/tramolaa\n'}
+[5.971154] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa\n'}
+[5.971259] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg\n'}
+[5.971332] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detection_list.h\n'}
+[5.971410] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail\n'}
+[5.971487] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__struct.h\n'}
+[5.971570] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__type_support.h\n'}
+[5.971764] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__struct.h\n'}
+[5.972027] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__functions.c\n'}
+[5.972292] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__functions.c\n'}
+[5.972560] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__functions.h\n'}
+[5.972823] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__functions.h\n'}
+[5.973073] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__type_support.h\n'}
+[5.973294] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detection.h\n'}
+[5.973521] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/rosidl_generator_c__visibility_control.h\n'}
+[5.973647] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/library_path.sh\n'}
+[5.973817] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/library_path.dsv\n'}
+[5.975350] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_generator_c.so\n'}
+[5.975512] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_generator_c.so" to ""\n'}
+[5.975695] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa\n'}
+[5.975851] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg\n'}
+[5.975941] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail\n'}
+[5.976052] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__rosidl_typesupport_fastrtps_c.h\n'}
+[5.976134] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__rosidl_typesupport_fastrtps_c.h\n'}
+[5.976273] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[5.976666] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_fastrtps_c.so\n'}
+[5.977290] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_fastrtps_c.so" to ""\n'}
+[5.977474] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa\n'}
+[5.977645] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg\n'}
+[5.977811] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detection.hpp\n'}
+[5.977983] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detection_list.hpp\n'}
+[5.978300] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail\n'}
+[5.978502] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__type_support.hpp\n'}
+[5.978784] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__builder.hpp\n'}
+[5.979030] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__traits.hpp\n'}
+[5.979267] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__struct.hpp\n'}
+[5.979639] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__builder.hpp\n'}
+[5.979810] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__traits.hpp\n'}
+[5.980024] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__type_support.hpp\n'}
+[5.980351] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__struct.hpp\n'}
+[5.980515] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[5.980599] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa\n'}
+[5.980690] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg\n'}
+[5.980793] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail\n'}
+[5.980905] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[5.981024] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/dds_fastrtps\n'}
+[5.981134] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[5.981336] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[5.981538] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_fastrtps_cpp.so\n'}
+[5.982084] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_fastrtps_cpp.so" to ""\n'}
+[5.982171] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa\n'}
+[5.982255] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg\n'}
+[5.982331] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail\n'}
+[5.982390] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__rosidl_typesupport_introspection_c.h\n'}
+[5.982547] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__type_support.c\n'}
+[5.982823] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__rosidl_typesupport_introspection_c.h\n'}
+[5.983070] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__type_support.c\n'}
+[5.983297] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[5.983561] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_introspection_c.so\n'}
+[5.984109] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_introspection_c.so" to ""\n'}
+[5.984332] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_c.so\n'}
+[5.984861] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_c.so" to ""\n'}
+[5.984981] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa\n'}
+[5.985216] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg\n'}
+[5.985364] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail\n'}
+[5.985477] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__rosidl_typesupport_introspection_cpp.hpp\n'}
+[5.985610] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection__type_support.cpp\n'}
+[5.985826] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__type_support.cpp\n'}
+[5.986093] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/include/tramolaa/tramolaa/msg/detail/detection_list__rosidl_typesupport_introspection_cpp.hpp\n'}
+[5.986717] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_introspection_cpp.so\n'}
+[5.987460] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_introspection_cpp.so" to ""\n'}
+[5.987666] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_cpp.so\n'}
+[5.988094] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_typesupport_cpp.so" to ""\n'}
+[5.988256] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/pythonpath.sh\n'}
+[5.988382] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/pythonpath.dsv\n'}
+[5.988721] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa-0.0.0-py3.10.egg-info\n'}
+[5.988836] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa-0.0.0-py3.10.egg-info/PKG-INFO\n'}
+[5.989267] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa-0.0.0-py3.10.egg-info/dependency_links.txt\n'}
+[5.989710] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa-0.0.0-py3.10.egg-info/top_level.txt\n'}
+[5.990291] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa-0.0.0-py3.10.egg-info/SOURCES.txt\n'}
+[5.990619] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa\n'}
+[5.990898] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/_tramolaa_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[5.991240] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/_tramolaa_s.ep.rosidl_typesupport_c.c\n'}
+[5.991795] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg\n'}
+[5.991899] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/_detection.py\n'}
+[5.992063] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/_detection_list_s.c\n'}
+[5.992420] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/_detection_list.py\n'}
+[5.992909] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/__init__.py\n'}
+[5.993086] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/_detection_s.c\n'}
+[5.993372] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[5.993689] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/__init__.py\n'}
+[5.993916] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/libtramolaa__rosidl_generator_py.so\n'}
+[5.994221] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[5.994593] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/_tramolaa_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[5.994858] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.026319] (-) TimerEvent: {}
+[6.054282] (tramolaa) StdoutLine: {'line': b"Listing '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa'...\n"}
+[6.054803] (tramolaa) StdoutLine: {'line': b"Compiling '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/__init__.py'...\n"}
+[6.055113] (tramolaa) StdoutLine: {'line': b"Listing '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg'...\n"}
+[6.055274] (tramolaa) StdoutLine: {'line': b"Compiling '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/__init__.py'...\n"}
+[6.055467] (tramolaa) StdoutLine: {'line': b"Compiling '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/_detection.py'...\n"}
+[6.055610] (tramolaa) StdoutLine: {'line': b"Compiling '/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/msg/_detection_list.py'...\n"}
+[6.072243] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.072948] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[6.073319] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.074506] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[6.074677] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.074898] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/local/lib/python3.10/dist-packages/tramolaa/tramolaa_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so" to ""\n'}
+[6.075119] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_generator_py.so\n'}
+[6.075725] (tramolaa) StdoutLine: {'line': b'-- Set runtime path of "/home/efe/Desktop/ros2_ws/install/tramolaa/lib/libtramolaa__rosidl_generator_py.so" to ""\n'}
+[6.075870] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/msg/Detection.idl\n'}
+[6.075954] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/msg/DetectionList.idl\n'}
+[6.076122] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/msg/Detection.msg\n'}
+[6.076207] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/msg/DetectionList.msg\n'}
+[6.076499] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/ament_index/resource_index/package_run_dependencies/tramolaa\n'}
+[6.076698] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/ament_index/resource_index/parent_prefix_path/tramolaa\n'}
+[6.076994] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/ament_prefix_path.sh\n'}
+[6.077100] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/ament_prefix_path.dsv\n'}
+[6.077440] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/path.sh\n'}
+[6.077613] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/environment/path.dsv\n'}
+[6.077962] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/local_setup.bash\n'}
+[6.078111] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/local_setup.sh\n'}
+[6.078217] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/local_setup.zsh\n'}
+[6.078321] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/local_setup.dsv\n'}
+[6.078622] (tramolaa) StdoutLine: {'line': b'-- Installing: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/package.dsv\n'}
+[6.078994] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/ament_index/resource_index/packages/tramolaa\n'}
+[6.079177] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_generator_cExport.cmake\n'}
+[6.079315] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_generator_cExport-noconfig.cmake\n'}
+[6.079463] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[6.079746] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[6.079854] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_generator_cppExport.cmake\n'}
+[6.079986] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[6.080072] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[6.080208] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_introspection_cExport.cmake\n'}
+[6.080335] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[6.080473] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_cExport.cmake\n'}
+[6.080619] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[6.080729] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[6.080803] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[6.080927] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_cppExport.cmake\n'}
+[6.081039] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaa__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[6.081171] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_generator_pyExport.cmake\n'}
+[6.081317] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/export_tramolaa__rosidl_generator_pyExport-noconfig.cmake\n'}
+[6.081416] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/rosidl_cmake-extras.cmake\n'}
+[6.081507] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[6.081750] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[6.081872] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[6.081970] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[6.082044] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[6.082115] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[6.082185] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaaConfig.cmake\n'}
+[6.082253] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/cmake/tramolaaConfig-version.cmake\n'}
+[6.082324] (tramolaa) StdoutLine: {'line': b'-- Up-to-date: /home/efe/Desktop/ros2_ws/install/tramolaa/share/tramolaa/package.xml\n'}
+[6.086858] (tramolaa) CommandEnded: {'returncode': 0}
+[6.111965] (tramolaa) JobEnded: {'identifier': 'tramolaa', 'rc': 0}
+[6.113674] (-) EventReactorShutdown: {}

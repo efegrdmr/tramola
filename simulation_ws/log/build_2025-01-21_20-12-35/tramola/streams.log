@@ -1,0 +1,48 @@
+[0.514s] Invoking command in '/home/efe/Desktop/ros2_ws/src/tramola': PYTHONPATH=/home/efe/Desktop/ros2_ws/build/tramola/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/tramola build --build-base /home/efe/Desktop/ros2_ws/build/tramola/build install --record /home/efe/Desktop/ros2_ws/build/tramola/install.log --single-version-externally-managed install_data
+[0.700s] running egg_info
+[0.700s] creating ../../build/tramola/tramola.egg-info
+[0.701s] writing ../../build/tramola/tramola.egg-info/PKG-INFO
+[0.701s] writing dependency_links to ../../build/tramola/tramola.egg-info/dependency_links.txt
+[0.701s] writing entry points to ../../build/tramola/tramola.egg-info/entry_points.txt
+[0.701s] writing requirements to ../../build/tramola/tramola.egg-info/requires.txt
+[0.701s] writing top-level names to ../../build/tramola/tramola.egg-info/top_level.txt
+[0.701s] writing manifest file '../../build/tramola/tramola.egg-info/SOURCES.txt'
+[0.703s] reading manifest file '../../build/tramola/tramola.egg-info/SOURCES.txt'
+[0.703s] adding license file 'LICENSE'
+[0.703s] writing manifest file '../../build/tramola/tramola.egg-info/SOURCES.txt'
+[0.703s] running build
+[0.704s] running build_py
+[0.704s] creating /home/efe/Desktop/ros2_ws/build/tramola/build
+[0.704s] creating /home/efe/Desktop/ros2_ws/build/tramola/build/lib
+[0.704s] creating /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola
+[0.704s] copying tramola/vision.py -> /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola
+[0.704s] copying tramola/__init__.py -> /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola
+[0.704s] copying tramola/video.py -> /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola
+[0.704s] copying tramola/followPath.py -> /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola
+[0.704s] copying tramola/thruster.py -> /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola
+[0.704s] running install
+[0.704s] running install_lib
+[0.705s] creating /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola
+[0.705s] copying /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola/vision.py -> /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola
+[0.705s] copying /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola/__init__.py -> /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola
+[0.705s] copying /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola/video.py -> /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola
+[0.705s] copying /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola/followPath.py -> /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola
+[0.705s] copying /home/efe/Desktop/ros2_ws/build/tramola/build/lib/tramola/thruster.py -> /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola
+[0.706s] byte-compiling /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola/vision.py to vision.cpython-310.pyc
+[0.706s] byte-compiling /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola/__init__.py to __init__.cpython-310.pyc
+[0.707s] byte-compiling /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola/video.py to video.cpython-310.pyc
+[0.707s] byte-compiling /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola/followPath.py to followPath.cpython-310.pyc
+[0.708s] byte-compiling /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola/thruster.py to thruster.cpython-310.pyc
+[0.708s] running install_data
+[0.708s] creating /home/efe/Desktop/ros2_ws/install/tramola/share/ament_index
+[0.708s] creating /home/efe/Desktop/ros2_ws/install/tramola/share/ament_index/resource_index
+[0.708s] creating /home/efe/Desktop/ros2_ws/install/tramola/share/ament_index/resource_index/packages
+[0.708s] copying resource/tramola -> /home/efe/Desktop/ros2_ws/install/tramola/share/ament_index/resource_index/packages
+[0.708s] copying package.xml -> /home/efe/Desktop/ros2_ws/install/tramola/share/tramola
+[0.709s] running install_egg_info
+[0.710s] Copying ../../build/tramola/tramola.egg-info to /home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages/tramola-0.0.0-py3.10.egg-info
+[0.711s] running install_scripts
+[0.729s] Installing followPath script to /home/efe/Desktop/ros2_ws/install/tramola/lib/tramola
+[0.729s] Installing video script to /home/efe/Desktop/ros2_ws/install/tramola/lib/tramola
+[0.729s] writing list of installed files to '/home/efe/Desktop/ros2_ws/build/tramola/install.log'
+[0.755s] Invoked command in '/home/efe/Desktop/ros2_ws/src/tramola' returned '0': PYTHONPATH=/home/efe/Desktop/ros2_ws/build/tramola/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/efe/Desktop/ros2_ws/install/tramola/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/tramola build --build-base /home/efe/Desktop/ros2_ws/build/tramola/build install --record /home/efe/Desktop/ros2_ws/build/tramola/install.log --single-version-externally-managed install_data

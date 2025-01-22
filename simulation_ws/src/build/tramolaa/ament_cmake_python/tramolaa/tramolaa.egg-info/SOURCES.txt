@@ -1,0 +1,9 @@
+setup.py
+tramolaa/__init__.py
+tramolaa.egg-info/PKG-INFO
+tramolaa.egg-info/SOURCES.txt
+tramolaa.egg-info/dependency_links.txt
+tramolaa.egg-info/top_level.txt
+tramolaa/msg/__init__.py
+tramolaa/msg/_detection.py
+tramolaa/msg/_detection_list.py

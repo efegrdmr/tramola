@@ -1,0 +1,4 @@
+source;share/tramolaa/local_setup.bash
+source;share/tramolaa/local_setup.dsv
+source;share/tramolaa/local_setup.sh
+source;share/tramolaa/local_setup.zsh

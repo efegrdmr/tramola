@@ -1,0 +1,46 @@
+running egg_info
+creating ../build/tramola/tramola.egg-info
+writing ../build/tramola/tramola.egg-info/PKG-INFO
+writing dependency_links to ../build/tramola/tramola.egg-info/dependency_links.txt
+writing entry points to ../build/tramola/tramola.egg-info/entry_points.txt
+writing requirements to ../build/tramola/tramola.egg-info/requires.txt
+writing top-level names to ../build/tramola/tramola.egg-info/top_level.txt
+writing manifest file '../build/tramola/tramola.egg-info/SOURCES.txt'
+reading manifest file '../build/tramola/tramola.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file '../build/tramola/tramola.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/efe/Desktop/ros2_ws/src/build/tramola/build
+creating /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib
+creating /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola
+copying tramola/vision.py -> /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola
+copying tramola/__init__.py -> /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola
+copying tramola/video.py -> /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola
+copying tramola/followPath.py -> /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola
+copying tramola/thruster.py -> /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola
+running install
+running install_lib
+creating /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola
+copying /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola/vision.py -> /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola
+copying /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola/__init__.py -> /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola
+copying /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola/video.py -> /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola
+copying /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola/followPath.py -> /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola
+copying /home/efe/Desktop/ros2_ws/src/build/tramola/build/lib/tramola/thruster.py -> /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola
+byte-compiling /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola/vision.py to vision.cpython-310.pyc
+byte-compiling /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola/__init__.py to __init__.cpython-310.pyc
+byte-compiling /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola/video.py to video.cpython-310.pyc
+byte-compiling /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola/followPath.py to followPath.cpython-310.pyc
+byte-compiling /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola/thruster.py to thruster.cpython-310.pyc
+running install_data
+creating /home/efe/Desktop/ros2_ws/src/install/tramola/share/ament_index
+creating /home/efe/Desktop/ros2_ws/src/install/tramola/share/ament_index/resource_index
+creating /home/efe/Desktop/ros2_ws/src/install/tramola/share/ament_index/resource_index/packages
+copying resource/tramola -> /home/efe/Desktop/ros2_ws/src/install/tramola/share/ament_index/resource_index/packages
+copying package.xml -> /home/efe/Desktop/ros2_ws/src/install/tramola/share/tramola
+running install_egg_info
+Copying ../build/tramola/tramola.egg-info to /home/efe/Desktop/ros2_ws/src/install/tramola/lib/python3.10/site-packages/tramola-0.0.0-py3.10.egg-info
+running install_scripts
+Installing followPath script to /home/efe/Desktop/ros2_ws/src/install/tramola/lib/tramola
+Installing video script to /home/efe/Desktop/ros2_ws/src/install/tramola/lib/tramola
+writing list of installed files to '/home/efe/Desktop/ros2_ws/src/build/tramola/install.log'

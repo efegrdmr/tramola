@@ -1,0 +1,233 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-c420a4a4148ffda14295.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				},
+				{
+					"build" : "tramolaa__py",
+					"jsonFile" : "directory-tramolaa__py-480c583434d03327040f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "/home/efe/Desktop/ros2_ws/src/build/tramolaa/tramolaa__py",
+					"targetIndexes" : 
+					[
+						4
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1
+					],
+					"name" : "tramolaa",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_build_tramolaa_egg::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_build_tramolaa_egg-288376121abd49cce374.json",
+					"name" : "ament_cmake_python_build_tramolaa_egg",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_copy_tramolaa::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_copy_tramolaa-00a7acdcc6d63d2ba5b4.json",
+					"name" : "ament_cmake_python_copy_tramolaa",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa-43a58ac6253fceb26080.json",
+					"name" : "tramolaa",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__cpp-c509f455d5e891509e4b.json",
+					"name" : "tramolaa__cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "tramolaa__py::@4ad5d360b910b4616b55",
+					"jsonFile" : "target-tramolaa__py-a5e592d9fed9d736c27c.json",
+					"name" : "tramolaa__py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_generator_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_generator_c-411143ecf1dca83a259e.json",
+					"name" : "tramolaa__rosidl_generator_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_generator_py::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_generator_py-a913043002a83266574d.json",
+					"name" : "tramolaa__rosidl_generator_py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_c-1728e5707f238416ec45.json",
+					"name" : "tramolaa__rosidl_typesupport_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_c__pyext-097c2b6d8fee5bae9bd4.json",
+					"name" : "tramolaa__rosidl_typesupport_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_cpp-aa31656e1bc58de48ff1.json",
+					"name" : "tramolaa__rosidl_typesupport_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_fastrtps_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_fastrtps_c-902dfaa0edfe87ff01f7.json",
+					"name" : "tramolaa__rosidl_typesupport_fastrtps_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_fastrtps_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_fastrtps_c__pyext-bf7651168c17b1bf74db.json",
+					"name" : "tramolaa__rosidl_typesupport_fastrtps_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_fastrtps_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_fastrtps_cpp-e3178c92caf64d495d66.json",
+					"name" : "tramolaa__rosidl_typesupport_fastrtps_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_introspection_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_introspection_c-ced662abe4860b10da20.json",
+					"name" : "tramolaa__rosidl_typesupport_introspection_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_introspection_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_introspection_c__pyext-f1808e9adbd945d6df84.json",
+					"name" : "tramolaa__rosidl_typesupport_introspection_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa__rosidl_typesupport_introspection_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa__rosidl_typesupport_introspection_cpp-e90923559ee2f8f2cc24.json",
+					"name" : "tramolaa__rosidl_typesupport_introspection_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tramolaa_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tramolaa_uninstall-5e6007b9c15db08bba00.json",
+					"name" : "tramolaa_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-c881b5749228351f57bd.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/efe/Desktop/ros2_ws/src/build/tramolaa",
+		"source" : "/home/efe/Desktop/ros2_ws/src/tramolaa"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

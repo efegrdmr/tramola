@@ -1,0 +1,13 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from tramolaa/msg/DetectionList.msg
+// generated code does not contain a copyright notice
+
+#include "tramolaa/msg/Detection.idl"
+
+module tramolaa {
+  module msg {
+    struct DetectionList {
+      sequence<tramolaa::msg::Detection> objects;
+    };
+  };
+};
