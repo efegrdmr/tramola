@@ -30,17 +30,26 @@ class DetectionListenerNode(Node):
         self.thrusters.setSpeedRight(1000)
 
     def detection_callback(self, msg):
-        # 0 blue buoy
+        # 0 green buoy
         # 1 red buoy
-        nearestBlue = None
+        # 2 yellow buoy
+        nearestGreen = None
         nearestRed = None
         for detection in msg.detections:
             if detection.confidence < 0.3:
                 self.get_logger().warn(f"Low confidence: {detection.confidence}. Ignoring detection.")
                 continue
+            
+            # do not recognize if the object is too far away
+            if (detection.class_id == 0 or detection.class_id ==1) and detection.width < 0.05:
+                self.get_logger().warn("Object is too far away")
+            elif detection.class_id == 2 and detection.width < 0.0025:
+                self.get_logger().warn("Object is too far away")
+                
+
 
             if detection.class_id == 0:
-                if nearestBlue is None or nearestBlue.width < detection.width:
+                if nearestGreen is None or nearestBlue.width < detection.width:
                     nearestBlue = detection
 
             elif detection.class_id == 1:

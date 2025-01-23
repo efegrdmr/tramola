@@ -65,6 +65,8 @@ class ImageViewer(Node):
         try:
             # Convert ROS image to OpenCV format
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            if self.recording:
+                self.video_writer.write(cv_image)
             if self.detecting:
                 img_height, img_width, _ = cv_image.shape
                 for detection in self.detections:
@@ -93,8 +95,7 @@ class ImageViewer(Node):
         except Exception as e:
             self.get_logger().error(f"Error displaying image: {str(e)}")
         
-        if self.recording:
-            self.video_writer.write(cv_image)
+        
 
 
     def handle_keypress(self, key):

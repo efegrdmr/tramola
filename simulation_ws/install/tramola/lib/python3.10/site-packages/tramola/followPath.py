@@ -1,7 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from tramolaa.msg import DetectionList  # Adjust with the correct package
-from tramolaa.msg import Detection
+from tramolaa.msg import DetectionList, Detection
 from tramola.thruster import Thrusters
 
 class DetectionListenerNode(Node):
