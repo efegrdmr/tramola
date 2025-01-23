@@ -35,6 +35,7 @@ class DetectionListenerNode(Node):
         # 2 yellow buoy
         nearestGreen = None
         nearestRed = None
+        nearestYellow = None
         for detection in msg.detections:
             if detection.confidence < 0.3:
                 self.get_logger().warn(f"Low confidence: {detection.confidence}. Ignoring detection.")
@@ -47,35 +48,58 @@ class DetectionListenerNode(Node):
                 self.get_logger().warn("Object is too far away")
                 
 
-
+            # find the closest object
             if detection.class_id == 0:
-                if nearestGreen is None or nearestBlue.width < detection.width:
-                    nearestBlue = detection
+                if nearestGreen is None or nearestGreen.width < detection.width:
+                    nearestGreen = detection
 
             elif detection.class_id == 1:
                 if nearestRed is None or nearestRed.width < detection.width:
                     nearestRed = detection
 
-        if nearestBlue is None and nearestRed is not None:
-            if nearestRed.x_center > 0.3:
-                self.goLeft()
-            else:
-                self.goStraight()
+            elif detection.class_id == 2:
+                if nearestYellow is None or nearestYellow.width < detection.width:
+                    nearestYellow = detection
 
-        elif nearestRed is None and nearestBlue is not None:
-            if nearestBlue.x_center < 0.7:
-                self.goRight()
-            else:
+
+        if nearestYellow is None:
+            if nearestGreen is None and nearestRed is not None:
+                if nearestRed.x_center > 0.3:
+                    self.goRight()
+                else:
+                    self.goStraight()
+
+            elif nearestRed is None and nearestGreen is not None:
+                if nearestGreen.x_center < 0.7:
+                    self.goLeft()
+                else:
+                    self.goStraight()
+            elif nearestRed is None and nearestGreen is None:
                 self.goStraight()
-        elif nearestRed is None and nearestBlue is None:
-            self.goStraight()
+            else:
+                middle = (nearestRed.x_center + nearestGreen.x_center) / 2
+
+                if middle < 0.5:
+                    self.goLeft()
+                else:
+                    self.goRight()
         else:
-            middle = (nearestRed.x_center + nearestBlue.x_center) / 2
-
-            if middle < 0.5:
-                self.goLeft()
-            else:
+            if nearestGreen is None and nearestRed is not None:
                 self.goRight()
+            elif nearestRed is None and nearestGreen is not None:
+                self.goLeft()
+            elif nearestRed is None and nearestGreen is None:
+                self.goStraight()
+            else:
+                if abs(nearestGreen.x_center - nearestYellow.x_center) < abs(nearestRed.x_center - nearestYellow.x_center):
+                    middle = (nearestRed.x_center + nearestYellow.x_center) / 2
+                else:
+                    middle = (nearestGreen.x_center + nearestYellow.x_center) / 2
+                
+                if middle < 0.5:
+                    self.goLeft()
+                else:
+                    self.goRight()
 
 
 def main(args=None):
