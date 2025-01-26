@@ -54,7 +54,7 @@ class ImageViewer(Node):
             self.get_logger().info("Starting video recording...")
             self.recording = True
             self.video_writer = cv2.VideoWriter(
-                "/home/efe/Desktop/video_" + str(time.time()) + ".avi",
+                "/home/girayu/video_" + str(time.time()) + ".avi",
                 cv2.VideoWriter_fourcc(*'XVID'),
                 20,
                 (1280, 720)

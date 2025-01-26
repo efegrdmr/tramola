@@ -355,7 +355,7 @@
     
     <!-- The VRX short navigation course -->
     <include>
-      <uri>/home/efe/Desktop/tramola/simulation_ws/models/followPath</uri>
+      <uri>/home/girayu/tramola/simulation_ws/models/followPath</uri>
       <pose>-524 186 0 0 0 -1.44</pose>
     </include>
 
