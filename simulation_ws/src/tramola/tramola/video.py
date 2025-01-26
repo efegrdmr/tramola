@@ -65,8 +65,6 @@ class ImageViewer(Node):
         try:
             # Convert ROS image to OpenCV format
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-            if self.recording:
-                self.video_writer.write(cv_image)
             if self.detecting:
                 img_height, img_width, _ = cv_image.shape
                 for detection in self.detections:
@@ -89,7 +87,9 @@ class ImageViewer(Node):
                     cv2.rectangle(cv_image, (x, y), (x + box_width, y + box_height), color, thickness)
                     text = f"Confidence {detection.confidence:.2f} id {detection.class_id}"
                     cv2.putText(cv_image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-
+           
+            if self.recording:
+                self.video_writer.write(cv_image)
            
             cv2.imshow("Camera View", cv_image)
         except Exception as e:

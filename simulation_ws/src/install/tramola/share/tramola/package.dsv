@@ -1,6 +1,0 @@
-source;share/tramola/hook/pythonpath.ps1
-source;share/tramola/hook/pythonpath.dsv
-source;share/tramola/hook/pythonpath.sh
-source;share/tramola/hook/ament_prefix_path.ps1
-source;share/tramola/hook/ament_prefix_path.dsv
-source;share/tramola/hook/ament_prefix_path.sh
