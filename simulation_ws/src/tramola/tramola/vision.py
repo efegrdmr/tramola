@@ -5,6 +5,7 @@ from tramolaa.msg import Detection, DetectionList  # Replace with your custom me
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 import cv2
+import os
 
 
 class YoloNode(Node):
@@ -12,8 +13,9 @@ class YoloNode(Node):
         super().__init__('yolo_detection_node')
         self.get_logger().info('Init start')
 
+        MODEL_PATH = os.getenv('MODEL_PATH')
         # Load the YOLO model (replace with your model path)
-        self.model = YOLO('/home/efe/best.pt')  # Ensure this path is correct and accessible
+        self.model = YOLO(MODEL_PATH)  # Ensure this path is correct and accessible
 
         # Subscription to the image topic
         self.subscription = self.create_subscription(

@@ -5,6 +5,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 import time
+import os 
 
 from tramola.thruster import Thrusters
 from tramolaa.msg import DetectionList, Detection
@@ -53,8 +54,9 @@ class ImageViewer(Node):
             # Start recording
             self.get_logger().info("Starting video recording...")
             self.recording = True
+            VIDEO_PATH = os.getenv("VIDEO_PATH")
             self.video_writer = cv2.VideoWriter(
-                "/home/efe/Desktop/video_" + str(time.time()) + ".avi",
+                VIDEO_PATH+"/video_" + str(time.time()) + ".avi",
                 cv2.VideoWriter_fourcc(*'XVID'),
                 20,
                 (1280, 720)
