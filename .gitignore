@@ -50,3 +50,4 @@ catkin_ws/.#*
 # Catkin custom files
 catkin_ws/CATKIN_IGNORE
 
+.vscode/
