@@ -1,11 +1,10 @@
+#!/usr/bin/env python
+
 import os
 import cv2
 import rospy
 from tramola.msg import Detection, DetectionList
 from ultralytics import YOLO
-
-#!/usr/bin/env python
-
 
 def main():
     rospy.init_node('yolo_detection_node', anonymous=True)

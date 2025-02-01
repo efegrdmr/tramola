@@ -1,10 +1,11 @@
+#!/usr/bin/env python
+
 import rospy
 from mavros_msgs.msg import OverrideRCIn
 
-#!/usr/bin/env python
 
 
-class USVController:
+class Vehicle:
     def __init__(self):
         rospy.init_node('usv_controller', anonymous=True)
         self.rc_override_pub = rospy.Publisher('/mavros/rc/override', OverrideRCIn, queue_size=10)
