@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 from mavros_msgs.msg import RCIn, State
 from mavros_msgs.srv import SetMode
-import subprocess
-
-script_process = None
+from tramola.followPath import FollowPath  
+from tramola.dock import Dock
 current_mode = None
+task = None
 
 def state_callback(msg):
     global current_mode
@@ -23,32 +23,36 @@ def set_mode(mode):
         rospy.logerr("Service call failed: %s", e)
 
 def rc_callback(msg):
-    global script_process
-    ch6 = msg.channels[5] if len(msg.channels) > 5 else 0
-    ch7 = msg.channels[6] if len(msg.channels) > 6 else 0
+    global task
+    ch5 = msg.channels[4]
+    ch6 = msg.channels[5]
+    ch7 = msg.channels[6]
 
-    if ch7 < 1300:
-        set_mode("HOLD")
-        if script_process is not None:
-            script_process.kill()
-            script_process = None
-        return
-    elif ch7 < 1700:
+
+    if ch6 < 1500:
         set_mode("MANUAL")
-        if script_process is not None:
-            script_process.kill()
-            script_process = None
+        if task is not None:
+            task.stop()
+            task = None
         return
     
-    # start the desired script
-    set_mode("MANUAL")
+    # RC7 < 1500 ve rc5 < 1333 ise followpath
+    # RC7 < 1500 ve rc5 > 1333 > 1666 ise dock
+    # RC7 < 1500 ve rc5 > 1666 ise speed test
 
-    if ch6 < 1300:
-        if script_process is None:
-            script_process = subprocess.Popen(["rosrun", "your_package", "your_script.py"])
-    elif ch6 < 1700:
-        if script_process is None:
-            script_process = subprocess.Popen(["rosrun", "your_package", "your_script.py"])
+    # RC7 > 1500 ve rc5 < 1333 ise su atma top atma
+    # RC7 > 1500 ve rc5 > 1333 > 1666 ise ???
+    # RC7 > 1500 ve rc5 > 1666 ise ???
+
+
+    if ch7 < 1500 and ch5 < 1333:
+        if task is None:
+            task = FollowPath()
+            task.start()
+    elif ch7 < 1500 and ch5 > 1333 and ch5 < 1666:
+        if task is None:
+            task = Dock()
+            task.start()
 
         
     

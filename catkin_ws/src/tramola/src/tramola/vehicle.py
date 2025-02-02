@@ -32,3 +32,7 @@ class Vehicle:
     def stop(self):
         self.rc_msg.channels[self.steering_channel] = 1500  # Neutral steering
         self.rc_msg.channels[self.throttle_channel] = 1500  # Neutral throttle
+
+    def __del__(self):
+        self.timer.shutdown()
+        self.stop()
