@@ -33,6 +33,9 @@ class Task:
     def detection_callback(self, msg):
         raise NotImplementedError("The detection_callback method must be overridden in a subclass")
 
+    def _stop(self):
+        raise NotImplementedError("The stop method must be overridden in a subclass")
+
     def stop(self):
         for sub in self.subscriptions:
             sub.unregister()
@@ -42,5 +45,5 @@ class Task:
             srv.shutdown()
         for timer in self.timers:
             timer.shutdown()
-
+        self._stop()
         del self.vehicle

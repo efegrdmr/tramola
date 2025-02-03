@@ -20,15 +20,15 @@ class Vehicle:
     def scale_pwm(self, value):
         return int(self.MIN_PWM + value * (self.MAX_PWM - self.MIN_PWM))
 
-    def go_straight(self, throttle=0.5):
+    def go_straight(self, throttle=0.2):
         self.rc_msg.channels[self.steering_channel] = self.scale_pwm(0.5)  # Neutral steering
         self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(throttle)
 
-    def go_left(self, throttle=0.5, steering=0.3):
+    def go_left(self, throttle=0.2, steering=0.3):
         self.rc_msg.channels[self.steering_channel] = self.scale_pwm(steering)  # Left steering
         self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(throttle)
 
-    def go_right(self, throttle=0.5, steering=0.7):
+    def go_right(self, throttle=0.2, steering=0.7):
         self.rc_msg.channels[self.steering_channel] = self.scale_pwm(steering)  # Right steering
         self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(throttle)
 

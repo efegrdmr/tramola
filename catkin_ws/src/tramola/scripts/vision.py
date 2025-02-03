@@ -3,25 +3,30 @@
 import os
 import cv2
 import rospy
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
 from tramola.msg import Detection, DetectionList
 from ultralytics import YOLO
 
 def main():
     rospy.init_node('yolo_detection_node', anonymous=True)
-    publisher = rospy.Publisher('yolo_detections', DetectionList, queue_size=10)
+    detection_pub = rospy.Publisher('yolo_detections', DetectionList, queue_size=10)
+    image_pub = rospy.Publisher('/camera/image_raw', Image, queue_size=10)
+    bridge = CvBridge()
     rate = rospy.Rate(10)
 
-    # Replace with your YOLO model path
     MODEL_PATH = os.getenv('MODEL_PATH', 'path_to_your_model.pt')
     model = YOLO(MODEL_PATH)
 
-    # Use default USB camera (or replace with another index if needed)
     cap = cv2.VideoCapture(0)
 
     while not rospy.is_shutdown():
         ret, frame = cap.read()
         if not ret:
             continue
+
+        # Publish raw camera frame
+        image_pub.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
 
         # Run YOLO
         results = model(frame)
@@ -49,7 +54,7 @@ def main():
                 detection.class_id = class_id
                 detection_list.detections.append(detection)
 
-        publisher.publish(detection_list)
+        detection_pub.publish(detection_list)
         rospy.loginfo("Published {} detections.".format(len(detection_list.detections)))
         rate.sleep()
 
