@@ -6,10 +6,10 @@ import time
 if __name__ == '__main__':
     vehicle = Vehicle()
     
-    vehicle.go_straight(throttle=1700)
+    vehicle.go_straight(0.1)
     time.sleep(2)
-    vehicle.go_left(throttle=1600)
+    vehicle.go_left(0.1)
     time.sleep(2)
-    vehicle.go_right(throttle=1600)
+    vehicle.go_right(0.1)
     time.sleep(2)
     vehicle.stop()
