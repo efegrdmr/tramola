@@ -4,17 +4,21 @@ from mavros_msgs.msg import RCIn, State
 from mavros_msgs.srv import SetMode
 from tramola.followPath import FollowPath  
 from tramola.dock import Dock
+
 current_mode = None
 task = None
+set_mode_srv = None
 
 def state_callback(msg):
     global current_mode
     current_mode = msg.mode
 
 def set_mode(mode):
+    global set_mode_srv, current_mode
     if current_mode == mode:
         return
-    set_mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
+    if set_mode_srv is None:
+        set_mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
     try:
         resp = set_mode_srv(base_mode=0, custom_mode=mode)
         if resp.mode_sent:
@@ -61,6 +65,7 @@ def main():
     rospy.init_node("mode_switcher", anonymous=True)
     rospy.Subscriber("/mavros/rc/in", RCIn, rc_callback)
     rospy.Subscriber("/mavros/state", State, state_callback)
+
     rospy.spin()
 
 if __name__ == "__main__":
