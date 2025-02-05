@@ -4,8 +4,7 @@ import rospy
 
 from geometry_msgs.msg import Twist
 from mavros_msgs.srv import SetMode, SetModeRequest
-from sensor_msgs.msg import Imu
-import tf.transformations
+from std_msgs.msg import Float64
 
 
 class Vehicle:
@@ -23,8 +22,8 @@ class Vehicle:
         self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
         self.current_mode = None
 
-        # IMU subscriber
-        self.Imu_sub = rospy.Subscriber("/mavros/imu/data", Imu, self.imu_callback)
+        # Compass
+        self.compass_sub = rospy.Subscriber("/mavros/global_position/compass_hdg", Float64, self.compass_callback)
         self.orientation = None
 
 
@@ -51,10 +50,9 @@ class Vehicle:
         cmd.angular.z = self.angular_speed
         self.velocity_pub.publish(cmd)
 
-    def imu_callback(self, msg):
-        (_, _, yaw) = tf.transformations.euler_from_quaternion([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])
-        self.orientation = yaw * (180.0 / 3.14159)  # Convert to  degrees 0 and 360 North 90 East 180 South 270 West
-
+    def compass_callback(self, msg):
+        # 0 and 360 North 90 East 180 South 270 West
+        self.orientation = msg.data
 
     def turn_degrees(self, degrees, angular_speed=0.5):
         # clockwise is positive
@@ -101,5 +99,5 @@ class Vehicle:
         self.stop()
         self.velocity_pub.unregister()
         self.mode_srv.shutdown()
-        self.Imu_sub.unregister()
+        self.compass_sub.unregister()
         
