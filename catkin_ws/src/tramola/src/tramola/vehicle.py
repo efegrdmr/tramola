@@ -1,23 +1,31 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 
 from geometry_msgs.msg import Twist
 from mavros_msgs.srv import SetMode, SetModeRequest
+from sensor_msgs.msg import Imu
+import tf.transformations
 
 
 class Vehicle:
     def __init__(self):
-        assert rospy.core.is_initialized(), "ROS node is not initialized"   
+        assert rospy.core.is_initialized(), "ROS node is not initialized"  
+
+        # Velocity publisher 
         self.velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel_unstamped', Twist, queue_size=1)
         self.linear_speed = 0.0 # max 1.0
         self.angular_speed = 0.0 # max 1.0
-
         self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
 
-        rospy.wait_for_service("/mavros/set_mode")  # Servis hazır olana kadar bekle
+        # Set mode service
+        rospy.wait_for_service("/mavros/set_mode") 
         self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
         self.current_mode = None
+
+        # IMU subscriber
+        self.Imu_sub = rospy.Subscriber("/mavros/imu/data", Imu, self.imu_callback)
+        self.orientation = None
 
 
     def set_mode(self, mode):
@@ -33,12 +41,38 @@ class Vehicle:
         else:
             rospy.logwarn("Failed to change mode to %s", mode)
         
+    def set_velocity(self, linear_speed, angular_speed):
+        self.linear_speed = linear_speed
+        self.angular_speed = angular_speed
 
     def publish_speed(self, event):
         cmd = Twist()
         cmd.linear.x = self.linear_speed
         cmd.angular.z = self.angular_speed
         self.velocity_pub.publish(cmd)
+
+    def imu_callback(self, msg):
+        (_, _, yaw) = tf.transformations.euler_from_quaternion([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])
+        self.orientation = yaw * (180.0 / 3.14159)  # Convert to  degrees 0 and 360 North 90 East 180 South 270 West
+
+
+    def turn_degrees(self, degrees, angular_speed=0.5):
+        # clockwise is positive
+        target_orientation = self.orientation + degrees
+        if target_orientation > 180:
+            target_orientation -= 360
+        elif target_orientation < -180:
+            target_orientation += 360
+
+        if target_orientation > self.orientation:
+            self.turn_right(angular_speed)
+        else:
+            self.turn_left(angular_speed)
+
+        while abs(self.orientation - target_orientation) > 5:
+            rospy.sleep(0.1)
+        
+        self.stop()
 
     def turn_left(self, angular_speed=0.5):
         self.angular_speed = angular_speed
@@ -59,10 +93,13 @@ class Vehicle:
         
 
     def stop(self):
-        self.rc_msg.channels[self.steering_channel] = self.scale_pwm(0.5)  # Neutral steering
-        self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(0.5)  # Neutral throttle
+        self.linear_speed = 0.0
+        self.angular_speed = 0.0
 
     def __del__(self):
         self.timer.shutdown()
         self.stop()
         self.velocity_pub.unregister()
+        self.mode_srv.shutdown()
+        self.Imu_sub.unregister()
+        
