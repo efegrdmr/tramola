@@ -62,7 +62,7 @@ def rc_callback(msg):
     
 
 def main():
-    rospy.init_node("mode_switcher", anonymous=True)
+    rospy.init_node("controller", anonymous=True)
     rospy.Subscriber("/mavros/rc/in", RCIn, rc_callback)
     rospy.Subscriber("/mavros/state", State, state_callback)
 

@@ -1,36 +1,62 @@
 #!/usr/bin/env python
 
 import rospy
-from mavros_msgs.msg import OverrideRCIn
+
+from geometry_msgs.msg import Twist
+from mavros_msgs.srv import SetMode, SetModeRequest
+
 
 class Vehicle:
     def __init__(self):
-        rospy.init_node('usv_controller', anonymous=True)
-        self.rc_override_pub = rospy.Publisher('/mavros/rc/override', OverrideRCIn, queue_size=10)
-        self.rc_msg = OverrideRCIn()
-        self.steering_channel = 0  # Adjust based on your RC configuration
-        self.throttle_channel = 2  # Adjust based on your RC configuration
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_rc_override)  # 10 Hz
-        self.MAX_PWM = 2000
-        self.MIN_PWM = 1000
+        assert rospy.core.is_initialized(), "ROS node is not initialized"   
+        self.velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel_unstamped', Twist, queue_size=1)
+        self.linear_speed = 0.0 # max 1.0
+        self.angular_speed = 0.0 # max 1.0
 
-    def publish_rc_override(self, event):
-        self.rc_override_pub.publish(self.rc_msg)
+        self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
 
-    def scale_pwm(self, value):
-        return int(self.MIN_PWM + value * (self.MAX_PWM - self.MIN_PWM))
+        rospy.wait_for_service("/mavros/set_mode")  # Servis hazır olana kadar bekle
+        self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
+        self.current_mode = None
 
-    def go_straight(self, throttle=0.2):
-        self.rc_msg.channels[self.steering_channel] = self.scale_pwm(0.5)  # Neutral steering
-        self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(throttle)
 
-    def go_left(self, throttle=0.2, steering=0.3):
-        self.rc_msg.channels[self.steering_channel] = self.scale_pwm(steering)  # Left steering
-        self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(throttle)
+    def set_mode(self, mode):
+        if self.current_mode == mode:
+            return
 
-    def go_right(self, throttle=0.2, steering=0.7):
-        self.rc_msg.channels[self.steering_channel] = self.scale_pwm(steering)  # Right steering
-        self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(throttle)
+        req = SetModeRequest()
+        req.custom_mode = mode
+        resp = self.mode_srv(req)
+        if resp.mode_sent:
+            self.current_mode = mode
+            rospy.loginfo("Mode changed to %s successfully", mode)
+        else:
+            rospy.logwarn("Failed to change mode to %s", mode)
+        
+
+    def publish_speed(self, event):
+        cmd = Twist()
+        cmd.linear.x = self.linear_speed
+        cmd.angular.z = self.angular_speed
+        self.velocity_pub.publish(cmd)
+
+    def turn_left(self, angular_speed=0.5):
+        self.angular_speed = angular_speed
+
+    def turn_right(self, angular_speed=0.5):
+        self.angular_speed = -angular_speed
+
+    def go_straight(self, speed=0.2):
+        self.linear_speed = speed
+
+    def go_left(self, speed=0.2, angular_speed=0.5):
+        self.linear_speed = speed
+        self.angular_speed = angular_speed
+
+    def go_right(self, speed=0.2, angular_speed=0.5):
+        self.linear_speed = speed
+        self.angular_speed = -angular_speed
+        
 
     def stop(self):
         self.rc_msg.channels[self.steering_channel] = self.scale_pwm(0.5)  # Neutral steering
@@ -39,4 +65,4 @@ class Vehicle:
     def __del__(self):
         self.timer.shutdown()
         self.stop()
-        self.rc_override_pub.unregister()
+        self.velocity_pub.unregister()

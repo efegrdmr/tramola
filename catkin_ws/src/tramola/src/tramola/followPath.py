@@ -7,7 +7,7 @@ class FollowPath(Task):
         super().__init__()
 
     def start(self):
-        pass
+        self.vehicle.set_mode("GUIDED")
 
     def detection_callback(self, msg):
         # 0 green buoy

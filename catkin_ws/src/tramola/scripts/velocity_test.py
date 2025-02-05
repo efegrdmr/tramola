@@ -1,9 +1,8 @@
+#!/usr/bin/env python3
+
 import rospy
 from geometry_msgs.msg import Twist
-from mavros_msgs.srv import SetMode
-
-
-#!/usr/bin/env python
+from mavros_msgs.srv import SetMode, SetModeRequest
 
 set_mode_srv = None
 current_mode = None
@@ -37,29 +36,37 @@ def move_bit_right(pub, speed=0.2, angular_speed=0.5):
 
 def set_mode(mode):
     global set_mode_srv, current_mode
+
     if current_mode == mode:
         return
+    
     if set_mode_srv is None:
+        rospy.wait_for_service("/mavros/set_mode")  # Servis hazır olana kadar bekle
         set_mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
+
     try:
-        resp = set_mode_srv(base_mode=0, custom_mode=mode)
+        req = SetModeRequest()
+        req.custom_mode = mode
+        resp = set_mode_srv(req)
         if resp.mode_sent:
-            rospy.loginfo("Mode changed successfully")
+            current_mode = mode
+            rospy.loginfo("Mode changed to %s successfully", mode)
+        else:
+            rospy.logwarn("Failed to change mode to %s", mode)
     except rospy.ServiceException as e:
         rospy.logerr("Service call failed: %s", e)
 
-
 def main():
     rospy.init_node('velocity_test', anonymous=True)
+    
     velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel_unstamped', Twist, queue_size=10)
-    rate = rospy.Rate(2)
 
-    while not rospy.is_shutdown():
-        set_mode("GUIDED")
-        go_straight(velocity_pub, 1.0)
-        rate.sleep()
-        move_bit_left(velocity_pub, 1.0)
-        rate.sleep()
+    set_mode("GUIDED")
+
+    go_straight(velocity_pub, 0.2)
+    rospy.sleep()
+    move_bit_left(velocity_pub, 0.2)
+    rospy.sleep()
 
 if __name__ == '__main__':
     main()
