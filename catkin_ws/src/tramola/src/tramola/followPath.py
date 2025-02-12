@@ -82,8 +82,5 @@ class FollowPath(Task):
                 else:
                     self.vehicle.go_right()
 
-
-
-
     def _stop(self):
         pass
