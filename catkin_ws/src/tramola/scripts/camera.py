@@ -3,6 +3,7 @@ import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
+import numpy as np
 
 bridge = CvBridge()
 
@@ -22,6 +23,12 @@ def callback(data):
 
 if __name__ == '__main__':
     rospy.init_node('camera_viewer', anonymous=True)
+    
+    # Create a window and show an empty image (black)
+    cv2.namedWindow("Camera Feed", cv2.WINDOW_NORMAL)
+    blank_image = np.zeros((480, 640, 3), dtype=np.uint8)
+    cv2.imshow("Camera Feed", blank_image)
+    
     # Subscribe to the ROS topic (adjust the topic name if needed)
     rospy.Subscriber('/camera/rgb/image_raw', Image, callback)
     
