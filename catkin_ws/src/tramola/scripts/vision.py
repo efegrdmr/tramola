@@ -2,12 +2,19 @@
 import rospy
 from ultralytics import YOLO
 import cv2
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+
 # Import your ROS messages; for example:
 from tramola.msg import Detection, DetectionList
 
-# Initialize ROS node and publisher
+# Initialize ROS node and publishers
 rospy.init_node("yolo_v8_ros")
-pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=10)
+detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=10)
+camera_pub = rospy.Publisher("/camera/image_raw", Image, queue_size=10)
+
+# Create a CV bridge instance
+bridge = CvBridge()
 
 # Initialize YOLOv8 model (adjust the path to your custom model)
 model = YOLO("/home/tramola/yolov8n.pt")
@@ -21,6 +28,10 @@ while not rospy.is_shutdown():
     if not ret:
         rospy.logwarn("Failed to capture image")
         continue
+
+    # Publish the camera image
+    ros_image = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+    camera_pub.publish(ros_image)
 
     # YOLOv8 expects a BGR image (as provided by cv2.VideoCapture)
     results = model(frame)
@@ -62,6 +73,6 @@ while not rospy.is_shutdown():
                       f"Center: ({det.x_center:.2f}, {det.y_center:.2f}), "
                       f"Size: ({det.width:.2f}, {det.height:.2f})")
 
-    pub.publish(msg)
+    detection_pub.publish(msg)
 
 cap.release()
