@@ -28,6 +28,8 @@ if __name__ == '__main__':
     cv2.namedWindow("Camera Feed", cv2.WINDOW_NORMAL)
     blank_image = np.zeros((480, 640, 3), dtype=np.uint8)
     cv2.imshow("Camera Feed", blank_image)
+    rospy.loginfo("camera started")
+    
     
     # Subscribe to the ROS topic (adjust the topic name if needed)
     rospy.Subscriber('/camera/rgb/image_raw', Image, callback)
