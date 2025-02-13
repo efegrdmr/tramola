@@ -1,39 +1,67 @@
 #!/usr/bin/env python3
 import rospy
-import jetson_inference
-import jetson_utils
+from ultralytics import YOLO
+import cv2
+# Import your ROS messages; for example:
 from tramola.msg import Detection, DetectionList
 
-# Initialize ROS node
-rospy.init_node("yolo_trt_ros")
+# Initialize ROS node and publisher
+rospy.init_node("yolo_v8_ros")
 pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=10)
 
-# Load custom TensorRT model
-net = jetson_inference.detectNet(argv=['--model=/home/tramola/yolov4-custom.trt', '--labels=/home/tramola/labels.txt', ' --input-blob=input',  '--output-cvg=confs',  '--output-bbox=boxes'])
+# Initialize YOLOv8 model (adjust the path to your custom model)
+model = YOLO("/home/tramola/yolov8n.pt")
 
-camera = jetson_utils.gstCamera(1280, 720, "/dev/video0")  
-rospy.sleep(2)  # Give time for camera to initialize
-
+# Use OpenCV to capture video (adjust device index as needed)
+cap = cv2.VideoCapture(0)
+rospy.sleep(2)  # Give time for the camera to warm up
 
 while not rospy.is_shutdown():
-    img, width, height = camera.CaptureRGBA()
-    detections = net.Detect(img, width, height)
-    
-    msg = DetectionList()
-    for d in detections:
-        det_msg = Detection()
-        det_msg.x_center = d.Center[0] / width
-        det_msg.y_center = d.Center[1] / height
-        det_msg.width = d.Width / width
-        det_msg.height = d.Height / height
-        det_msg.confidence = d.Confidence
-        det_msg.class_id = d.ClassID
-        msg.detections.append(det_msg)
+    ret, frame = cap.read()
+    if not ret:
+        rospy.logwarn("Failed to capture image")
+        continue
 
-    rospy.loginfo(f"Detected {len(detections)} objects")
+    # YOLOv8 expects a BGR image (as provided by cv2.VideoCapture)
+    results = model(frame)
+
+    msg = DetectionList()
+    for result in results:
+        # Iterate over detected bounding boxes
+        for box in result.boxes:
+            # Get box coordinates ([x1, y1, x2, y2]) as a list of floats
+            coords = box.xyxy[0].cpu().numpy().tolist()
+            x1, y1, x2, y2 = coords
+
+            # Get image dimensions
+            height, width, _ = frame.shape
+
+            # Calculate normalized center, width, and height
+            x_center = ((x1 + x2) / 2) / width
+            y_center = ((y1 + y2) / 2) / height
+            box_width = (x2 - x1) / width
+            box_height = (y2 - y1) / height
+
+            # Get confidence and class id
+            confidence = box.conf.cpu().numpy()[0]
+            class_id = int(box.cls.cpu().numpy()[0])
+            
+            det_msg = Detection()
+            det_msg.x_center = x_center
+            det_msg.y_center = y_center
+            det_msg.width = box_width
+            det_msg.height = box_height
+            det_msg.confidence = confidence
+            det_msg.class_id = class_id
+
+            msg.detections.append(det_msg)
+
+    rospy.loginfo(f"Detected {len(msg.detections)} objects")
     for det in msg.detections:
         rospy.loginfo(f"Class ID: {det.class_id}, Confidence: {det.confidence:.2f}, "
                       f"Center: ({det.x_center:.2f}, {det.y_center:.2f}), "
                       f"Size: ({det.width:.2f}, {det.height:.2f})")
 
     pub.publish(msg)
+
+cap.release()
