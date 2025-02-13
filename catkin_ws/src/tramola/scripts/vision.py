@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/tramola/vision/bin/python3.8
 import rospy
 from ultralytics import YOLO
 import cv2
@@ -11,7 +11,6 @@ from tramola.msg import Detection, DetectionList
 # Initialize ROS node and publishers
 rospy.init_node("yolo_v8_ros")
 detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=10)
-camera_pub = rospy.Publisher("/camera/image_raw", Image, queue_size=10)
 
 # Create a CV bridge instance
 bridge = CvBridge()
@@ -28,10 +27,6 @@ while not rospy.is_shutdown():
     if not ret:
         rospy.logwarn("Failed to capture image")
         continue
-
-    # Publish the camera image
-    ros_image = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
-    camera_pub.publish(ros_image)
 
     # YOLOv8 expects a BGR image (as provided by cv2.VideoCapture)
     results = model(frame)
