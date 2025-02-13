@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/tramola/vision/bin/python3.8
 
 import rospy
 from geometry_msgs.msg import Twist
