@@ -31,6 +31,10 @@ class Vehicle:
         self.latitude = None
         self.longitude = None
 
+        rospy.sleep(5)
+        rospy.loginfo(f"orientation: {self.orientation}\n latitude: {self.latitude} longitude: {self.longitude}")
+        
+
     def set_mode(self, mode):
         if self.current_mode == mode:
             return

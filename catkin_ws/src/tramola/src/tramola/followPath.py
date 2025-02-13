@@ -1,5 +1,6 @@
 from tramola.task import Task
 import rospy
+import time
 
 
 class FollowPath(Task):
@@ -8,6 +9,7 @@ class FollowPath(Task):
 
     def start(self):
         self.vehicle.set_mode("GUIDED")
+        self.last_detection_time = time.time()
 
     def detection_callback(self, msg):
         # 0 green buoy
@@ -16,6 +18,14 @@ class FollowPath(Task):
         nearestGreen = None
         nearestRed = None
         nearestYellow = None
+
+        if len(msg.detections) == 0:
+            if time.time() - self.last_detection_time > 5:
+                self.vehicle.set_mode("MANUEL")
+                self.stop()
+                return
+        
+
         for detection in msg.detections:
             if detection.confidence < 0.3:
                 rospy.rospy.loginfo(f"Low confidence: {detection.confidence}. Ignoring detection.")
@@ -42,6 +52,9 @@ class FollowPath(Task):
                 if nearestYellow is None or nearestYellow.width < detection.width:
                     nearestYellow = detection
             
+        
+        if nearestGreen is not None or nearestRed is not None or nearestYellow is not None:
+            self.last_detection_time = time.time()
 
         if nearestYellow is None:
             if nearestGreen is None and nearestRed is not None:
