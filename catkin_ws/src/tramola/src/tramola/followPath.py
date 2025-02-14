@@ -11,6 +11,8 @@ class FollowPath(Task):
         self.vehicle.set_mode("GUIDED")
         self.last_detection_time = time.time()
 
+
+
     def detection_callback(self, msg):
         # 0 green buoy
         # 1 red buoy
@@ -28,15 +30,16 @@ class FollowPath(Task):
 
         for detection in msg.detections:
             if detection.confidence < 0.3:
-                rospy.rospy.loginfo(f"Low confidence: {detection.confidence}. Ignoring detection.")
+                rospy.logwarn(f"Low confidence: {detection.confidence}. Ignoring detection.")
                 continue
             
+
             # do not recognize if the object is too far away
             if (detection.class_id == 0 or detection.class_id ==1) and detection.width < 0.05:
-                rospy.rospy.loginfo("Object is too far away")
+                rospy.logwarn("Object is too far away")
                 continue
             elif detection.class_id == 2 and detection.width < 0.0025:
-                rospy.rospy.loginfo("Object is too far away")
+                rospy.logwarn("Object is too far away")
                 continue
 
             # find the closest object

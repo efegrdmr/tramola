@@ -79,7 +79,7 @@ class Vehicle:
         else:
             self.turn_left(angular_speed)
 
-        while abs(self.orientation - target_orientation) > 5:
+        while abs(self.orientation - target_orientation) > 30:
             rospy.sleep(0.1)
         
         self.stop()
