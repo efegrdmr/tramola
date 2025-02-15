@@ -1,6 +1,5 @@
 import rospy
 from tramola.task import Task
-from tramola.msg import DetectionList, Detection
 import time
 from geopy.distance import geodesic
 
@@ -12,6 +11,9 @@ class SpeedChallenge(Task):
         self.previousStatus = None
         self.start_location = self.vehicle.location
         self.start_orientation = self.vehicle.orientation
+        # TESTING
+        self.objects["blue_buoy"] = self.objects["yellow_buoy"]
+        # TESTING
 
     def set_status(self, status):
         self.previousStatus = self.status
@@ -25,7 +27,7 @@ class SpeedChallenge(Task):
 
         if self.status == "WAITING_FOR_GREEN_LIGHT":
             # TODO
-            pass
+            self.set_status("GOING_TO_BLUE_BUOY")
             return
 
         for detection in msg.detections:
@@ -41,9 +43,9 @@ class SpeedChallenge(Task):
                 if nearestObstacle is None or nearestObstacle.x_center > detection.x_center:
                     nearestObstacle = detection
 
-            if detection.class_id == self.objects["green_buoy"]:
+            if detection.class_id == self.objects["green_gate_buoy"]:
                 greenBuoy = detection
-            elif detection.class_id == self.objects["red_buoy"]:
+            elif detection.class_id == self.objects["red_gate_buoy"]:
                 redBuoy = detection
 
         
@@ -92,6 +94,14 @@ class SpeedChallenge(Task):
                 self.set_status("AVOIDING_OBSTACLE")
                 return
             
+            # TESTING
+            if geodesic(self.start_location, self.vehicle.location).meters < 3:
+                    self.stop()
+            else:
+                self.vehicle.send_location(*self.start_location)
+                rospy.sleep(0.5)
+            return
+            # TESTING
             if greenBuoy is None and redBuoy is None:
                 if geodesic(self.start_location, self.vehicle.location).meters < 3:
                     self.stop()
