@@ -56,7 +56,6 @@ class Task:
             srv.shutdown()
         for timer in self.timers:
             timer.shutdown()
-        self._stop()
+        self.vehicle.set_mode("LOITER")
         del self.vehicle
-
         self.status = "COMPLETED"

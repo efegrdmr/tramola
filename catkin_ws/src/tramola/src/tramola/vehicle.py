@@ -5,6 +5,8 @@ from geometry_msgs.msg import Twist
 from mavros_msgs.srv import SetMode, SetModeRequest
 from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
+from geographic_msgs.msg import GeoPoseStamped
+
 
 
 class Vehicle:
@@ -28,12 +30,16 @@ class Vehicle:
 
         # GPS
         gps_sub = rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.gps_callback)
-        self.latitude = None
-        self.longitude = None
+        self.location = None
 
-        rospy.sleep(5)
-        rospy.loginfo(f"orientation: {self.orientation}\n latitude: {self.latitude} longitude: {self.longitude}")
-        
+        # location sending
+        self.location_pub = rospy.Publisher("/mavros/global_position/global", GeoPoseStamped, queue_size=1)
+
+    def send_location(self, latitude, longitude):
+        msg = GeoPoseStamped()
+        msg.pose.position.latitude = latitude
+        msg.pose.position.longitude = longitude
+        self.location_pub.publish(msg)
 
     def set_mode(self, mode):
         if self.current_mode == mode:
@@ -63,8 +69,7 @@ class Vehicle:
         self.orientation = msg.data
 
     def gps_callback(self, msg):
-        self.latitude = msg.latitude
-        self.longitude = msg.longitude
+        self.location = (self.latitude, self.longitude)
 
     def turn_degrees(self, degrees, angular_speed=0.5):
         # clockwise is positive
