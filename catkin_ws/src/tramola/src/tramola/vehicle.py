@@ -4,7 +4,7 @@ import rospy
 from geometry_msgs.msg import Twist
 from mavros_msgs.srv import SetMode, SetModeRequest
 from std_msgs.msg import Float64
-from sensor_msgs.msg import NavSatFix
+from sensor_msgs.msg import NavSatFix, Range
 from geographic_msgs.msg import GeoPoseStamped
 
 
@@ -35,6 +35,10 @@ class Vehicle:
         # location sending
         self.location_pub = rospy.Publisher("/mavros/global_position/global", GeoPoseStamped, queue_size=1)
 
+        # Distance Sensor
+        self.hcsr04_sub = rospy.Subscriber("/mavros/distance_sensor/hrlv_ez4_pub", Range, self.distance_sensor_callback)
+        self.distance = None
+
     def send_location(self, latitude, longitude):
         msg = GeoPoseStamped()
         msg.pose.position.latitude = latitude
@@ -63,6 +67,10 @@ class Vehicle:
         cmd.linear.x = self.linear_speed
         cmd.angular.z = self.angular_speed
         self.velocity_pub.publish(cmd)
+
+
+    def distance_sensor_callback(self, msg):
+        self.distance = msg.range
 
     def compass_callback(self, msg):
         # 0 and 360 North 90 East 180 South 270 West
