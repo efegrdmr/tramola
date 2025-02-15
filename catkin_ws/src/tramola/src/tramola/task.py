@@ -11,6 +11,7 @@ class Task:
         self.timers = []
         self.vehicle = Vehicle()
         self.add_subscription("yolo_detections", DetectionList, self.detection_callback)
+        self.status = "STARTED"
 
 
     def add_timer(self, period, callback):
@@ -33,10 +34,10 @@ class Task:
     def detection_callback(self, msg):
         raise NotImplementedError("The detection_callback method must be overridden in a subclass")
 
-    def _stop(self):
-        raise NotImplementedError("The stop method must be overridden in a subclass")
 
     def stop(self):
+        if self.status == "COMPLETED":
+            return
         for sub in self.subscriptions:
             sub.unregister()
         for pub in self.publications:
@@ -47,3 +48,5 @@ class Task:
             timer.shutdown()
         self._stop()
         del self.vehicle
+
+        self.status = "COMPLETED"

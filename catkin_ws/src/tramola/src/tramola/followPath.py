@@ -10,19 +10,17 @@ class FollowPath(Task):
     def start(self):
         self.vehicle.set_mode("GUIDED")
         self.last_detection_time = time.time()
+        self.objects = {"green": 0, "red": 1, "yellow": 2}
 
 
 
     def detection_callback(self, msg):
-        # 0 green buoy
-        # 1 red buoy
-        # 2 yellow buoy
         nearestGreen = None
         nearestRed = None
         nearestYellow = None
 
         if len(msg.detections) == 0:
-            if time.time() - self.last_detection_time > 5:
+            if time.time() - self.last_detection_time > 2:
                 self.vehicle.set_mode("MANUEL")
                 self.stop()
                 return
@@ -35,23 +33,23 @@ class FollowPath(Task):
             
 
             # do not recognize if the object is too far away
-            if (detection.class_id == 0 or detection.class_id ==1) and detection.width < 0.05:
+            if (detection.class_id == self.objects["green"] or detection.class_id ==self.objects["red"]) and detection.width < 0.05:
                 rospy.logwarn("Object is too far away")
                 continue
-            elif detection.class_id == 2 and detection.width < 0.0025:
+            elif detection.class_id == self.objects["yellow"] and detection.width < 0.0025:
                 rospy.logwarn("Object is too far away")
                 continue
 
             # find the closest object
-            if detection.class_id == 0:
+            if detection.class_id == self.objects["green"]:
                 if nearestGreen is None or nearestGreen.width < detection.width:
                     nearestGreen = detection
 
-            elif detection.class_id == 1:
+            elif detection.class_id == self.objects["red"]:
                 if nearestRed is None or nearestRed.width < detection.width:
                     nearestRed = detection
 
-            elif detection.class_id == 2:
+            elif detection.class_id == self.objects["yellow"]:
                 if nearestYellow is None or nearestYellow.width < detection.width:
                     nearestYellow = detection
             
@@ -97,6 +95,3 @@ class FollowPath(Task):
                     self.vehicle.go_left()
                 else:
                     self.vehicle.go_right()
-
-    def _stop(self):
-        pass

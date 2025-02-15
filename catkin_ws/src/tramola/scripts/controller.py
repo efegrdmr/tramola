@@ -40,6 +40,16 @@ def rc_callback(msg):
             task = None
         return
     
+    if task is not None:
+        if task.status == "FOLLOWPATH":
+            task = FollowPath()
+            task.start()
+        elif task.status == "DOCK":
+            task = Dock()
+            task.start()
+        
+        return
+    
     # RC7 < 1500 ve rc5 < 1333 ise followpath
     # RC7 < 1500 ve rc5 > 1333 > 1666 ise dock
     # RC7 < 1500 ve rc5 > 1666 ise speed test
@@ -50,13 +60,11 @@ def rc_callback(msg):
 
 
     if ch7 < 1500 and ch5 < 1333:
-        if task is None:
-            task = FollowPath()
-            task.start()
+        task = FollowPath()
+        task.start()
     elif ch7 < 1500 and ch5 > 1333 and ch5 < 1666:
-        if task is None:
-            task = Dock()
-            task.start()
+        task = Dock()
+        task.start()
 
         
     

@@ -92,7 +92,7 @@ class Vehicle:
         self.linear_speed = 0.0
         self.angular_speed = -angular_speed
 
-    def go_straight(self, speed=0.2):
+    def go_straight(self, speed=0.4):
         self.linear_speed = speed
 
     def go_left(self, speed=0.4, angular_speed=0.3):
