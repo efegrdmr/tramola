@@ -85,19 +85,21 @@ class Vehicle:
         self.stop()
 
     def turn_left(self, angular_speed=0.5):
+        self.linear_speed = 0.0
         self.angular_speed = angular_speed
 
     def turn_right(self, angular_speed=0.5):
+        self.linear_speed = 0.0
         self.angular_speed = -angular_speed
 
     def go_straight(self, speed=0.2):
         self.linear_speed = speed
 
-    def go_left(self, speed=0.2, angular_speed=0.5):
+    def go_left(self, speed=0.4, angular_speed=0.3):
         self.linear_speed = speed
         self.angular_speed = angular_speed
 
-    def go_right(self, speed=0.2, angular_speed=0.5):
+    def go_right(self, speed=0.4, angular_speed=0.3):
         self.linear_speed = speed
         self.angular_speed = -angular_speed
         
