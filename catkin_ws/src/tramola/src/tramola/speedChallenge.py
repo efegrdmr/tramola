@@ -5,8 +5,9 @@ from tramola.msg import DetectionList, Detection
 
 class SpeedChallenge(Task):
     def start(self):
-        pass
-    
+        self.vehicle.set_mode("GUIDED")
+        self.objects = {"green": 0, "red": 1, "yellow": 2}
+
 
     def detection_callback(self, msg):
         pass

@@ -5,6 +5,16 @@ from tramola.msg import DetectionList, Detection
 class Task:
     def __init__(self):
         assert rospy.core.is_initialized(), "ROS node is not initialized"
+        self.objects = {
+            "green_buoy": 0, "red_buoy": 1, "yellow_buoy": 2, "blue_buoy": 3, "black_buoy": 4,
+            "red_gate_buoy": 5, "green_gate_buoy": 6,
+            "orange_vessel": 7, "black_vessel": 8, 
+            "blue_triangle": 9, "red_triangle": 10, "green_triangle": 11, 
+            "blue_circle": 12, "red_circle": 13, "green_circle": 14,
+            "blue_square": 15, "red_square": 16, "green_square": 17,
+            "blue_plus": 18, "red_plus": 19, "green_plus": 20
+                        }
+
         self.subscriptions = []
         self.publications = []
         self.services = []

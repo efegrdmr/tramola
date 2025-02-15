@@ -19,7 +19,6 @@ class FollowPath(Task):
         self.last_pid_time = time.time()
 
     def detection_callback(self, msg):
-        # Initialize nearest detections
         nearestGreen = None
         nearestRed = None
         nearestYellow = None
@@ -29,31 +28,51 @@ class FollowPath(Task):
                 self.vehicle.set_mode("MANUAL")
                 self.stop()
                 return
+        
 
-        # Look for valid detections
         for detection in msg.detections:
             if detection.confidence < 0.3:
                 rospy.logwarn(f"Low confidence: {detection.confidence}. Ignoring detection.")
                 continue
+            
 
-            # Ignore object if too far away
-            if (detection.class_id in [0, 1] and detection.width < 0.05) or \
-               (detection.class_id == 2 and detection.width < 0.0025):
+            # do not recognize if the object is too far away
+            if (detection.class_id == self.objects["green_gate_buoy"] or detection.class_id == self.objects["red_gate_buoy"]) and detection.width < 0.09:
                 rospy.logwarn("Object is too far away")
                 continue
 
-            if detection.class_id == 0:
-                if nearestGreen is None or nearestGreen.width < detection.width:
+            elif (detection.class_id == self.objects["green_buoy"] or detection.class_id ==self.objects["red_buoy"]) and detection.width < 0.05:
+                rospy.logwarn("Object is too far away")
+                continue
+            elif detection.class_id == self.objects["yellow_buoy"] and detection.width < 0.0025:
+                rospy.logwarn("Object is too far away")
+                continue
+
+            # find the closest object
+            if detection.class_id == self.objects["green_gate_buoy"]:
+                if nearestGreen is None or nearestGreen.class_id == self.objects["green_buoy"] or nearestGreen.width < detection.width:
                     nearestGreen = detection
-            elif detection.class_id == 1:
-                if nearestRed is None or nearestRed.width < detection.width:
+
+            elif detection.class_id == self.objects["green_buoy"]:
+                if nearestGreen is None or (nearestGreen.class_id != self.objects["green_gate_buoy"] and nearestGreen.width < detection.width):
+                    nearestGreen = detection
+
+            elif detection.class_id == self.objects["red_gate_buoy"]:
+                if nearestRed is None or nearestRed.class_id == self.objects["red_buoy"] or nearestRed.width < detection.width:
                     nearestRed = detection
-            elif detection.class_id == 2:
+
+            elif detection.class_id == self.objects["red_buoy"]:
+                if nearestRed is None or (nearestRed.class_id != self.objects["red_gate_buoy"] and nearestRed.width < detection.width):
+                    nearestRed = detection
+
+            elif detection.class_id == self.objects["yellow_buoy"]:
                 if nearestYellow is None or nearestYellow.width < detection.width:
                     nearestYellow = detection
-
-        if nearestGreen or nearestRed or nearestYellow:
+            
+        
+        if nearestGreen is not None or nearestRed is not None or nearestYellow is not None:
             self.last_detection_time = time.time()
+
 
         # Compute a measured x_center based on available detections
         measured_center = None
