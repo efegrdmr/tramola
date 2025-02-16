@@ -4,15 +4,10 @@ import time
 
 
 class FollowPath(Task):
-    def __init__(self):
-        super().__init__()
-
     def start(self):
         self.vehicle.set_mode("GUIDED")
         self.last_detection_time = time.time()
         
-
-
     def detection_callback(self, msg):
         nearestGreen = None
         nearestRed = None

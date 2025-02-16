@@ -10,7 +10,7 @@ from tramola.msg import Detection, DetectionList
 
 # Initialize ROS node and publishers
 rospy.init_node("yolo_v8_ros")
-detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=10)
+detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=1)
 
 # Create a CV bridge instance
 bridge = CvBridge()

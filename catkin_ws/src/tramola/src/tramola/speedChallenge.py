@@ -95,7 +95,7 @@ class SpeedChallenge(Task):
                 return
             
             # TESTING
-            if geodesic(self.start_location, self.vehicle.location).meters < 3:
+            if geodesic(self.start_location, self.vehicle.location).meters < 2:
                     self.stop()
             else:
                 self.vehicle.send_location(*self.start_location)

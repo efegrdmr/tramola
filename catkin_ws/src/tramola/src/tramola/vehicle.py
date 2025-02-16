@@ -35,9 +35,6 @@ class Vehicle:
         # location sending
         self.location_pub = rospy.Publisher("/mavros/global_position/global", GeoPoseStamped, queue_size=1)
 
-        # Distance Sensor
-        self.hcsr04_sub = rospy.Subscriber("/mavros/distance_sensor/hrlv_ez4_pub", Range, self.distance_sensor_callback)
-        self.distance = None
 
     def send_location(self, latitude, longitude):
         msg = GeoPoseStamped()
@@ -69,17 +66,15 @@ class Vehicle:
         self.velocity_pub.publish(cmd)
 
 
-    def distance_sensor_callback(self, msg):
-        self.distance = msg.range
-
     def compass_callback(self, msg):
         # 0 and 360 North 90 East 180 South 270 West
         self.orientation = msg.data
 
     def gps_callback(self, msg):
-        self.location = (self.latitude, self.longitude)
+        self.location = (msg.latitude, msg.longitude)
 
     def turn_degrees(self, degrees, angular_speed=0.5):
+        #TODO 
         # clockwise is positive
         target_orientation = self.orientation + degrees
         if target_orientation > 180:
@@ -108,11 +103,11 @@ class Vehicle:
     def go_straight(self, speed=0.4):
         self.linear_speed = speed
 
-    def go_left(self, speed=0.4, angular_speed=0.3):
+    def go_left(self, speed=0.3, angular_speed=0.3):
         self.linear_speed = speed
         self.angular_speed = angular_speed
 
-    def go_right(self, speed=0.4, angular_speed=0.3):
+    def go_right(self, speed=0.3, angular_speed=0.3):
         self.linear_speed = speed
         self.angular_speed = -angular_speed
         
