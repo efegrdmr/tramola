@@ -2,24 +2,31 @@ from tramola.task import Task
 import rospy
 
 
-class followPath(Task):
+class FollowPath(Task):
     def start(self):
         self.vehicle.set_mode("GUIDED")
-        self.ANGULAR_LOSS_RATE = 0.1 # açısal hızın sıfıra yaklaşma oranı
-        self.ANGULAR_GAIN_RATE = 0.1 # açısal hızın artma oranı
+        self.ANGULAR_LOSS_RATE = 0.1 # açısal hızın sıfıra yaklaşma hızı
+        self.ANGULAR_GAIN_RATE = 0.3 # açısal hızın artma oranı
         self.add_timer(0.3,self.loss_callback)
         self.last_detection_time = rospy.get_time()
-        self.vehicle.linear_speed = 0.3
+        self.vehicle.linear_speed = 0.5
         
-    def loss_callback(self):
+    def loss_callback(self, event):
         if self.vehicle.angular_speed > 0:
             self.vehicle.angular_speed = max(self.vehicle.angular_speed - self.ANGULAR_LOSS_RATE, 0)
         else:
             self.vehicle.angular_speed = min(self.vehicle.angular_speed + self.ANGULAR_LOSS_RATE, 0)
 
     def calculate_steering_angle(self, desired_x):
-        diff = desired_x - 0.5
-        self.vehicle.angular_speed += self.ANGULAR_GAIN_RATE * diff
+        rospy.loginfo("desired " + str(desired_x))
+        
+        diff = -( desired_x - 0.5)
+        self.vehicle.angular_speed +=  self.ANGULAR_GAIN_RATE * diff
+        if self.vehicle.angular_speed < 0:
+            rospy.loginfo("going right")
+        else:
+            rospy.loginfo("going left")
+        
     
     def detection_callback(self, msg):
         nearestGreen = None
@@ -28,6 +35,7 @@ class followPath(Task):
 
         if len(msg.detections) == 0:
             if rospy.get_time() - self.last_detection_time > 2:
+                rospy.logwarn("No detection for 2 seconds. Stopping.")
                 self.stop()
                 return
     
@@ -38,15 +46,12 @@ class followPath(Task):
             
 
             # do not recognize if the object is too far away
-            if (detection.class_id == self.objects["green_gate_buoy"] or detection.class_id == self.objects["red_gate_buoy"]):
-                rospy.logwarn("Object is too far away")
-                continue
+            # if (detection.class_id == self.objects["green_gate_buoy"] or detection.class_id == self.objects["red_gate_buoy"]):
+            #    continue
 
             elif (detection.class_id == self.objects["green_buoy"] or detection.class_id ==self.objects["red_buoy"]) and detection.width < 0.05:
-                rospy.logwarn("Object is too far away")
                 continue
             elif detection.class_id == self.objects["yellow_buoy"] and detection.width < 0.0025:
-                rospy.logwarn("Object is too far away")
                 continue
 
             # find the closest object
@@ -76,28 +81,38 @@ class followPath(Task):
 
         if nearestYellow is None:
             if nearestGreen is None and nearestRed is None:
+                rospy.logwarn("No green or red buoy or yellow buoy detected. Going straight.")
                 desired_x = 0.5
-            elif nearestGreen is None and nearestRed is not None:                
+            elif nearestGreen is None and nearestRed is not None:      
+                rospy.logwarn("Red buoy detected. avoiding the red buoy. x " + str(nearestRed.x_center))
                 desired_x = (0.5 + nearestRed.x_center) % 1
             elif nearestGreen is not None and nearestRed is None:
+                rospy.logwarn("Green buoy detected. avoiding the green buoy.")
                 desired_x = (0.5 + nearestGreen.x_center) % 1
             else:
+                rospy.logwarn("Both green and red buoy detected. Going between them.")
                 desired_x = (nearestGreen.x_center + nearestRed.x_center) / 2
             
         else:
             if nearestGreen is None and nearestRed is None:
+                rospy.logwarn("No green or red buoy detected. avoiding the yellow buoy.")
                 desired_x = (0.5 + nearestYellow.x_center) % 1
             elif nearestGreen is None and nearestRed is not None:                
-                if nearestYellow.x_center > 0.5:
+                if nearestYellow.x_center > 0.8:
+                    rospy.logwarn("Red buoy and yellow buoy detected yellow is far from red. Going between them.")
                     desired_x = (nearestYellow.x_center + nearestRed.x_center) / 2
                 else:
                     desired_x =  (0.5 + max(nearestYellow.x_center, nearestRed.x_center)) % 1
+                    rospy.logwarn("Red buoy and yellow buoy detected yellow is close to red. avoiding them.")
             elif nearestGreen is not None and nearestRed is None:
-                if nearestYellow.x_center < 0.5:
+                if nearestYellow.x_center < 0.3:
+                    rospy.logwarn("Green buoy and yellow buoy detected yellow is far from green. Going between them.")
                     desired_x = (nearestGreen.x_center + nearestYellow.x_center) / 2
                 else:
+                    rospy.logwarn("Green buoy and yellow buoy detected yellow is close to green. avoiding them.")
                     desired_x =  (0.5 + min(nearestYellow.x_center, nearestGreen.x_center)) % 1
             else:
+                rospy.logwarn("All buoys detected. Going between the furthest two buoys.")
                 red_yellow_diff = nearestRed.x_center - nearestYellow.x_center
                 green_yellow_diff = nearestGreen.x_center - nearestYellow.x_center
                 if red_yellow_diff < green_yellow_diff:

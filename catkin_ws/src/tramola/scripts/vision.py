@@ -16,11 +16,16 @@ detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=1)
 bridge = CvBridge()
 
 # Initialize YOLOv8 model (adjust the path to your custom model)
-model = YOLO("/home/tramola/catkin_ws/src/tramola/models/balon.pt")
+model = YOLO("/home/tramola/catkin_ws/src/tramola/models/everything.pt")
 
 # Use OpenCV to capture video (adjust device index as needed)
 cap = cv2.VideoCapture(0)
 rospy.sleep(2)  # Give time for the camera to warm up
+names = ['blue circle', 'blue plus', 'blue square', 'blue triangle', 
+        'green circle', 'green plus', 'green square', 'green triangle', 
+        'red circle', 'red plus', 'red square', 'red triangle',
+        'black balloon', 'green balloon', 'red balloon', 'yellow balloon',
+        'black plus', 'black triangle']
 
 while not rospy.is_shutdown():
     ret, frame = cap.read()
@@ -64,7 +69,7 @@ while not rospy.is_shutdown():
 
     rospy.loginfo(f"Detected {len(msg.detections)} objects")
     for det in msg.detections:
-        rospy.loginfo(f"Class ID: {det.class_id}, Confidence: {det.confidence:.2f}, "
+        rospy.loginfo(f"Class: {names[det.class_id]}, Confidence: {det.confidence:.2f}, "
                       f"Center: ({det.x_center:.2f}, {det.y_center:.2f}), "
                       f"Size: ({det.width:.2f}, {det.height:.2f})")
 
