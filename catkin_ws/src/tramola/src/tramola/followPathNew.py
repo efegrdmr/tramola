@@ -1,5 +1,7 @@
+import numpy as np
 from tramola.task import Task
 import rospy
+from tramola.sort import convert_normalized_to_bbox, Sort
 
 
 class FollowPath(Task):
@@ -10,6 +12,8 @@ class FollowPath(Task):
         self.add_timer(0.3,self.loss_callback)
         self.last_detection_time = rospy.get_time()
         self.vehicle.linear_speed = 0.5
+        self.mot_tracker = Sort() 
+        self.track_bbs_ids = np.array([])
         
     def loss_callback(self, event):
         if self.vehicle.angular_speed > 0:
@@ -28,6 +32,7 @@ class FollowPath(Task):
             rospy.loginfo("going left")
         
     
+
     def detection_callback(self, msg):
         nearestGreen = None
         nearestRed = None
@@ -37,9 +42,15 @@ class FollowPath(Task):
             if rospy.get_time() - self.last_detection_time > 2:
                 rospy.logwarn("No detection for 2 seconds. Stopping.")
                 self.stop()
+                rospy.loginfo("total yellow buoys detected: " + str(self.track_bbs_ids.shape[0]))
+                
                 return
-    
+
+        yellow_buoys = []
         for detection in msg.detections:
+            if detection.class_id == self.objects["yellow_buoy"]:
+                yellow_buoys.append(convert_normalized_to_bbox(detection.x_center, detection.y_center, detection.width, detection.height, detection.confidence))
+
             if detection.confidence < 0.3:
                 rospy.logwarn(f"Low confidence: {detection.confidence}. Ignoring detection.")
                 continue
@@ -74,13 +85,16 @@ class FollowPath(Task):
             elif detection.class_id == self.objects["yellow_buoy"]:
                 if nearestYellow is None or nearestYellow.width < detection.width:
                     nearestYellow = detection
-                
-            
+
+        if len(yellow_buoys) > 0:
+            self.track_bbs_ids = self.mot_tracker.update(np.array(yellow_buoys))
+        else:
+            self.track_bbs_ids = self.mot_tracker.update()
         if nearestGreen is not None or nearestRed is not None or nearestYellow is not None:
             self.last_detection_time = rospy.get_time()
 
         if nearestYellow is None or \
-        (nearestYellow.x_center < 0.3 or nearestYellow.x_center > 0.7 or nearestGreen.y_center > 0.6):
+        (nearestYellow.x_center < 0.3 or nearestYellow.x_center > 0.7 or nearestYellow.y_center > 0.6):
             if nearestGreen is None and nearestRed is None:
                 rospy.logwarn("No green or red buoy or yellow buoy detected. Going straight.")
                 desired_x = 0.5

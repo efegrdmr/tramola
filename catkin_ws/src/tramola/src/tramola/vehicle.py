@@ -77,17 +77,12 @@ class Vehicle:
         #TODO 
         # clockwise is positive
         target_orientation = self.orientation + degrees
-        if target_orientation > 180:
-            target_orientation -= 360
-        elif target_orientation < -180:
-            target_orientation += 360
-
-        if target_orientation > self.orientation:
-            self.turn_right(angular_speed)
-        else:
+        if degrees < 0:
             self.turn_left(angular_speed)
+        else:
+            self.turn_right(angular_speed)
 
-        while abs(self.orientation - target_orientation) > 30:
+        while abs(self.orientation - target_orientation) > 10:
             rospy.sleep(0.1)
         
         self.stop()

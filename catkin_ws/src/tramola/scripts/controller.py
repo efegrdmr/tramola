@@ -49,8 +49,11 @@ def rc_callback(msg):
         elif task.status == "DOCK":
             task = Dock()
             task.start()
-        
+        elif task.status == "SPEEDCHALLENGE":
+            task = SpeedChallenge()
+            task.start()
         return
+    
     
     # RC7 < 1500 ve rc5 < 1333 ise followpath
     # RC7 < 1500 ve rc5 > 1333 > 1666 ise dock
