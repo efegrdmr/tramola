@@ -20,7 +20,7 @@ class FollowPath(Task):
     def calculate_steering_angle(self, desired_x):
         rospy.loginfo("desired " + str(desired_x))
         
-        diff = -( desired_x - 0.5)
+        diff = -(desired_x - 0.5)
         self.vehicle.angular_speed +=  self.ANGULAR_GAIN_RATE * diff
         if self.vehicle.angular_speed < 0:
             rospy.loginfo("going right")
