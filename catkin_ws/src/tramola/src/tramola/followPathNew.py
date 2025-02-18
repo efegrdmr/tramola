@@ -6,7 +6,7 @@ class FollowPath(Task):
     def start(self):
         self.vehicle.set_mode("GUIDED")
         self.ANGULAR_LOSS_RATE = 0.1 # açısal hızın sıfıra yaklaşma hızı
-        self.ANGULAR_GAIN_RATE = 0.3 # açısal hızın artma oranı
+        self.ANGULAR_GAIN_RATE = 0.4 # açısal hızın artma oranı
         self.add_timer(0.3,self.loss_callback)
         self.last_detection_time = rospy.get_time()
         self.vehicle.linear_speed = 0.5
@@ -79,16 +79,23 @@ class FollowPath(Task):
         if nearestGreen is not None or nearestRed is not None or nearestYellow is not None:
             self.last_detection_time = rospy.get_time()
 
-        if nearestYellow is None:
+        if nearestYellow is None or \
+        (nearestYellow.x_center < 0.3 or nearestYellow.x_center > 0.7 or nearestGreen.y_center > 0.6):
             if nearestGreen is None and nearestRed is None:
                 rospy.logwarn("No green or red buoy or yellow buoy detected. Going straight.")
                 desired_x = 0.5
             elif nearestGreen is None and nearestRed is not None:      
                 rospy.logwarn("Red buoy detected. avoiding the red buoy. x " + str(nearestRed.x_center))
-                desired_x = (0.5 + nearestRed.x_center) % 1
+                if nearestRed.x_center < 0.5:
+                    desired_x = (0.5 + nearestRed.x_center) % 1
+                else:
+                    desired_x = 0.9 # manually turn right to get back on track
             elif nearestGreen is not None and nearestRed is None:
                 rospy.logwarn("Green buoy detected. avoiding the green buoy.")
-                desired_x = (0.5 + nearestGreen.x_center) % 1
+                if nearestGreen.x_center > 0.5:
+                    desired_x = (0.5 + nearestGreen.x_center) % 1
+                else:
+                    desired_x = 0.1 # manually turn left to get back on track
             else:
                 rospy.logwarn("Both green and red buoy detected. Going between them.")
                 desired_x = (nearestGreen.x_center + nearestRed.x_center) / 2
@@ -112,13 +119,9 @@ class FollowPath(Task):
                     rospy.logwarn("Green buoy and yellow buoy detected yellow is close to green. avoiding them.")
                     desired_x =  (0.5 + min(nearestYellow.x_center, nearestGreen.x_center)) % 1
             else:
-                rospy.logwarn("All buoys detected. Going between the furthest two buoys.")
-                red_yellow_diff = nearestRed.x_center - nearestYellow.x_center
-                green_yellow_diff = nearestGreen.x_center - nearestYellow.x_center
-                if red_yellow_diff < green_yellow_diff:
-                    desired_x = (nearestGreen.x_center + nearestYellow.x_center) / 2
-                else:
-                    desired_x = (nearestYellow.x_center + nearestRed.x_center) / 2
+                rospy.logwarn("All buoys detected. Avoiding the closest one.")
+                closest = min(nearestGreen.x_center, nearestRed.x_center, nearestYellow.x_center)
+                desired_x = (0.5 + closest) % 1
         
         self.calculate_steering_angle(desired_x)
        
