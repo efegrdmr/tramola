@@ -66,10 +66,10 @@ def convert_normalized_to_bbox(x_center, y_center, width, height, score):
     """
     Converts normalized coordinates to [x1, y1, x2, y2] format.
     """
-    x1 = x_center - width / 2
-    y1 = y_center - height / 2
-    x2 = x_center + width / 2
-    y2 = y_center + height / 2
+    x1 = x_center - width / 2 * 1280
+    y1 = y_center - height / 2 * 720
+    x2 = x_center + width / 2 * 1280
+    y2 = y_center + height / 2 * 720
     return [x1, y1, x2, y2, score]
 
 def convert_bbox_to_z(bbox):

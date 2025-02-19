@@ -44,7 +44,7 @@ class FollowPath(Task):
             if rospy.get_time() - self.last_detection_time > 2:
                 rospy.logwarn("No detection for 2 seconds. Stopping.")
                 self.stop()
-                rospy.loginfo("total yellow buoys detected: " + str(self.track_bbs_ids.shape[0]))
+                rospy.loginfo("total yellow buoys detected: " + str(len(self.yellow_buoy_ids)))
                 
                 return
 
@@ -90,7 +90,9 @@ class FollowPath(Task):
 
         if len(yellow_buoys) > 0:
             self.track_bbs_ids = self.mot_tracker.update(np.array(yellow_buoys))
-            rospy.logwarn("yellow object count: " + str(self.track_bbs_ids.shape[0]))
+            rospy.logwarn("yellow object count: " + str(len(self.yellow_buoy_ids)))
+            for track in self.track_bbs_ids:
+                self.yellow_buoy_ids.add(track[0])
         else:
             self.track_bbs_ids = self.mot_tracker.update()
         if nearestGreen is not None or nearestRed is not None or nearestYellow is not None:
