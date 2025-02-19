@@ -1,13 +1,21 @@
 from tramola.task import Task
 import rospy
 import time
+from std_msgs.msg import Int32
 
 
 class FollowPath(Task):
     def start(self):
         self.vehicle.set_mode("GUIDED")
         self.last_detection_time = time.time()
-        
+        self.set_yellow_detection_state(True)
+        self.yellow_count = 0
+        self.add_subscription("/yellow_counter", Int32, self.detection_callback)
+
+    
+    def yellow_counter_callback(self, msg):
+        self.yellow_count = msg.data
+
     def detection_callback(self, msg):
         nearestGreen = None
         nearestRed = None
@@ -17,6 +25,8 @@ class FollowPath(Task):
             if time.time() - self.last_detection_time > 2:
                 self.vehicle.set_mode("MANUAL")
                 self.stop()
+                rospy.loginfo("No detection for 2 seconds. Stopping the vehicle.")
+                rospy.loginfo("Yellow count: " + str(self.yellow_count))
                 return
         
 
@@ -37,6 +47,7 @@ class FollowPath(Task):
             elif detection.class_id == self.objects["yellow_buoy"] and detection.width < 0.0025:
                 rospy.logwarn("Object is too far away")
                 continue
+            
 
             # find the closest object
             if detection.class_id == self.objects["green_gate_buoy"]:
@@ -56,6 +67,7 @@ class FollowPath(Task):
                     nearestRed = detection
 
             elif detection.class_id == self.objects["yellow_buoy"]:
+
                 if nearestYellow is None or nearestYellow.width < detection.width:
                     nearestYellow = detection
             

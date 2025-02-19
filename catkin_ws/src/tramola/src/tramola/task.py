@@ -1,6 +1,7 @@
 import rospy
 from tramola.vehicle import Vehicle
 from tramola.msg import DetectionList, Detection
+from tramola.srv import greenLightDetectionState, inferenceState, selectModel, yellowDetectionState
 
 class Task:
     def __init__(self):
@@ -13,7 +14,7 @@ class Task:
             "blue_circle": 12, "red_circle": 13, "green_circle": 14,
             "blue_square": 15, "red_square": 16, "green_square": 17,
             "blue_plus": 18, "red_plus": 19, "green_plus": 20
-                        }
+        }
 
         self.subscriptions = []
         self.publications = []
@@ -23,7 +24,30 @@ class Task:
         self.add_subscription("yolo_detections", DetectionList, self.detection_callback)
         self.status = "STARTED"
 
+        # Add service proxies corresponding to vision.py services
+        rospy.wait_for_service("/green_light_detection_state")
+        self.green_light_detection_srv = rospy.ServiceProxy(
+            "/green_light_detection_state", greenLightDetectionState
+        )
+        rospy.wait_for_service("/inference_state")
+        self.inference_state_srv = rospy.ServiceProxy(
+            "/inference_state", inferenceState
+        )
+        rospy.wait_for_service("/select_model")
+        self.select_model_srv = rospy.ServiceProxy(
+            "/select_model", selectModel
+        )
+        rospy.wait_for_service("/yellow_detection_state")
+        self.yellow_detection_state_srv = rospy.ServiceProxy(
+            "/yellow_detection_state", yellowDetectionState
+        )
 
+
+        self.select_model("/home/tramola/catkin_ws/src/tramola/models/balon.pt")
+        self.set_inference_state(True)
+
+        self.start()
+    
     def add_timer(self, period, callback):
         self.timers.append(rospy.Timer(rospy.Duration(period), callback))
     
@@ -44,7 +68,6 @@ class Task:
     def detection_callback(self, msg):
         raise NotImplementedError("The detection_callback method must be overridden in a subclass")
 
-
     def stop(self):
         if self.status == "COMPLETED":
             return
@@ -59,3 +82,55 @@ class Task:
         self.vehicle.set_mode("LOITER")
         del self.vehicle
         self.status = "COMPLETED"
+
+        self.set_inference_state(False)
+
+    # Functions wrapping the service proxies
+
+    def set_green_light_detection(self, on):
+        """
+        Enable or disable green light detection.
+        """
+        try:
+            response = self.green_light_detection_srv(on=on)
+            rospy.loginfo(f"Green light detection state set to {on}")
+            return response.success
+        except rospy.ServiceException as e:
+            rospy.logerr(f"Failed to set green light detection state: {e}")
+            return False
+
+    def set_inference_state(self, on):
+        """
+        Enable or disable object inference.
+        """
+        try:
+            response = self.inference_state_srv(on=on)
+            rospy.loginfo(f"Inference state set to {on}")
+            return response.success
+        except rospy.ServiceException as e:
+            rospy.logerr(f"Failed to set inference state: {e}")
+            return False
+
+    def set_yellow_detection_state(self, on):
+        """
+        Enable or disable yellow object detection.
+        """
+        try:
+            response = self.yellow_detection_state_srv(on=on)
+            rospy.loginfo(f"Yellow detection state set to {on}")
+            return response.success
+        except rospy.ServiceException as e:
+            rospy.logerr(f"Failed to set yellow detection state: {e}")
+            return False
+
+    def select_model(self, model_path):
+        """
+        Select a YOLO model by path.
+        """
+        try:
+            response = self.select_model_srv(model_path=model_path)
+            rospy.loginfo(f"Model selected from: {model_path}")
+            return response.success
+        except rospy.ServiceException as e:
+            rospy.logerr(f"Failed to select model: {e}")
+            return False

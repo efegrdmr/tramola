@@ -1,3 +1,3 @@
-string modelName
+string modelPath
 ---
 bool success

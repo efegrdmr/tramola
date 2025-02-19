@@ -30,6 +30,8 @@ def set_mode(mode):
 
 def rc_callback(msg):
     global task
+    if len(msg.channels) < 8:
+        return
     ch5 = msg.channels[4]
     ch6 = msg.channels[5]
     ch7 = msg.channels[6]
@@ -45,13 +47,10 @@ def rc_callback(msg):
     if task is not None:
         if task.status == "FOLLOWPATH":
             task = FollowPath()
-            task.start()
         elif task.status == "DOCK":
             task = Dock()
-            task.start()
         elif task.status == "SPEEDCHALLENGE":
             task = SpeedChallenge()
-            task.start()
         return
     
     
@@ -66,15 +65,11 @@ def rc_callback(msg):
 
     if ch7 < 1500 and ch5 < 1333:
         task = FollowPath()
-        task.start()
     elif ch7 < 1500 and ch5 > 1333 and ch5 < 1666:
         # task = Dock()
-        # task.start()
         pass
     elif ch7 < 1500 and ch5 > 1666:
-        task = SpeedChallenge()
-        task.start()
-        
+        task = SpeedChallenge()        
     
 
 def main():

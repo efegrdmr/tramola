@@ -41,11 +41,11 @@ class FollowPath(Task):
         nearestYellow = None
 
         if len(msg.detections) == 0:
-            if rospy.get_time() - self.last_detection_time > 2:
-                rospy.logwarn("No detection for 2 seconds. Stopping.")
+            if rospy.get_time() - self.last_detection_time > 3:
+                rospy.logwarn("No detection for 3 seconds. Stopping.")
                 self.stop()
                 rospy.loginfo("total yellow buoys detected: " + str(len(self.yellow_buoy_ids)))
-                
+                self.set_yellow_detection_state(False)
                 return
 
         yellow_buoys = []
