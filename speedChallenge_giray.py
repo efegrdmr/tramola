@@ -308,12 +308,12 @@ class FollowPath(Task):
 
             if nearestRed is not None and nearestGreen is not None and -20<(nearestRed.distance - nearestGreen.distance)<20:
                 desired_x = (nearestRed.x_center + nearestGreen.x_center)/2
-                if nearestGreen.distance <gate_commit_distance or nearestRed<gate_commit_distance:
+                if nearestGreen.distance < self.gate_commit_distance or nearestRed< self.gate_commit_distance:
                     self.gate_passing_initiated= True
-            elif nearestRed is not None and nearestGreen is None and nearestRed.distance <red_avoid_distance:
+            elif nearestRed is not None and nearestGreen is None and nearestRed.distance <self.red_avoid_distance:
                 self.avoid_red_buoy(nearestRed)
                 return
-            elif nearestRed is  None and nearestGreen is not None and nearestGreen.distance <red_avoid_distance:
+            elif nearestRed is  None and nearestGreen is not None and nearestGreen.distance <self.red_avoid_distance:
                 self.avoid_red_buoy(nearestGreen)
                 return
 
