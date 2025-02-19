@@ -3,7 +3,7 @@ import rospy
 import time
 import math
 #import utm
-from sensor import get_sensor_distance
+from tramola.sensor import get_sensor_distance
 
 # açıları sabit kullandım onları dinamik hale getirmem lazım. kod çalıştığı durumda.
 class Docking(Task):

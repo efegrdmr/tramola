@@ -16,7 +16,7 @@ detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=1)
 bridge = CvBridge()
 
 # Initialize YOLOv8 model (adjust the path to your custom model)
-model = YOLO("/home/tramola/catkin_ws/src/tramola/models/everything.pt")
+model = YOLO("/home/tramola/catkin_ws/src/tramola/models/balon.pt")
 
 # Use OpenCV to capture video (adjust device index as needed)
 cap = cv2.VideoCapture(0)

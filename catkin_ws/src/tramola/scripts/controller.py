@@ -3,7 +3,7 @@ import rospy
 from mavros_msgs.msg import RCIn, State
 from mavros_msgs.srv import SetMode
 from tramola.followPathNew import FollowPath  
-from tramola.dock import Dock
+# from tramola.dock import Dock
 from tramola.speedChallenge import SpeedChallenge
 
 
@@ -68,8 +68,9 @@ def rc_callback(msg):
         task = FollowPath()
         task.start()
     elif ch7 < 1500 and ch5 > 1333 and ch5 < 1666:
-        task = Dock()
-        task.start()
+        # task = Dock()
+        # task.start()
+        pass
     elif ch7 < 1500 and ch5 > 1666:
         task = SpeedChallenge()
         task.start()

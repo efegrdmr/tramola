@@ -14,6 +14,7 @@ class FollowPath(Task):
         self.vehicle.linear_speed = 0.5
         self.mot_tracker = Sort() 
         self.track_bbs_ids = np.array([])
+        self.yellow_buoy_ids = set()
         
     def loss_callback(self, event):
         if self.vehicle.angular_speed > 0:
@@ -28,9 +29,10 @@ class FollowPath(Task):
         self.vehicle.angular_speed +=  self.ANGULAR_GAIN_RATE * diff
         if self.vehicle.angular_speed < 0:
             rospy.loginfo("going right")
-        else:
+        elif self.vehicle.angular_speed > 0:
             rospy.loginfo("going left")
-        
+        else:
+            rospy.loginfo("going straight")
     
 
     def detection_callback(self, msg):
