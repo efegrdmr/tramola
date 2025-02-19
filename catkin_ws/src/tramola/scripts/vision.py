@@ -4,13 +4,42 @@ from ultralytics import YOLO
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+from tramola.srv import greenLightDetectionState, greenLightDetectionStateResponse
+from tramola.srv import inferenceState, inferenceStateResponse
+from tramola.srv import selectModel, selectModelResponse
+from tramola.srv import yellowDetectionState, yellowDetectionStateResponse
 
-# Import your ROS messages; for example:
 from tramola.msg import Detection, DetectionList
 
-# Initialize ROS node and publishers
-rospy.init_node("yolo_v8_ros")
+def green_light_deteciton_state_handler(req):
+    # Example callback for green light detection service
+    if req.on:
+
+    response = greenLightDetectionStateResponse()
+    response.success = True
+    return response
+
+def inference_state_handler(req):
+    pass
+
+def select_model_handler(req):
+    pass
+
+def yellow_detection_state_handler(req):
+    pass
+
+
+rospy.init_node("vision")
 detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=1)
+
+# Services
+rospy.Service("/green_light_detection_state", greenLightDetectionState, green_light_deteciton_state_handler)
+rospy.Service("/inference_state", inferenceState, inference_state_handler)
+rospy.Service("/select_model", selectModel, select_model_handler)
+rospy.Service("/yellow_detection_state", yellowDetectionState, yellow_detection_state_handler)
+
+# Publishers
+green_light_detection_pub = rospy.Publisher("/green_light_detection", Image, queue_size=1)
 
 # Create a CV bridge instance
 bridge = CvBridge()
