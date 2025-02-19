@@ -4,7 +4,7 @@ import re  # Import regex module
 
 # Open Serial Connection
 arduino = serial.Serial(
-    port='/dev/ttyUSB0',  # Change based on your device
+    port='/dev/tty.usbserial-10',  # Change based on your device
     baudrate=115200,
     bytesize=serial.EIGHTBITS,
     parity=serial.PARITY_NONE,
