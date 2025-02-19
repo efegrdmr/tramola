@@ -88,6 +88,7 @@ class FollowPath(Task):
 
         if len(yellow_buoys) > 0:
             self.track_bbs_ids = self.mot_tracker.update(np.array(yellow_buoys))
+            rospy.logwarn("yellow object count: " + str(self.track_bbs_ids.shape[0]))
         else:
             self.track_bbs_ids = self.mot_tracker.update()
         if nearestGreen is not None or nearestRed is not None or nearestYellow is not None:
