@@ -1,10 +1,10 @@
 import serial
 import time
 import re  # Import regex module
-
+import rospy
 # Open Serial Connection
 arduino = serial.Serial(
-    port='/dev/tty.usbserial-10',  # Change based on your device
+    port='/dev/ttyUSB0',  # Change based on your device
     baudrate=115200,
     bytesize=serial.EIGHTBITS,
     parity=serial.PARITY_NONE,
@@ -25,19 +25,19 @@ def get_sensor_distance():
         while True:
             data = arduino.readline().decode('utf-8').strip()
             if data:
-                print(f"Received: {data}")  # Debugging
+                rospy.loginfo(f"Received: {data}")  # Debugging
 
                 # Extract numbers only (remove 'cm' or other text)
                 match = re.search(r"\d+(\.\d+)?", data)  # Find a number with optional decimal
                 if match:
                     return float(match.group())  # Convert to float
 
-                print("Invalid data, retrying...")
+                rospy.logwarn("Invalid data, retrying...")
 
             time.sleep(0.1)  # Allow time for a new reading
 
     except Exception as e:
-        print(f"Error: {e}")
+        rospy.logwarn(f"Error: {e}")
         return None
 
     # Main Loop
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     while True:
         distance = get_sensor_distance()
         if distance is not None:
-            print(f"Distance: {distance} cm")
+            rospy.loginfo(f"Distance: {distance} cm")
         else:
-            print("Failed to get distance")
+            rospy.logwarn("Failed to get distance")
 
