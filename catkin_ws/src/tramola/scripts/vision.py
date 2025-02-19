@@ -2,7 +2,6 @@
 import rospy
 from ultralytics import YOLO
 import cv2
-from cv_bridge import CvBridge
 
 from std_msgs.msg import Bool, Int32
 
@@ -12,11 +11,13 @@ from tramola.srv import selectModel, selectModelResponse
 from tramola.srv import yellowDetectionState, yellowDetectionStateResponse
 
 from tramola.msg import Detection, DetectionList
+from tramola.balloonTracker import BalloonTracker
 
 detect_green_light = False
 detect_yellow = False
 detect_objects = False
 model = None
+tracker = None
 
 def green_light_detection_state_handler(req):
     global detect_green_light
@@ -56,15 +57,20 @@ def select_model_handler(req):
     return response
 
 def yellow_detection_state_handler(req):
-    global detect_yellow
+    global detect_yellow, tracker
     if req.on:
         response = yellowDetectionStateResponse()
         detect_yellow = True
+        if tracker is not None:
+            del tracker
+        tracker = BalloonTracker()
         response.success = True
         return response
     else:
         response = yellowDetectionStateResponse()
         detect_yellow = False
+        del tracker
+        tracker = None
         response.success = True
         return response
 
@@ -105,16 +111,12 @@ while not rospy.is_shutdown():
         res = Bool(data=False)
         green_light_detection_pub.publish(res)
 
-    if detect_yellow:
-        # TODO: Detect yellow objects and publish the count to /yellow_counter
-        count = Int32(data=0)
-        yellow_counter_pub.publish(count)
-        pass
+    
 
     if detect_objects and model is not None: 
         # YOLOv8 expects a BGR image (as provided by cv2.VideoCapture)
         results = model(frame)
-
+        current_detections = []
         msg = DetectionList()
         for result in results:
             # Iterate over detected bounding boxes
@@ -135,6 +137,17 @@ while not rospy.is_shutdown():
                 # Get confidence and class id
                 confidence = box.conf.cpu().numpy()[0]
                 class_id = int(box.cls.cpu().numpy()[0])
+
+                # Yellow detection
+                if detect_yellow:
+                    count = Int32(data=0)
+                    cls = int(box.cls[0])
+                    conf = float(box.conf[0])
+                    
+                    if cls == 15:
+                        bbox = box.xyxy[0].cpu().numpy()
+                        current_detections.append((bbox, conf))
+
                 
                 det_msg = Detection()
                 det_msg.x_center = x_center
@@ -145,6 +158,11 @@ while not rospy.is_shutdown():
                 det_msg.class_id = class_id
 
                 msg.detections.append(det_msg)
+
+        if detect_yellow:
+            processed_detections = tracker.process_detections(current_detections)
+            yellow_count = Int32(tracker.balloon_count)
+            yellow_counter_pub.publish(count)
 
         rospy.loginfo(f"Detected {len(msg.detections)} objects")
         for det in msg.detections:

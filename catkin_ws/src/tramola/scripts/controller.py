@@ -48,7 +48,8 @@ def rc_callback(msg):
         if task.status == "FOLLOWPATH":
             task = FollowPath()
         elif task.status == "DOCK":
-            task = Dock()
+            # task = Dock()
+            pass
         elif task.status == "SPEEDCHALLENGE":
             task = SpeedChallenge()
         return
