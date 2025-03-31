@@ -4,7 +4,7 @@ from tramola.msg import DetectionList, Detection
 from tramola.srv import greenLightDetectionState, inferenceState, selectModel, yellowDetectionState
 
 class Task:
-    def __init__(self):
+    def __init__(self, vehicle):
         assert rospy.core.is_initialized(), "ROS node is not initialized"
         self.objects = {
             "green_buoy": 0, "red_buoy": 1, "yellow_buoy": 2, "blue_buoy": 3, "black_buoy": 4,
@@ -20,15 +20,11 @@ class Task:
         self.publications = []
         self.services = []
         self.timers = []
-        self.vehicle = Vehicle()
+        self.vehicle = vehicle
         self.add_subscription("yolo_detections", DetectionList, self.detection_callback)
         self.status = "STARTED"
 
         # Add service proxies corresponding to vision.py services
-        rospy.wait_for_service("/green_light_detection_state")
-        self.green_light_detection_srv = rospy.ServiceProxy(
-            "/green_light_detection_state", greenLightDetectionState
-        )
         rospy.wait_for_service("/inference_state")
         self.inference_state_srv = rospy.ServiceProxy(
             "/inference_state", inferenceState
@@ -37,11 +33,6 @@ class Task:
         self.select_model_srv = rospy.ServiceProxy(
             "/select_model", selectModel
         )
-        rospy.wait_for_service("/yellow_detection_state")
-        self.yellow_detection_state_srv = rospy.ServiceProxy(
-            "/yellow_detection_state", yellowDetectionState
-        )
-
 
         self.select_model("/home/tramola/catkin_ws/src/tramola/models/balon.pt")
         self.set_inference_state(True)
@@ -80,7 +71,6 @@ class Task:
         for timer in self.timers:
             timer.shutdown()
         self.vehicle.set_mode("LOITER")
-        del self.vehicle
         self.status = "COMPLETED"
 
         self.set_inference_state(False)

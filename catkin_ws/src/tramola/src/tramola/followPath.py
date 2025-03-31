@@ -1,8 +1,6 @@
 import numpy as np
 from tramola.task import Task
 import rospy
-from tramola.sort import convert_normalized_to_bbox, Sort
-
 
 class FollowPath(Task):
     def start(self):
@@ -12,9 +10,7 @@ class FollowPath(Task):
         self.add_timer(0.3,self.loss_callback)
         self.last_detection_time = rospy.get_time()
         self.vehicle.linear_speed = 0.5
-        self.mot_tracker = Sort() 
-        self.track_bbs_ids = np.array([])
-        self.yellow_buoy_ids = set()
+
         
     def loss_callback(self, event):
         if self.vehicle.angular_speed > 0:
@@ -48,11 +44,7 @@ class FollowPath(Task):
                 self.set_yellow_detection_state(False)
                 return
 
-        yellow_buoys = []
         for detection in msg.detections:
-            if detection.class_id == self.objects["yellow_buoy"]:
-                yellow_buoys.append(convert_normalized_to_bbox(detection.x_center, detection.y_center, detection.width, detection.height, detection.confidence))
-
             if detection.confidence < 0.3:
                 rospy.logwarn(f"Low confidence: {detection.confidence}. Ignoring detection.")
                 continue
@@ -88,13 +80,7 @@ class FollowPath(Task):
                 if nearestYellow is None or nearestYellow.width < detection.width:
                     nearestYellow = detection
 
-        if len(yellow_buoys) > 0:
-            self.track_bbs_ids = self.mot_tracker.update(np.array(yellow_buoys))
-            rospy.logwarn("yellow object count: " + str(len(self.yellow_buoy_ids)))
-            for track in self.track_bbs_ids:
-                self.yellow_buoy_ids.add(track[0])
-        else:
-            self.track_bbs_ids = self.mot_tracker.update()
+       
         if nearestGreen is not None or nearestRed is not None or nearestYellow is not None:
             self.last_detection_time = rospy.get_time()
 
