@@ -6,19 +6,18 @@ import time
 SERIAL_PORT = 'COM3'  # On Linux or macOS this might be '/dev/ttyUSB0' or similar
 BAUD_RATE = 9600
 TIMEOUT = 1  # Timeout for serial read operations
-RESPONSE_TIMEOUT = 300  # Timeout for response wait in milliseconds
+RESPONSE_TIMEOUT = 500  # Timeout for response wait in milliseconds
 
-# Frame delimiters and constants
-START_DELIMITER = 0x7E
-END_DELIMITER = 0x7F
-MIN_PACKET_SIZE = 4  # Start + Length + Checksum + End (plus payload)
 
 class Lora:
-    def __init__(self, reciever=False, reveiver_callback=None):
+    def __init__(self, message_callback=None):
         self.serial_port = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-        self.reveiver_callback = reveiver_callback
-        if reciever:
+        self.message_callback = message_callback
+        if message_callback:
             self.start_receiver()
+    
+    def set_message_callback(self, callback):
+        self.message_callback = callback
 
     def start_receiver(self):
         while True:
@@ -27,41 +26,39 @@ class Lora:
             if not packet:
                 continue  # No packet received, continue to read
             # Process the received packet
-            packet = self.process_received_packet(packet)
-            if packet and self.reveiver_callback:
+            if packet:
                 # Call the callback function with the processed response
-                response = self.reveiver_callback(packet)
+                response = self.message_callback(packet)
                 if response:
                     # send the result
-                    self.send(response, tries=0)
+                    self.send(response)
 
-                
+    def encode_message(self, message):
+        return bytearray(message)
+    
+    def decode_message(self, message):
+        return message.decode('utf-8')
         
-    def send(self, data, tries=3):
+    def send_message(self, message):
         """
         Sends data over the serial port.
         The data should be a byte array.
-        Returns the response as a byte array.
         """
-        packet = None
-        # Prepend start delimiter and append end delimiter
-        packet = bytearray([0x7E]) + data + bytearray([0x7F])
+        packet = self.encode_message(message)
+        checksum = self.calculate_checksum(packet) & 0xFFFF
+        checksum_bytes = checksum.to_bytes(2, byteorder='big')
+        packet += checksum_bytes
         self.serial_port.write(packet)
+        
+    
+    def send_message_and_wait_for_response(self, message):
         # Wait for response at most RESPONSE_TIMEOUT milliseconds
+        self.send_message(message)
         start_time = time.time()
         while (time.time() - start_time) * 1000 < RESPONSE_TIMEOUT:
             response = self.read_packet()
             if response:
-                # Process the received packet
-                response = self.process_received_packet(response)
-                if response:
-                    break
-        
-        if not response and tries > 0:
-            return self.send(data, tries - 1)
-        elif not response:
-            return None
-
+                break
         return response
             
     def calculate_checksum(self, data):
@@ -73,50 +70,14 @@ class Lora:
             checksum ^= byte
         return checksum
 
-    def process_received_packet(self,packet):
-        """
-        Process and validate a packet according to:
-        [START_DELIMITER][LENGTH][PAYLOAD...][CHECKSUM][END_DELIMITER]
-        Returns the payload if valid; otherwise, returns None.
-        """
-        packet_size = len(packet)
-
-        # Check for minimum packet size
-        if packet_size < MIN_PACKET_SIZE:
-            print("Packet too short.")
-            return None
-
-        # Verify start and end delimiters
-        if packet[0] != START_DELIMITER or packet[-1] != END_DELIMITER:
-            print("Start or end delimiter not found.")
-            return None
-
-        # Read payload length
-        payload_length = packet[1]
-
-        # Expected length = start + length byte + payload + checksum + end
-        if packet_size != payload_length + 4:
-            print("Packet length mismatch.")
-            return None
-
-        # Retrieve payload and checksum
-        payload = packet[2:2+payload_length]
-        received_checksum = packet[2+payload_length]
-
-        # Validate checksum
-        if self.calculate_checksum(payload) != received_checksum:
-            print("Checksum error.")
-            return None
-
-        return payload
+    
     
     def read_packet(self):
         """
-        Reads from the serial port until a complete packet is found
-        or the function times out. Returns a complete packet as a bytearray.
+        Reads from the serial port
+        Returns a complete packet as a bytearray.
         """
         buffer = bytearray()
-
         while True:
             # Read a single byte from serial (blocking with timeout)
             byte = self.serial_port.read(1)
@@ -124,21 +85,91 @@ class Lora:
                 # Timeout reached without receiving new byte
                 break
             buffer += byte
+        if len(buffer) == 0:
+            return None
 
-            # If we find a valid start delimiter in the buffer, try to identify a full packet.
-            if buffer[0] != START_DELIMITER:
-                # If the first byte isn't the start delimiter, pop it off and continue.
-                buffer.pop(0)
-                continue
+        packet_checksum = int.from_bytes(buffer[-2:], byteorder="big")
+        if self.calculate_checksum(buffer[:-2]) != packet_checksum:
+            return None
+        packet = self.decode_message(buffer[:-2])
+        return packet
+    
 
-            # Check if we have at least the minimum number of bytes
-            if len(buffer) >= MIN_PACKET_SIZE:
-                # Determine expected packet length from the length byte (at index 1)
-                expected_length = buffer[1] + 4
-                if len(buffer) >= expected_length:
-                    # We have read enough bytes; extract the packet
-                    packet = buffer[:expected_length]
-                    # Remove the processed packet from the buffer
-                    buffer = buffer[expected_length:]
-                    return packet
-        return None
+import heapq
+import time
+import threading
+
+class LoraGCSClient:
+    def __init__(self):
+        self.pq = []
+        self.requested_datas = {"state", "latitude", "longitude", "degree_from_north",
+                           "speed"}
+        for data in self.requested_datas:
+            heapq.heappush(self.pq, (time.time(), "GET," + data))
+        
+        self.state = None
+        self.latitude = None
+        self.longitude = None
+        self.degree_from_north = None
+        self.speed = None
+        self.manuel_speed = 0
+        self.manuel_yaw = 0
+        self.waypoints = []
+        self.lora = Lora()
+        self.waiting_for_response = False
+        self.response = None
+
+        def loop():
+            while True:
+                self.main_loop()
+        threading.Thread(target=loop, daemon=True).start()
+
+
+    def start_mission(self):
+        pass
+
+    def add_waypoint(self, lat, long):
+        pass
+
+    def delete_waypoints(self):
+        pass
+
+    def emergency_shutdown(self):
+        pass
+
+    def start_manuel_control(self):
+        pass
+
+    def stop_manuel_control(self):
+        pass
+
+    def main_loop(self):
+        _, message = heapq.heappop(self.pq)
+        if message in self.requested_datas:
+            response = self.lora.send_message_and_wait_for_response(message)
+            if response:
+                if message == "state":
+                    self.state = response
+                elif message == "latitude":
+                    self.latitude = float(response)
+                elif message == "longitude":
+                    self.longitude = float(response)
+                elif message == "degree_from_north":
+                    self.degree_from_north = int(response)
+                elif message == "speed":
+                    self.speed = float(response)
+            
+            heapq.heappush(self.pq, (time.time(), message))
+            return
+        
+        assert not self.waiting_for_response, "Waiting for response while sending message"
+        self.waiting_for_response = True
+        self.response = self.lora.send_message_and_wait_for_response(message)
+        self.waiting_for_response = False
+
+
+
+
+        
+
+            
