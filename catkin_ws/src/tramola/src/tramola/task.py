@@ -1,7 +1,7 @@
 import rospy
 from tramola.vehicle import Vehicle
 from tramola.msg import DetectionList, Detection
-from tramola.srv import greenLightDetectionState, inferenceState, selectModel, yellowDetectionState
+from tramola.srv import greenLightDetectionState, inferenceState, selectModel
 
 class Task:
     def __init__(self, vehicle):

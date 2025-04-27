@@ -5,7 +5,7 @@ from geometry_msgs.msg import Twist
 from mavros_msgs.srv import SetMode, SetModeRequest, WaypointPush, WaypointReached
 from mavros_msgs.msg import Waypoint, OverrideRCIn, CommandBool
 from std_msgs.msg import Float64
-from sensor_msgs.msg import NavSatFix, Range
+from sensor_msgs.msg import NavSatFix
 from geographic_msgs.msg import GeoPoseStamped
 from geometry_msgs.msg import TwistStamped
 
@@ -20,8 +20,7 @@ class Vehicle:
         self.velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel_unstamped', Twist, queue_size=1)
         self.linear_speed = 0.0 # max 1.0
         self.angular_speed = 0.0 # max 1.0
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
-
+        
         # Set mode service
         rospy.wait_for_service("/mavros/set_mode") 
         self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
@@ -32,7 +31,7 @@ class Vehicle:
         self.orientation = None
 
         # GPS
-        gps_sub = rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.gps_callback)
+        self.gps_sub = rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.gps_callback)
         self.location = None
 
         # location sending
@@ -61,6 +60,14 @@ class Vehicle:
         self.arming_srv.wait_for_service()
 
 
+    def start_velocity_publisher(self):
+        self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
+
+    def stop_velocity_publisher(self):
+        if self.timer is not None:
+            self.timer.shutdown()
+            self.timer = None
+
     def emergency_stop(self):
         self.stop_rc_ovveride()
         self.set_mode("HOLD")
@@ -83,7 +90,7 @@ class Vehicle:
         self.set_mode("MANUAL")
         self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_rc_override)  # 10 Hz
 
-    def publish_rc_override(self, event):
+    def publish_rc_override(self):
         self.rc_msg.channels[self.steering_channel] = self.scale_pwm(self.linear_speed)
         self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(self.angular_speed)
         self.rc_override_pub.publish(self.rc_msg)
@@ -93,7 +100,7 @@ class Vehicle:
             return
         self.timer.shutdown()
         self.timer = None
-        self.set_mode("AUTO")
+        self.set_mode("HOLD")
 
 
     def reached_cb(self, msg):
@@ -171,30 +178,6 @@ class Vehicle:
         
         self.stop()
 
-    def turn_left(self, angular_speed=0.5):
-        self.linear_speed = 0.0
-        self.angular_speed = angular_speed
-
-    def turn_right(self, angular_speed=0.5):
-        self.linear_speed = 0.0
-        self.angular_speed = -angular_speed
-
-    def go_straight(self, speed=0.4):
-        self.linear_speed = speed
-
-    def go_left(self, speed=0.3, angular_speed=0.3):
-        self.linear_speed = speed
-        self.angular_speed = angular_speed
-
-    def go_right(self, speed=0.3, angular_speed=0.3):
-        self.linear_speed = speed
-        self.angular_speed = -angular_speed
-        
-
-    def stop(self):
-        self.linear_speed = 0.0
-        self.angular_speed = 0.0
-
     def __del__(self):
         self.timer.shutdown()
         self.stop()
@@ -202,4 +185,10 @@ class Vehicle:
         self.mode_srv.shutdown()
         self.compass_sub.unregister()
         self.gps_sub.unregister()
+        self.speed_sub.unregister()
+        self.waypoint_srv.shutdown()
+        self.waypoint_reached_sub.unregister()
+        self.rc_override_pub.unregister()
+        self.arming_srv.shutdown()
+        self.location_pub.unregister()
         

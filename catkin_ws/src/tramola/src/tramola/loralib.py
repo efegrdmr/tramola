@@ -154,11 +154,6 @@ class LoraGCSClient:
         return self.send_message(message)
         
 
-    def delete_waypoints(self):
-        self.waypoints = []
-        return self.send_message("delete_waypoints")
-
-
     def emergency_shutdown(self):
         return self.send_message("emergency_shutdown")
 
