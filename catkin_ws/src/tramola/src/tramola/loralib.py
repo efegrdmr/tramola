@@ -95,7 +95,6 @@ class Lora:
         return packet
     
 
-import heapq
 import time
 import threading
 
@@ -104,68 +103,102 @@ class LoraGCSClient:
         self.pq = []
         self.requested_datas = {"state", "latitude", "longitude", "degree_from_north",
                            "speed"}
-        for data in self.requested_datas:
-            heapq.heappush(self.pq, (time.time(), "GET," + data))
         
         self.state = None
         self.latitude = None
         self.longitude = None
         self.degree_from_north = None
         self.speed = None
-        self.manuel_speed = 0
-        self.manuel_yaw = 0
+        self.manual_speed = 0
+        self.manual_yaw = 0
         self.waypoints = []
         self.lora = Lora()
-        self.waiting_for_response = False
-        self.response = None
-
-        def loop():
-            while True:
-                self.main_loop()
-        threading.Thread(target=loop, daemon=True).start()
+        self.getData = True
+        self.data_thread = None
+        self.manual_control_thread = None
+        self.manual_control = False
 
 
-    def start_mission(self):
-        pass
-
-    def add_waypoint(self, lat, long):
-        pass
-
-    def delete_waypoints(self):
-        pass
-
-    def emergency_shutdown(self):
-        pass
-
-    def start_manuel_control(self):
-        pass
-
-    def stop_manuel_control(self):
-        pass
-
-    def main_loop(self):
-        _, message = heapq.heappop(self.pq)
-        if message in self.requested_datas:
-            response = self.lora.send_message_and_wait_for_response(message)
-            if response:
-                if message == "state":
-                    self.state = response
-                elif message == "latitude":
-                    self.latitude = float(response)
-                elif message == "longitude":
-                    self.longitude = float(response)
-                elif message == "degree_from_north":
-                    self.degree_from_north = int(response)
-                elif message == "speed":
-                    self.speed = float(response)
-            
-            heapq.heappush(self.pq, (time.time(), message))
+    def start_data_requests(self):
+        if self.getData:
             return
         
-        assert not self.waiting_for_response, "Waiting for response while sending message"
-        self.waiting_for_response = True
-        self.response = self.lora.send_message_and_wait_for_response(message)
-        self.waiting_for_response = False
+        self.getData = True
+        self.data_thread = threading.Thread(target=self.data_loop, daemon=True)
+        self.data_thread.start()
+
+    def stop_data_requests(self):
+        if not self.getData:
+            return
+        self.getData = False
+        self.data_thread.join()
+        self.data_thread = None
+
+    def send_message(self, message):
+        getData = False
+        if self.getData:
+            getData = True
+            self.stop_data_requests()
+        response = self.lora.send_message_and_wait_for_response(message)
+        if getData:
+            self.start_data_requests()
+        return response
+
+    def start_mission(self):
+        return self.send_message("start_mission")
+        
+
+    def add_waypoint(self, lat, long):
+        self.waypoints.append((lat, long))
+        message = f"add_waypoint,{lat},{long}"
+        return self.send_message(message)
+        
+
+    def delete_waypoints(self):
+        self.waypoints = []
+        return self.send_message("delete_waypoints")
+
+
+    def emergency_shutdown(self):
+        return self.send_message("emergency_shutdown")
+
+    def start_manual_control(self):
+        self.stop_data_requests()
+        response = self.send_message("start_manual_control")
+        self.manual_control_thread = threading.Thread(target=self.manual_control_loop, daemon=True)
+        self.manual_control_thread.start()
+        return response
+
+    def stop_manual_control(self):
+        self.manual_control = False
+        self.manual_control_thread.join()
+        self.manual_control_thread = None
+        self.start_data_requests()
+
+
+    def data_loop(self):
+        while True:
+            for message in self.requested_datas:
+                if not self.getData:
+                    return
+                response = self.lora.send_message_and_wait_for_response(message)
+                if response:
+                    if message == "state":
+                        self.state = response
+                    elif message == "latitude":
+                        self.latitude = float(response)
+                    elif message == "longitude":
+                        self.longitude = float(response)
+                    elif message == "degree_from_north":
+                        self.degree_from_north = int(response)
+                    elif message == "speed":
+                        self.speed = float(response)
+                
+                
+    def manual_control_loop(self):
+        while self.manual_control:
+            self.send_message(f"manual_control,{self.manual_speed},{self.manual_yaw}")
+
 
 
 
