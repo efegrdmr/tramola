@@ -1,0 +1,10 @@
+<launch>
+<node name="control" pkg="tramola" type="control.py" output="screen"/>
+<node name="vision" pkg="tramola" type="vision.py" output="screen"/>
+<include file="$(find mavros)/launch/apm.launch">
+  <arg name="fcu_url" value="udp://:14540@<FCU_IP>:14550" />
+  <arg name="gcs_url" value="" />
+  <arg name="tgt_system_id" value="1" />
+  <arg name="tgt_component_id" value="1" />
+</include>
+</launch>

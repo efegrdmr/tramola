@@ -2,10 +2,14 @@
 #include <LoRa.h>
 
 const long frequency = 915E6; // Adjust according to your region (e.g., 433E6, 868E6, etc.)
+const int csPin    = 10;
+const int resetPin = 9;
+const int irqPin   = 2;
 
 void setup() {
     Serial.begin(9600);
     while (!Serial);
+    Lora.setPins(csPin, resetPin, irqPin); // Set LoRa module pins
     if (!LoRa.begin(frequency)) {
     while (1);
     }
