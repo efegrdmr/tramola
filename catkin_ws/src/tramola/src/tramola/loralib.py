@@ -3,7 +3,7 @@ import time
 
 
 # Configuration values (adjust these to your environment)
-SERIAL_PORT = 'COM3'  # On Linux or macOS this might be '/dev/ttyUSB0' or similar
+SERIAL_PORT = '/dev/ttyUSB0'  # On Linux or macOS this might be '/dev/ttyUSB0' or similar
 BAUD_RATE = 9600
 TIMEOUT = 1  # Timeout for serial read operations
 RESPONSE_TIMEOUT = 500  # Timeout for response wait in milliseconds
@@ -135,9 +135,8 @@ class LoraGCSClient:
         self.data_thread = None
 
     def send_message(self, message):
-        getData = False
+        getData = self.getData
         if self.getData:
-            getData = True
             self.stop_data_requests()
         response = self.lora.send_message_and_wait_for_response(message)
         if getData:

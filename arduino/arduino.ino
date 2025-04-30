@@ -9,7 +9,7 @@ const int irqPin   = 2;
 void setup() {
     Serial.begin(9600);
     while (!Serial);
-    Lora.setPins(csPin, resetPin, irqPin); // Set LoRa module pins
+    LoRa.setPins(csPin, resetPin, irqPin); // Set LoRa module pins
     if (!LoRa.begin(frequency)) {
     while (1);
     }
