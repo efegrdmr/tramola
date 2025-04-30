@@ -34,7 +34,7 @@ class Lora:
                     self.send(response)
 
     def encode_message(self, message):
-        return bytearray(message)
+        return bytearray(message.encode('utf-8'))
     
     def decode_message(self, message):
         return message.decode('utf-8')
@@ -113,11 +113,11 @@ class LoraGCSClient:
         self.manual_yaw = 0
         self.waypoints = []
         self.lora = Lora()
-        self.getData = True
         self.data_thread = None
         self.manual_control_thread = None
         self.manual_control = False
-
+        self.getData = False
+        self.start_data_requests()
 
     def start_data_requests(self):
         if self.getData:
