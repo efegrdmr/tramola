@@ -5,8 +5,8 @@ import time
 # Configuration values (adjust these to your environment)
 SERIAL_PORT = '/dev/ttyUSB0'  # On Linux or macOS this might be '/dev/ttyUSB0' or similar
 BAUD_RATE = 9600
-TIMEOUT = 1  # Timeout for serial read operations
-RESPONSE_TIMEOUT = 500  # Timeout for response wait in milliseconds
+TIMEOUT = 1.0  # Timeout for serial read operations
+RESPONSE_TIMEOUT = 2000  # Timeout for response wait in milliseconds
 
 
 class Lora:
@@ -26,13 +26,12 @@ class Lora:
             if not packet:
                 continue  # No packet received, continue to read
             # Process the received packet
-            print("Got packet:", packet.decode('utf-8'))
             if packet:
                 # Call the callback function with the processed response
                 response = self.message_callback(packet)
                 if response:
                     # send the result
-                    self.send(response)
+                    self.send_message(response)
 
     def encode_message(self, message):
         return bytearray(message.encode('utf-8'))
@@ -46,14 +45,15 @@ class Lora:
         The data should be a byte array.
         """
         packet = self.encode_message(message)
-        checksum = self.calculate_checksum(packet) & 0xFFFF
+        checksum = self.calculate_checksum(packet)
         checksum_bytes = checksum.to_bytes(2, byteorder='big')
-        packet += checksum_bytes
+        packet += checksum_bytes + '\n'.encode('utf-8')
         self.serial_port.write(packet)
         
     
     def send_message_and_wait_for_response(self, message):
         # Wait for response at most RESPONSE_TIMEOUT milliseconds
+        response = None
         self.send_message(message)
         start_time = time.time()
         while (time.time() - start_time) * 1000 < RESPONSE_TIMEOUT:
@@ -69,31 +69,41 @@ class Lora:
         checksum = 0
         for byte in data:
             checksum ^= byte
-        return checksum
+        return checksum & 0xFFFF
 
     
     
     def read_packet(self):
         """
-        Reads from the serial port
-        Returns a complete packet as a bytearray.
+        Reads from the serial port until a '\n' delimiter or timeout.
+        Returns a complete packet (excluding the '\n' and checksum) as a bytearray,
+        or None on timeout, checksum failure, or malformed data.
         """
+        start = time.time()
         buffer = bytearray()
-        while True:
-            # Read a single byte from serial (blocking with timeout)
+
+        while time.time() < start + TIMEOUT:
+            if self.serial_port.in_waiting < 1:
+                time.sleep(0.01)
+                continue
             byte = self.serial_port.read(1)
-            if len(byte) == 0:
-                # Timeout reached without receiving new byte
+            if byte == b'\n':
+                # End-of-packet delimiter
                 break
             buffer += byte
-        if len(buffer) == 0:
+
+        # Must have at least 2 bytes for checksum
+        if len(buffer) < 2:
+            return None
+        # Split out and verify checksum
+        packet_checksum = int.from_bytes(buffer[-2:], byteorder="big")
+        data = buffer[:-2]
+        if self.calculate_checksum(data) != packet_checksum:
             return None
 
-        packet_checksum = int.from_bytes(buffer[-2:], byteorder="big")
-        if self.calculate_checksum(buffer[:-2]) != packet_checksum:
-            return None
-        packet = self.decode_message(buffer[:-2])
-        return packet
+        # Decode and return payload
+        return self.decode_message(data)
+
     
 
 import time
@@ -118,7 +128,7 @@ class LoraGCSClient:
         self.manual_control_thread = None
         self.manual_control = False
         self.getData = False
-        self.start_data_requests()
+        #self.start_data_requests()
 
     def start_data_requests(self):
         if self.getData:

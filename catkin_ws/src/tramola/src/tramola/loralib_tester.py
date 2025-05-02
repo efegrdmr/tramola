@@ -10,6 +10,8 @@ def test_companion():
             return "mission_started"
         elif packet == "emergency_shutdown":
             return "shutdown_initiated"
+        elif packet == "start_manual_control":
+            return "manual_control_started"
         elif packet.startswith("manual_control"):
             return "manual_ack"
         elif packet in ("state","latitude","longitude","degree_from_north","speed"):
