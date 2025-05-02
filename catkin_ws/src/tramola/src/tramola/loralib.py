@@ -26,6 +26,7 @@ class Lora:
             if not packet:
                 continue  # No packet received, continue to read
             # Process the received packet
+            print("Got packet:", packet.decode('utf-8'))
             if packet:
                 # Call the callback function with the processed response
                 response = self.message_callback(packet)
