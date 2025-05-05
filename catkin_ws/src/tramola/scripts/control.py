@@ -15,6 +15,13 @@ class Control:
         self.set_mode("HOLD")
         self.vehicle.arming(False)
         self.state = "Idle"
+        self.speed_real = 0
+        self.heading_real = 0
+        self.yaw_real = 0
+        self.thruster_requested = 0
+        self.speed_requested = 0
+        self.heading_requested = 0
+        self.yaw_requested = 0
 
     # checks the status of a given task and get to the next one
     def mission_callback(self):
@@ -37,32 +44,39 @@ class Control:
         data = data.split(",")
         command = data[0]
 
-        if command == "state":
-            self.lora.send_messaage(self.state)
-        elif command == "latitude":
-            self.lora.send_message(self.vehicle.location.latitude)     
-        elif command == "longitude":
-            self.lora.send_message(self.vehicle.location.longitude)
-        elif command == "degree_from_north":
-            self.lora.send_message(self.vehicle.orientation)
-        elif command == "speed":
-            self.lora.send_message(self.vehicle.linear_speed)
+        if command == "speed_real":
+            return self.vehicle.speed
+        elif command == "heading":
+            return self.vehicle.heading
+        elif command == "yaw_real":
+            return self.yaw_real
+        elif command == "thruster_requested":
+            return self.thruster_requested
+        elif command == "speed_requested":
+            return self.speed_requested
+        elif command == "heading":
+            return self.heading_requested
+        elif command == "yaw_requested":
+            return self.yaw_requested
+        elif command == "add_waypoint":
+            pass
+        elif command == "location":
+            return "%f,%f" % (self.vehicle.location.latitude, self.vehicle.location.longitude)
         elif command == "start_mission":
+            self.state = "Following waypoints"
+            self.vehicle.set_mode("AUTO")
+
             self.vehicle.arming(True)
-            self.vehicle.follow_waypoints()
-            self.state = "Task 1"
-        elif command == "start_manual_control":
-            self.state = "Manual control"
-            self.vehicle.start_manual_control()
+
+            
         elif command == "emergency_shutdown":
-            self.state = "Emergency shutdown"
-            self.vehicle.emergency_stop()
-        elif command == "add_waypoint" and len(data) == 3:
-            lat, long = data[1], data[2]
-            self.vehicle.add_waypoint(lat, long)
-        elif command == "manual_control" and len(data) == 3:
-            speed, yaw = data[1], data[2]
-            self.vehicle.set_velocity(speed, yaw)
+            pass
+        elif command == "start_manual_control":
+            pass
+        elif command == "manual_control":
+            pass
+        elif command == "add_waypoint":
+            pass
         else:
             rospy.logwarn("Unknown command received: %s" % command)
 

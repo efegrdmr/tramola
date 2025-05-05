@@ -26,19 +26,21 @@ class Vehicle:
         self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
         self.current_mode = None
 
-        # Compass
+        # Real heading
         self.compass_sub = rospy.Subscriber("/mavros/global_position/compass_hdg", Float64, self.compass_callback)
-        self.orientation = None
+        self.heading = None
 
         # GPS
         self.gps_sub = rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.gps_callback)
         self.location = None
 
-        # location sending
+        # waypoint sending
         self.location_pub = rospy.Publisher("/mavros/global_position/global", GeoPoseStamped, queue_size=1)
 
-        # Speed
+        # Real speed
         self.speed_sub = rospy.Subscriber("/mavros/global_position/gp_vel", TwistStamped, self.speed_callback)
+        self.speed = 0.0
+        self.yaw = 0.0
 
         # Waypoint service
         self.waypoint_srv = rospy.ServiceProxy("mavros/mission/push", WaypointPush, persistent=True)
@@ -58,6 +60,10 @@ class Vehicle:
         # Arming
         self.arming_srv = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
         self.arming_srv.wait_for_service()
+
+        # Setpoint requests
+        
+
 
 
     def start_velocity_publisher(self):
@@ -95,6 +101,7 @@ class Vehicle:
         self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(self.angular_speed)
         self.rc_override_pub.publish(self.rc_msg)
 
+
     def stop_rc_ovveride(self):
         if self.timer is None:
             return
@@ -108,10 +115,12 @@ class Vehicle:
         if seq == len(self.waypoints) - 1:
             self.waypoints_reached = True
 
+
     def follow_waypoints(self):
         self.waypoint_srv(start_index=0, waypoints=self.waypoints)
 
         self.set_mode("AUTO")
+
 
     def add_waypoint(self, latitude, longitude):
         waypoint = Waypoint()
@@ -124,8 +133,10 @@ class Vehicle:
         waypoint.z_alt = 0.0
         self.waypoints.append(waypoint)
 
+
     def speed_callback(self, data):
         self.speed = math.sqrt(data.twist.linear.x**2 + data.twist.linear.y**2)
+
 
     def send_location(self, latitude, longitude):
         msg = GeoPoseStamped()
@@ -159,7 +170,7 @@ class Vehicle:
 
     def compass_callback(self, msg):
         # 0 and 360 North 90 East 180 South 270 West
-        self.orientation = msg.data
+        self.heading = float(msg.data)
 
     def gps_callback(self, msg):
         self.location = (msg.latitude, msg.longitude)
@@ -167,13 +178,13 @@ class Vehicle:
     def turn_degrees(self, degrees, angular_speed=0.5):
         #TODO 
         # clockwise is positive
-        target_orientation = self.orientation + degrees
+        target_orientation = self.heading + degrees
         if degrees < 0:
             self.turn_left(angular_speed)
         else:
             self.turn_right(angular_speed)
 
-        while abs(self.orientation - target_orientation) > 10:
+        while abs(self.heading - target_orientation) > 10:
             rospy.sleep(0.1)
         
         self.stop()
