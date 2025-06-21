@@ -185,19 +185,24 @@ class Vehicle:
     def gps_callback(self, msg):
         self.location = (msg.latitude, msg.longitude)
 
-    def turn_degrees(self, degrees, angular_speed=0.5):
-        #TODO 
-        # clockwise is positive
-        target_orientation = self.heading + degrees
-        if degrees < 0:
-            self.turn_left(angular_speed)
-        else:
-            self.turn_right(angular_speed)
-
-        while abs(self.heading - target_orientation) > 10:
-            rospy.sleep(0.1)
+    def angle_between(self, lat, lon):
+        """
+        Return angle between the vehicle and the point
+        """
         
-        self.stop()
+        # Convert degrees to radians
+        lat1_rad = math.radians(self.location[0])
+        lat2_rad = math.radians(lat)
+        delta_lon_rad = math.radians(lon - self.location[1])
+
+        x = math.sin(delta_lon_rad) * math.cos(lat2_rad)
+        y = math.cos(lat1_rad) * math.sin(lat2_rad) - \
+            math.sin(lat1_rad) * math.cos(lat2_rad) * math.cos(delta_lon_rad)
+
+        angle_rad = math.atan2(x, y)
+        bearing_deg = (math.degrees(angle_rad) + 360) % 360  # Normalize to 0–360 degrees
+
+        return bearing_deg - self.heading
 
     def __del__(self):
         self.timer.shutdown()
