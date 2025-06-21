@@ -14,14 +14,9 @@ class Control:
         self.task = None
         self.set_mode("HOLD")
         self.vehicle.arming(False)
-        self.state = "Idle"
-        self.speed_real = 0
-        self.heading_real = 0
-        self.yaw_real = 0
-        self.thruster_requested = 0
-        self.speed_requested = 0
-        self.heading_requested = 0
-        self.yaw_requested = 0
+        self.points = []
+        self.state = "idle"
+      
 
     # checks the status of a given task and get to the next one
     def mission_callback(self):
@@ -49,36 +44,43 @@ class Control:
         elif command == "heading":
             return self.vehicle.heading
         elif command == "yaw_real":
-            return self.yaw_real
+            return self.vehicle.yaw
         elif command == "thruster_requested":
-            return self.thruster_requested
+            return "%f,%f" % (self.vehicle.thrust_left,self.vehicle.thrust_right)
         elif command == "speed_requested":
-            return self.speed_requested
-        elif command == "heading":
-            return self.heading_requested
+            return self.vehicle.last_sent_linear_speed
         elif command == "yaw_requested":
-            return self.yaw_requested
-        elif command == "add_waypoint":
-            pass
+            return self.vehicle.last_sent_angular_speed
         elif command == "location":
             return "%f,%f" % (self.vehicle.location.latitude, self.vehicle.location.longitude)
         elif command == "start_mission":
+            if self.state != "idle":
+                return "ERR"
             self.state = "Following waypoints"
+            if len(self.vehicle.waypoints) != 5: # video için değişecek
+                return "ERR"
             self.vehicle.set_mode("AUTO")
 
             self.vehicle.arming(True)
+            self.vehicle.follow_waypoints()
+            return "OK"
 
-            
         elif command == "emergency_shutdown":
-            pass
-        elif command == "start_manual_control":
-            pass
-        elif command == "manual_control":
-            pass
+            self.vehicle.set_mode("HOLD")
+            self.vehicle.arming(False)
+            return "OK"
         elif command == "add_waypoint":
-            pass
+            last_added = self.points[len(self.points) - 1]
+            if last_added != (data[1], data[2]):
+                self.points.append((data[1], data[2]))
+
+            return "OK"
+            
+
+
         else:
             rospy.logwarn("Unknown command received: %s" % command)
+            return "ERR"
 
 
 if __name__ == "__main__":

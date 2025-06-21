@@ -1,5 +1,0 @@
-classes = 3
-train = data/buoys/train.txt
-valid = data/buoys/valid.txt
-names = data/buoys/obj.names
-backup = backup/

@@ -2,7 +2,7 @@
 import rospy
 import math
 from geometry_msgs.msg import Twist
-from mavros_msgs.srv import SetMode, SetModeRequest, WaypointPush, WaypointReached
+from mavros_msgs.srv import SetMode, SetModeRequest, WaypointPush, WaypointReached, ActuatorControl
 from mavros_msgs.msg import Waypoint, OverrideRCIn, CommandBool
 from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
@@ -20,6 +20,8 @@ class Vehicle:
         self.velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel_unstamped', Twist, queue_size=1)
         self.linear_speed = 0.0 # max 1.0
         self.angular_speed = 0.0 # max 1.0
+        self.last_sent_linear_speed = 0
+        self.last_sent_angular_speed = 0
         
         # Set mode service
         rospy.wait_for_service("/mavros/set_mode") 
@@ -61,9 +63,15 @@ class Vehicle:
         self.arming_srv = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
         self.arming_srv.wait_for_service()
 
-        # Setpoint requests
+        # Get thrust
+        rospy.Subscriber("/mavros/actuator_output", ActuatorControl, actuator_output_cb)
+        self.thrust_left = 0
+        self.thrust_right = 0
+                                        
         
-
+    def actuator_output_cb(self, msg):
+        self.thrust_left =  msg.controls[1] # ?????????
+        self.thrust_right = msg.controls[3]
 
 
     def start_velocity_publisher(self):
@@ -166,6 +174,8 @@ class Vehicle:
         cmd.linear.x = self.linear_speed
         cmd.angular.z = self.angular_speed
         self.velocity_pub.publish(cmd)
+        self.last_sent_linear_speed = self.linear_speed
+        self.last_sent_angular_speed = self.angular_speed
 
 
     def compass_callback(self, msg):
