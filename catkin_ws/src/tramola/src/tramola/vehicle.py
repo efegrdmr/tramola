@@ -200,7 +200,7 @@ class Vehicle:
             math.sin(lat1_rad) * math.cos(lat2_rad) * math.cos(delta_lon_rad)
 
         angle_rad = math.atan2(x, y)
-        bearing_deg = (math.degrees(angle_rad) + 360) % 360  # Normalize to 0–360 degrees
+        bearing_deg = (math.degrees(angle_rad) + 360) % 360  # Normalize to 0-360 degrees
 
         return bearing_deg - self.heading
 
