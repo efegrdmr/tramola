@@ -1,4 +1,4 @@
-#!/home/tramola/vision/bin/python3.8
+#!/usr/bin/env python
 import rospy
 import cv2
 from cv_bridge import CvBridge

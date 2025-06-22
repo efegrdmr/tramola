@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import math
 from tramola.loralib import LoRa
 from tramola.vehicle import Vehicle

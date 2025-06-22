@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from tramola.lidar import Lidar 
 from tramola.vehicle import Vehicle
 
