@@ -32,9 +32,15 @@ class Cluster:
 
     def __str__(self):
         return (
-            f"Cluster(start: {self.start_dist:.3f} m @ {self.start_angle:.3f} rad, "
-            f"end: {self.end_dist:.3f} m @ {self.end_angle:.3f} rad, "
-            f"horiz: {self.min_horiz_dist:.3f} m)"
+            "Cluster(start: {0:.3f} m @ {1:.3f} rad, "
+            "end: {2:.3f} m @ {3:.3f} rad, "
+            "horiz: {4:.3f} m)".format(
+                self.start_dist,
+                self.start_angle,
+                self.end_dist,
+                self.end_angle,
+                self.min_horiz_dist,
+            )
         )
 
 class Lidar:
