@@ -5,7 +5,8 @@ from std_srvs.srv import Empty
 
 
 SCAN_DEGREE = math.radians(45) 
-CLUSTER_GAP = math.radians(5) 
+ANGLE_GAP = math.radians(5) 
+DISTANCE_GAP  = 0.2 
 
 class Cluster:
     """
@@ -51,6 +52,7 @@ class Lidar:
     def scan_callback(self, scan_msg):
         ranges = scan_msg.ranges
         angle = scan_msg.angle_min
+        prev_dist  = None
         first_valid = True
         clusters = []
         current = None
@@ -69,13 +71,19 @@ class Lidar:
                 current = Cluster(angle, r)
                 first_valid = False
             else:
-                # determine angular gap from previous beam
-                if angle - prev_angle <= CLUSTER_GAP:
+                # compute gaps
+                ang_gap  = angle - prev_angle
+                dist_gap = abs(r - prev_dist)
+
+                # same cluster only if both gaps are small
+                if ang_gap <= ANGLE_GAP and dist_gap <= DISTANCE_GAP:
                     current.add(angle, r)
                 else:
                     clusters.append(current)
                     current = Cluster(angle, r)
+
             prev_angle = angle
+            prev_dist = r
             angle += scan_msg.angle_increment
 
         # finalize last cluster
