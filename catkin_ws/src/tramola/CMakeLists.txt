@@ -57,9 +57,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  inferenceState.srv
-  selectModel.srv
-  yellowDetectionState.srv
+  imageDetection.srv
 )
 
 ## Generate actions in the 'action' folder
