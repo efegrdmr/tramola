@@ -4,8 +4,8 @@ from sensor_msgs.msg import LaserScan
 from std_srvs.srv import Empty
 
 
-SCAN_DEGREE = math.radians(45) 
-ANGLE_GAP = math.radians(5) 
+SCAN_DEGREE = 0.6
+ANGLE_GAP = math.radians(2) 
 DISTANCE_GAP  = 0.2 
 
 class Cluster:
@@ -20,6 +20,7 @@ class Cluster:
         self.end_dist = distance
         # horizontal component for min distance
         self.min_horiz_dist = distance * math.cos(angle)
+        self.min_dist = distance
 
     def add(self, angle, distance):
         # update end
@@ -29,17 +30,21 @@ class Cluster:
         horizontal_dist = distance * math.cos(angle)
         if horizontal_dist < self.min_horiz_dist:
             self.min_horiz_dist = horizontal_dist
+        if distance < self.min_dist:
+            self.min_dist = distance
 
     def __str__(self):
         return (
-            "Cluster(start: {0:.3f} m @ {1:.3f} rad, "
-            "end: {2:.3f} m @ {3:.3f} rad, "
-            "horiz: {4:.3f} m)".format(
+            "Cluster(start: {0:.3f} m @ {1:.3f} degree, "
+            "end: {2:.3f} m @ {3:.3f} degree, "
+            "horiz: {4:.3f} m"
+            "dist: {4:.3f} m)".format(
                 self.start_dist,
-                self.start_angle,
+                math.degrees(self.start_angle),
                 self.end_dist,
-                self.end_angle,
+                math.degrees(self.end_angle),
                 self.min_horiz_dist,
+                self.min_dist,
             )
         )
 

@@ -1,15 +1,16 @@
 
 import rospy
 import math
-from geometry_msgs.msg import Twist
-from mavros_msgs.srv import SetMode, SetModeRequest, WaypointPush, WaypointReached, ActuatorControl
-from mavros_msgs.msg import Waypoint, OverrideRCIn, CommandBool
-from std_msgs.msg import Float64
-from sensor_msgs.msg import NavSatFix
+
+# ROS messages
+from geometry_msgs.msg import Twist, TwistStamped
+from mavros_msgs.msg   import Waypoint, OverrideRCIn, WaypointReached, ActuatorControl
+from std_msgs.msg      import Float64
+from sensor_msgs.msg   import NavSatFix
 from geographic_msgs.msg import GeoPoseStamped
-from geometry_msgs.msg import TwistStamped
 
-
+# MAVROS services
+from mavros_msgs.srv   import SetMode, SetModeRequest, WaypointPush, CommandBool
 
 
 class Vehicle:
@@ -64,7 +65,7 @@ class Vehicle:
         self.arming_srv.wait_for_service()
 
         # Get thrust
-        rospy.Subscriber("/mavros/actuator_output", ActuatorControl, actuator_output_cb)
+        rospy.Subscriber("/mavros/actuator_output", ActuatorControl, self.actuator_output_cb)
         self.thrust_left = 0
         self.thrust_right = 0
                                         
