@@ -1,73 +1,101 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Python 2 compatible LoRa communication module
+# Date: 2025-06-25
+
 import serial
 import time
+import threading
 
-
-# Configuration values (adjust these to your environment)
-SERIAL_PORT = '/dev/ttyUSB0'  # On Linux or macOS this might be '/dev/ttyUSB0' or similar
-BAUD_RATE = 9600
-TIMEOUT = 1.0  # Timeout for serial read operations
-RESPONSE_TIMEOUT = 2000  # Timeout for response wait in milliseconds
-
-
-class Lora:
-    def __init__(self, message_callback=None):
-        self.serial_port = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-        self.message_callback = message_callback
-        if message_callback:
-            self.start_receiver()
+class Lora(object):
+    def __init__(self, port='/dev/ttyUSB0', baud_rate=9600, timeout=1.0, response_timeout=2000, message_callback=None):
+        try:
+            self.serial_port = serial.Serial(port, baud_rate, timeout=timeout)
+            self.response_timeout = response_timeout
+            self.message_callback = message_callback
+            self.running = False
+            self.receiver_thread = None
+            
+            if message_callback:
+                self.start_receiver()
+        except serial.SerialException as e:
+            raise Exception("Failed to open serial port: %s" % e)
     
-
     def set_message_callback(self, callback):
         self.message_callback = callback
-
-
+        
     def start_receiver(self):
-        while True:
-            # Read a packet from the serial port
-            packet = self.read_packet()
-            if not packet:
-                continue  # No packet received, continue to read
-            # Process the received packet
-            if packet:
-                # Call the callback function with the processed response
-                response = self.message_callback(packet)
-                if response:
-                    # send the result
-                    self.send_message(response)
-
+        if self.receiver_thread and self.running:
+            return  # Already running
+            
+        self.running = True
+        self.receiver_thread = threading.Thread(target=self._receiver_loop)
+        self.receiver_thread.daemon = True
+        self.receiver_thread.start()
+    
+    def stop_receiver(self):
+        self.running = False
+        if self.receiver_thread:
+            self.receiver_thread.join(timeout=2.0)
+            self.receiver_thread = None
+    
+    def _receiver_loop(self):
+        while self.running:
+            try:
+                # Read a packet from the serial port
+                packet = self.read_packet()
+                if packet and self.message_callback:
+                    # Call the callback function with the processed response
+                    response = self.message_callback(packet)
+                    if response:
+                        # Send the result
+                        self.send_message(response)
+            except Exception as e:
+                print("Error in receiver loop:", e)
+            time.sleep(0.01)  # Small delay to prevent CPU hogging
 
     def encode_message(self, message):
-        return bytearray(message.encode('utf-8'))
+        if isinstance(message, unicode):
+            return bytearray(message.encode('utf-8'))
+        return bytearray(message)
     
-
     def decode_message(self, message):
-        return message.decode('utf-8')
+        try:
+            return str(message)
+        except UnicodeDecodeError:
+            return None
         
-
     def send_message(self, message):
         """
         Sends data over the serial port.
         The data should be a byte array.
         """
-        packet = self.encode_message(message)
-        checksum = self.calculate_checksum(packet)
-        checksum_bytes = checksum.to_bytes(2, byteorder='big')
-        packet += checksum_bytes + '\n'.encode('utf-8')
-        self.serial_port.write(packet)
-        
+        try:
+            packet = self.encode_message(message)
+            checksum = self.calculate_checksum(packet)
+            checksum_bytes = bytearray([checksum >> 8, checksum & 0xFF])
+            packet.extend(checksum_bytes)
+            packet.append(ord('\n'))  # Use byte for newline in Python 2
+            self.serial_port.write(str(packet))
+            return True
+        except Exception as e:
+            print("Error sending message:", e)
+            return False
     
     def send_message_and_wait_for_response(self, message):
         # Wait for response at most RESPONSE_TIMEOUT milliseconds
+        if not self.send_message(message):
+            return None
+            
         response = None
-        self.send_message(message)
         start_time = time.time()
-        while (time.time() - start_time) * 1000 < RESPONSE_TIMEOUT:
+        while (time.time() - start_time) * 1000 < self.response_timeout:
             response = self.read_packet()
             if response:
                 break
+            time.sleep(0.01)  # Small delay to prevent CPU hogging
         return response
             
-
     def calculate_checksum(self, data):
         """
         Calculates a simple XOR-based checksum for the given data.
@@ -76,7 +104,6 @@ class Lora:
         for byte in data:
             checksum ^= byte
         return checksum & 0xFFFF
-
     
     def read_packet(self):
         """
@@ -84,38 +111,46 @@ class Lora:
         Returns a complete packet (excluding the '\n' and checksum) as a bytearray,
         or None on timeout, checksum failure, or malformed data.
         """
-        start = time.time()
-        buffer = bytearray()
+        try:
+            start = time.time()
+            buffer = bytearray()
 
-        while time.time() < start + TIMEOUT:
-            if self.serial_port.in_waiting < 1:
-                time.sleep(0.01)
-                continue
-            byte = self.serial_port.read(1)
-            if byte == b'\n':
-                # End-of-packet delimiter
-                break
-            buffer += byte
+            while time.time() < start + self.serial_port.timeout:
+                if self.serial_port.inWaiting() < 1:  # Python 2 uses inWaiting instead of in_waiting
+                    time.sleep(0.01)
+                    continue
+                byte = self.serial_port.read(1)
+                if byte == '\n':  # Python 2 string comparison
+                    # End-of-packet delimiter
+                    break
+                buffer.append(ord(byte) if isinstance(byte, str) else byte)  # Handle byte conversion for Python 2
 
-        # Must have at least 2 bytes for checksum
-        if len(buffer) < 2:
+            # Must have at least 2 bytes for checksum
+            if len(buffer) < 2:
+                return None
+                
+            # Split out and verify checksum
+            packet_checksum = (buffer[-2] << 8) | buffer[-1]  # Manual byte-to-int conversion
+            data = buffer[:-2]
+            if self.calculate_checksum(data) != packet_checksum:
+                return None
+
+            # Decode and return payload
+            return self.decode_message(data)
+        except Exception as e:
+            print("Error reading packet:", e)
             return None
-        # Split out and verify checksum
-        packet_checksum = int.from_bytes(buffer[-2:], byteorder="big")
-        data = buffer[:-2]
-        if self.calculate_checksum(data) != packet_checksum:
-            return None
-
-        # Decode and return payload
-        return self.decode_message(data)
+            
+    def close(self):
+        """Close the serial port and clean up resources"""
+        self.stop_receiver()
+        if self.serial_port and self.serial_port.isOpen():
+            self.serial_port.close()
 
 
-import time
-
-class LoraGCSClient:
-    def __init__(self):
-        self.pq = []
-        self.requested_datas = {"speed_real", "heading", "yaw_real", "thruster_requested"
+class LoraGCSClient(object):
+    def __init__(self, lora):
+        self.requested_datas = {"speed_real", "heading", "yaw_real", "thruster_requested",
                            "speed_requested", "yaw_requested", "location"}
         
         self.location = None
@@ -128,54 +163,93 @@ class LoraGCSClient:
 
         self.manual_speed = 0
         self.manual_yaw = 0
-        self.lora = Lora()
-
+        self.lora = lora
+        self.data_request_running = False
+        self.data_request_thread = None
   
     def send_message(self, message):
         return self.lora.send_message_and_wait_for_response(message)
         
-
     def start_mission(self):
         return self.send_message("start_mission")
         
-
     def emergency_shutdown(self):
         return self.send_message("emergency_shutdown")
 
-
     def add_waypoint(self, latitude, longitude):
-        message = f"add_waypoint,{latitude},{longitude}"
+        message = "add_waypoint,%f,%f" % (latitude, longitude)
         return self.send_message(message)
 
-
-    def start_manual_control(self):
-        self.stop_data_requests()
-        response = self.send_message("start_manual_control")
-        return response
+    def start_data_requests(self):
+        """Start a thread to periodically request data updates"""
+        if self.data_request_thread and self.data_request_running:
+            return  # Already running
+            
+        self.data_request_running = True
+        self.data_request_thread = threading.Thread(target=self._data_request_loop)
+        self.data_request_thread.daemon = True
+        self.data_request_thread.start()
     
-
-    def send_manuel_request(self):
-        self.send_message(f"manual_control,{self.manual_speed},{self.manual_yaw}")
-
+    def stop_data_requests(self):
+        """Stop the data request thread"""
+        self.data_request_running = False
+        if self.data_request_thread:
+            self.data_request_thread.join(timeout=2.0)
+            self.data_request_thread = None
+    
+    def _data_request_loop(self):
+        """Thread function to continuously request data updates"""
+        while self.data_request_running:
+            self.sync_data()
+            time.sleep(1.0)  # Request update every second
 
     def sync_data(self):
+        """Request updates for all data values"""
         for message in self.requested_datas:
-            response = self.lora.send_message_and_wait_for_response(message)
-            if response:
-                if message == "location":
-                    self.location = response.split(",")
-                    self.location = (float(self.location[0]), float(self.location[1]))
-                elif message == "speed_real":
-                    self.speed_real = float(response)
-                elif message == "heading":
-                    self.heading = float(response)
-                elif message == "yaw_real":
-                    self.yaw_real = float(response)
-                elif message == "thruster_requested":
-                    self.thruster_requested = float(response)
-                elif message == "speed_requested":
-                    self.speed_requested = float(response)
-                elif message == "yaw_requested":
-                    self.yaw_requested = float(response)
-            time.sleep(0.5)
-                
+            try:
+                response = self.lora.send_message_and_wait_for_response(message)
+                if response:
+                    if message == "location":
+                        parts = response.split(",")
+                        if len(parts) >= 2:
+                            try:
+                                self.location = (float(parts[0]), float(parts[1]))
+                            except ValueError:
+                                print("Invalid location format:", response)
+                    elif message == "speed_real":
+                        try:
+                            self.speed_real = float(response)
+                        except ValueError:
+                            print("Invalid speed_real format:", response)
+                    elif message == "heading":
+                        try:
+                            self.heading = float(response)
+                        except ValueError:
+                            print("Invalid heading format:", response)
+                    elif message == "yaw_real":
+                        try:
+                            self.yaw_real = float(response)
+                        except ValueError:
+                            print("Invalid yaw_real format:", response)
+                    elif message == "thruster_requested":
+                        try:
+                            self.thruster_requested = float(response)
+                        except ValueError:
+                            print("Invalid thruster_requested format:", response)
+                    elif message == "speed_requested":
+                        try:
+                            self.speed_requested = float(response)
+                        except ValueError:
+                            print("Invalid speed_requested format:", response)
+                    elif message == "yaw_requested":
+                        try:
+                            self.yaw_requested = float(response)
+                        except ValueError:
+                            print("Invalid yaw_requested format:", response)
+            except Exception as e:
+                print("Error syncing data for %s: %s" % (message, e))
+            time.sleep(0.2)  # Small delay between requests to prevent flooding
+    
+    def close(self):
+        """Clean up resources"""
+        self.stop_data_requests()
