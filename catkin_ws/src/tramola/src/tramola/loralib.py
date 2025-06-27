@@ -8,7 +8,7 @@ import time
 import threading
 
 class Lora(object):
-    def __init__(self, port='/dev/ttyUSB0', baud_rate=9600, timeout=1.0, response_timeout=2000, message_callback=None):
+    def __init__(self, port='/dev/ttyUSB0', baud_rate=9600, timeout=1.0, response_timeout=5000, message_callback=None):
         try:
             self.serial_port = serial.Serial(port, baud_rate, timeout=timeout)
             self.response_timeout = response_timeout
@@ -16,8 +16,6 @@ class Lora(object):
             self.running = False
             self.receiver_thread = None
             
-            if message_callback:
-                self.start_receiver()
         except serial.SerialException as e:
             raise Exception("Failed to open serial port: %s" % e)
     
@@ -44,11 +42,14 @@ class Lora(object):
             try:
                 # Read a packet from the serial port
                 packet = self.read_packet()
+                if packet:
+                    print(packet + "  came")
                 if packet and self.message_callback:
                     # Call the callback function with the processed response
                     response = self.message_callback(packet)
                     if response:
                         # Send the result
+                        time.sleep(0.02)
                         self.send_message(response)
             except Exception as e:
                 print("Error in receiver loop:", e)
@@ -67,16 +68,16 @@ class Lora(object):
         
     def send_message(self, message):
         """
-        Sends data over the serial port.
+        Sends data over the serial port without checksum verification.
         The data should be a byte array.
         """
         try:
             packet = self.encode_message(message)
-            checksum = self.calculate_checksum(packet)
-            checksum_bytes = bytearray([checksum >> 8, checksum & 0xFF])
-            packet.extend(checksum_bytes)
-            packet.append(ord('\n'))  # Use byte for newline in Python 2
-            self.serial_port.write(str(packet))
+            # Just append newline - no checksum
+            packet.append(ord('\n'))
+            # Send the raw bytes
+            self.serial_port.write(bytes(packet))
+            print("message sent: " + message)
             return True
         except Exception as e:
             print("Error sending message:", e)
@@ -108,35 +109,27 @@ class Lora(object):
     def read_packet(self):
         """
         Reads from the serial port until a '\n' delimiter or timeout.
-        Returns a complete packet (excluding the '\n' and checksum) as a bytearray,
-        or None on timeout, checksum failure, or malformed data.
+        Returns the complete packet as a bytearray (excluding the '\n'),
+        or None on timeout or malformed data.
         """
         try:
             start = time.time()
             buffer = bytearray()
 
             while time.time() < start + self.serial_port.timeout:
-                if self.serial_port.inWaiting() < 1:  # Python 2 uses inWaiting instead of in_waiting
+                if self.serial_port.inWaiting() < 1:
                     time.sleep(0.01)
                     continue
                 byte = self.serial_port.read(1)
-                if byte == '\n':  # Python 2 string comparison
-                    # End-of-packet delimiter
+                if byte == '\n' or byte == b'\n':
+                    # End-of-packet delimiter found
                     break
-                buffer.append(ord(byte) if isinstance(byte, str) else byte)  # Handle byte conversion for Python 2
+                buffer.append(ord(byte) if isinstance(byte, str) else byte)
 
-            # Must have at least 2 bytes for checksum
-            if len(buffer) < 2:
-                return None
-                
-            # Split out and verify checksum
-            packet_checksum = (buffer[-2] << 8) | buffer[-1]  # Manual byte-to-int conversion
-            data = buffer[:-2]
-            if self.calculate_checksum(data) != packet_checksum:
-                return None
-
-            # Decode and return payload
-            return self.decode_message(data)
+            # Return if we have any data
+            if len(buffer) > 0:
+                return self.decode_message(buffer)
+            return None
         except Exception as e:
             print("Error reading packet:", e)
             return None
@@ -233,7 +226,8 @@ class LoraGCSClient(object):
                             print("Invalid yaw_real format:", response)
                     elif message == "thruster_requested":
                         try:
-                            self.thruster_requested = float(response)
+                            data = response.split(",")
+                            self.thruster_requested = (float(data[0]), float(data[1]))
                         except ValueError:
                             print("Invalid thruster_requested format:", response)
                     elif message == "speed_requested":

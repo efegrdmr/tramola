@@ -18,6 +18,7 @@ class Control:
         self.vehicle.arming(False)
         self.points = []
         self.state = "IDLE"
+        self.lora.start_receiver()
 
       
 
@@ -46,7 +47,7 @@ class Control:
     def lora_callback(self, data):
         data = data.split(",")
         command = data[0]
-
+        print("message came: " + str(data)) 
         if command == "speed_real":
             return str(self.vehicle.speed)
         elif command == "heading":
