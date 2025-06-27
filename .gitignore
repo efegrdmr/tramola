@@ -51,3 +51,7 @@ catkin_ws/.#*
 catkin_ws/CATKIN_IGNORE
 
 .vscode/
+
+
+# Map cahce
+*map_cache/

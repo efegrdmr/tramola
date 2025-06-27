@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import math
-from tramola.loralib import LoRa
+from tramola.loralib import Lora
 from tramola.vehicle import Vehicle
-from tramola.task2 import Task2
+from tramola.GoTo import GoTo
 from tramola.task3 import Task3
 import rospy
 
@@ -10,30 +11,35 @@ import rospy
 class Control:
     def __init__(self):
         self.vehicle = Vehicle()
-        self.lora = LoRa(self.lora_callback)
+        self.lora = Lora(self.lora_callback)
         rospy.init_node("control", anonymous=True)
         self.task = None
         self.set_mode("HOLD")
         self.vehicle.arming(False)
         self.points = []
-        self.state = "idle"
+        self.state = "IDLE"
       
 
     # checks the status of a given task and get to the next one
     def mission_callback(self):
-        if self.state == "Following waypoints":
-            if self.vehicle.waypoints_reached:
-                self.state = "Task 2"
-                self.task = Task2()
-        if self.state == "Task 2":
+        if self.state == "GOTO":
+            if not self.task:
+                self.vehicle.arming(True)
+                self.vehicle.set_mode("AUTO")
+                self.task = GoTo(self.points.pop(0))
             if self.task.status == "COMPLETED":
-                self.state = "Task 3"
-                self.task = Task3()
-        if self.state == "Task 3":
+                if len(self.points) == 0:
+                    self.state = "KAMIKAZE"
+                    self.task.stop()
+                    self.task = Task3()
+                else:
+                    self.task.stop()
+                    self.task = self.points.pop(0)
+            
+        elif self.state == "KAMIKAZE":
             if self.task.status == "COMPLETED":
-                self.state = "IDLE"
-                self.vehicle.set_mode("HOLD")
-                self.vehicle.arming(False)
+                self.task.stop()
+                self.vehicle.set_mode = "HOLD"
             
 
     def lora_callback(self, data):
@@ -41,29 +47,25 @@ class Control:
         command = data[0]
 
         if command == "speed_real":
-            return self.vehicle.speed
+            return str(self.vehicle.speed)
         elif command == "heading":
-            return self.vehicle.heading
+            return str(self.vehicle.heading)
         elif command == "yaw_real":
-            return self.vehicle.yaw
+            return str(self.vehicle.yaw)
         elif command == "thruster_requested":
             return "%f,%f" % (self.vehicle.thrust_left,self.vehicle.thrust_right)
         elif command == "speed_requested":
-            return self.vehicle.last_sent_linear_speed
+            return str(self.vehicle.last_sent_linear_speed)
         elif command == "yaw_requested":
-            return self.vehicle.last_sent_angular_speed
+            return str(self.vehicle.last_sent_angular_speed)
         elif command == "location":
-            return "%f,%f" % (self.vehicle.location.latitude, self.vehicle.location.longitude)
+            return "%f,%f" % (self.vehicle.location[0], self.vehicle.location[1])
         elif command == "start_mission":
-            if self.state != "idle":
+            if self.state != "IDLE":
                 return "ERR"
-            self.state = "Following waypoints"
-            if len(self.vehicle.waypoints) != 5: # video için değişecek
+            if len(self.points) == 0:
                 return "ERR"
-            self.vehicle.set_mode("AUTO")
-
-            self.vehicle.arming(True)
-            self.vehicle.follow_waypoints()
+            self.state = "GOTO"
             return "OK"
 
         elif command == "emergency_shutdown":
@@ -77,8 +79,6 @@ class Control:
 
             return "OK"
             
-
-
         else:
             rospy.logwarn("Unknown command received: %s" % command)
             return "ERR"
