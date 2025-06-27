@@ -10,7 +10,7 @@ from sensor_msgs.msg   import NavSatFix
 from geographic_msgs.msg import GeoPoseStamped
 
 # MAVROS services
-from mavros_msgs.srv   import SetMode, SetModeRequest, WaypointPush, CommandBool
+from mavros_msgs.srv   import SetMode, SetModeRequest, WaypointPush, CommandBool, CommandBoolRequest
 
 
 class Vehicle:
@@ -37,28 +37,11 @@ class Vehicle:
         self.gps_sub = rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.gps_callback)
         self.location = None
 
-        # waypoint sending
-        self.location_pub = rospy.Publisher("/mavros/global_position/global", GeoPoseStamped, queue_size=1)
-
         # Real speed
         self.speed_sub = rospy.Subscriber("/mavros/global_position/gp_vel", TwistStamped, self.speed_callback)
         self.speed = 0.0
         self.yaw = 0.0
 
-        # Waypoint service
-        self.waypoint_srv = rospy.ServiceProxy("mavros/mission/push", WaypointPush, persistent=True)
-        self.waypoints = []
-        self.waypoints_reached = False
-        self.waypoint_reached_sub = rospy.Subscriber("/mavros/mission/reached", WaypointReached,self.reached_cb, queue_size=1)
-
-        # Rc override
-        self.rc_override_pub = rospy.Publisher('/mavros/rc/override', OverrideRCIn, queue_size=10)
-        self.rc_msg = OverrideRCIn()
-        self.steering_channel = 0 
-        self.throttle_channel = 2
-        self.timer = None
-        self.MAX_PWM = 2000
-        self.MIN_PWM = 1000
 
         # Arming
         self.arming_srv = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
@@ -92,56 +75,9 @@ class Vehicle:
         self.publish_speed()
 
     def arming(self, arm):
-        req = CommandBool()
+        req = CommandBoolRequest()
         req.value = arm
         self.arming_srv(req)
-        
-    def scale_pwm(self, value):
-        return int(self.MIN_PWM + value * (self.MAX_PWM - self.MIN_PWM))
-
-    def start_rc_ovveride(self):
-        if self.timer is not None:
-            return
-        self.set_mode("MANUAL")
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_rc_override)  # 10 Hz
-
-    def publish_rc_override(self):
-        self.rc_msg.channels[self.steering_channel] = self.scale_pwm(self.linear_speed)
-        self.rc_msg.channels[self.throttle_channel] = self.scale_pwm(self.angular_speed)
-        self.rc_override_pub.publish(self.rc_msg)
-
-
-    def stop_rc_ovveride(self):
-        if self.timer is None:
-            return
-        self.timer.shutdown()
-        self.timer = None
-        self.set_mode("HOLD")
-
-
-    def reached_cb(self, msg):
-        seq = msg.wp_seq
-        if seq == len(self.waypoints) - 1:
-            self.waypoints_reached = True
-
-
-    def follow_waypoints(self):
-        self.waypoint_srv(start_index=0, waypoints=self.waypoints)
-
-        self.set_mode("AUTO")
-
-
-    def add_waypoint(self, latitude, longitude):
-        waypoint = Waypoint()
-        waypoint.frame = Waypoint.FRAME_GLOBAL_REL_ALT
-        waypoint.command = Waypoint.CMD_NAV_WAYPOINT
-        waypoint.is_current = False
-        waypoint.autocontinue = True
-        waypoint.x_lat = latitude
-        waypoint.y_long = longitude
-        waypoint.z_alt = 0.0
-        self.waypoints.append(waypoint)
-
 
     def speed_callback(self, data):
         self.speed = math.sqrt(data.twist.linear.x**2 + data.twist.linear.y**2)
@@ -213,8 +149,6 @@ class Vehicle:
         self.compass_sub.unregister()
         self.gps_sub.unregister()
         self.speed_sub.unregister()
-        self.waypoint_srv.shutdown()
-        self.waypoint_reached_sub.unregister()
         self.rc_override_pub.unregister()
         self.arming_srv.shutdown()
         self.location_pub.unregister()

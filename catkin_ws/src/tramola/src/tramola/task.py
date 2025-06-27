@@ -58,42 +58,4 @@ class Task:
             timer.shutdown()
         self.status = "COMPLETED"
 
-    # Functions wrapping the service proxies
-
-    def set_green_light_detection(self, on):
-        """
-        Enable or disable green light detection.
-        """
-        try:
-            response = self.green_light_detection_srv(on=on)
-            rospy.loginfo(f"Green light detection state set to {on}")
-            return response.success
-        except rospy.ServiceException as e:
-            rospy.logerr(f"Failed to set green light detection state: {e}")
-            return False
-
-    def set_inference_state(self, on):
-        """
-        Enable or disable object inference.
-        """
-        try:
-            response = self.inference_state_srv(on=on)
-            rospy.loginfo(f"Inference state set to {on}")
-            return response.success
-        except rospy.ServiceException as e:
-            rospy.logerr(f"Failed to set inference state: {e}")
-            return False
-
-    def set_yellow_detection_state(self, on):
-        """
-        Enable or disable yellow object detection.
-        """
-        try:
-            response = self.yellow_detection_state_srv(on=on)
-            rospy.loginfo(f"Yellow detection state set to {on}")
-            return response.success
-        except rospy.ServiceException as e:
-            rospy.logerr(f"Failed to set yellow detection state: {e}")
-            return False
-
-
+    

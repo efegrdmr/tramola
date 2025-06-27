@@ -3,21 +3,22 @@
 import math
 from tramola.loralib import Lora
 from tramola.vehicle import Vehicle
-from tramola.GoTo import GoTo
+from tramola.goTo import GoTo
 from tramola.task3 import Task3
 import rospy
 
 
 class Control:
     def __init__(self):
-        self.vehicle = Vehicle()
-        self.lora = Lora(self.lora_callback)
         rospy.init_node("control", anonymous=True)
+        self.vehicle = Vehicle()
+        self.lora = Lora(message_callback=self.lora_callback)
         self.task = None
-        self.set_mode("HOLD")
+        self.vehicle.set_mode("HOLD")
         self.vehicle.arming(False)
         self.points = []
         self.state = "IDLE"
+
       
 
     # checks the status of a given task and get to the next one
@@ -86,3 +87,4 @@ class Control:
 
 if __name__ == "__main__":
     control = Control()
+    rospy.spin()

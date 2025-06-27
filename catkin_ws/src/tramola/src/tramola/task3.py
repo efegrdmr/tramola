@@ -1,4 +1,4 @@
-from tramola import Task
+from tramola.task import Task
 
 class Task3(Task):
     def start(self):
