@@ -137,7 +137,7 @@ void loop() {
         Serial.write(rxByte);
       }
     }
-    Serial.println();
+    Serial.write('\n');
   }
   
   // Periodic health check
