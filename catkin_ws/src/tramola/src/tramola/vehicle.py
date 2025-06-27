@@ -1,15 +1,16 @@
 
 import rospy
 import math
-from geometry_msgs.msg import Twist
-from mavros_msgs.srv import SetMode, SetModeRequest, WaypointPush, WaypointReached
-from mavros_msgs.msg import Waypoint, OverrideRCIn, CommandBool
-from std_msgs.msg import Float64
-from sensor_msgs.msg import NavSatFix
+
+# ROS messages
+from geometry_msgs.msg import Twist, TwistStamped
+from mavros_msgs.msg   import Waypoint, OverrideRCIn, WaypointReached, ActuatorControl
+from std_msgs.msg      import Float64
+from sensor_msgs.msg   import NavSatFix
 from geographic_msgs.msg import GeoPoseStamped
-from geometry_msgs.msg import TwistStamped
 
-
+# MAVROS services
+from mavros_msgs.srv   import SetMode, SetModeRequest, WaypointPush, CommandBool
 
 
 class Vehicle:
@@ -20,6 +21,8 @@ class Vehicle:
         self.velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel_unstamped', Twist, queue_size=1)
         self.linear_speed = 0.0 # max 1.0
         self.angular_speed = 0.0 # max 1.0
+        self.last_sent_linear_speed = 0
+        self.last_sent_angular_speed = 0
         
         # Set mode service
         rospy.wait_for_service("/mavros/set_mode") 
@@ -61,9 +64,15 @@ class Vehicle:
         self.arming_srv = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
         self.arming_srv.wait_for_service()
 
-        # Setpoint requests
+        # Get thrust
+        rospy.Subscriber("/mavros/actuator_output", ActuatorControl, self.actuator_output_cb)
+        self.thrust_left = 0
+        self.thrust_right = 0
+                                        
         
-
+    def actuator_output_cb(self, msg):
+        self.thrust_left =  msg.controls[1] # ?????????
+        self.thrust_right = msg.controls[3]
 
 
     def start_velocity_publisher(self):
@@ -166,6 +175,8 @@ class Vehicle:
         cmd.linear.x = self.linear_speed
         cmd.angular.z = self.angular_speed
         self.velocity_pub.publish(cmd)
+        self.last_sent_linear_speed = self.linear_speed
+        self.last_sent_angular_speed = self.angular_speed
 
 
     def compass_callback(self, msg):
@@ -175,19 +186,24 @@ class Vehicle:
     def gps_callback(self, msg):
         self.location = (msg.latitude, msg.longitude)
 
-    def turn_degrees(self, degrees, angular_speed=0.5):
-        #TODO 
-        # clockwise is positive
-        target_orientation = self.heading + degrees
-        if degrees < 0:
-            self.turn_left(angular_speed)
-        else:
-            self.turn_right(angular_speed)
-
-        while abs(self.heading - target_orientation) > 10:
-            rospy.sleep(0.1)
+    def angle_between(self, lat, lon):
+        """
+        Return angle between the vehicle and the point
+        """
         
-        self.stop()
+        # Convert degrees to radians
+        lat1_rad = math.radians(self.location[0])
+        lat2_rad = math.radians(lat)
+        delta_lon_rad = math.radians(lon - self.location[1])
+
+        x = math.sin(delta_lon_rad) * math.cos(lat2_rad)
+        y = math.cos(lat1_rad) * math.sin(lat2_rad) - \
+            math.sin(lat1_rad) * math.cos(lat2_rad) * math.cos(delta_lon_rad)
+
+        angle_rad = math.atan2(x, y)
+        bearing_deg = (math.degrees(angle_rad) + 360) % 360  # Normalize to 0-360 degrees
+
+        return bearing_deg - self.heading
 
     def __del__(self):
         self.timer.shutdown()

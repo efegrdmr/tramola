@@ -57,9 +57,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  inferenceState.srv
-  selectModel.srv
-  yellowDetectionState.srv
+  imageDetection.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -161,7 +159,7 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-catkin_install_python(PROGRAMS scripts/controller.py scripts/nav.py scripts/thrusterTest.py scripts/vision.py scripts/recordVideo.py
+catkin_install_python(PROGRAMS scripts/control.py scripts/vision.py scripts/lidarTest.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

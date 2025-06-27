@@ -1,24 +1,18 @@
-#!/home/tramola/vision/bin/python3.8
+#!/usr/bin/env python
 import rospy
-from ultralytics import YOLO
 import cv2
 from cv_bridge import CvBridge
 
-from std_msgs.msg import Bool, Int32
 
-from tramola.srv import greenLightDetectionState, greenLightDetectionStateResponse
-from tramola.srv import inferenceState, inferenceStateResponse
-from tramola.srv import selectModel, selectModelResponse
-from tramola.srv import yellowDetectionState, yellowDetectionStateResponse
 
+from tramola.srv import imageDetection
 from tramola.msg import Detection, DetectionList
 
 
 detect_objects = False
-model = None
 
 
-def inference_state_handler(req):
+def detection_state_handler(req):
     global detect_objects
     # Example callback for inference state service
     if req.on:
@@ -32,25 +26,15 @@ def inference_state_handler(req):
         response.success = True
         return response
 
-def select_model_handler(req):
-    global model
-    if model is not None:
-        del model
-    model = YOLO(req.model_path)
-    response = selectModelResponse()
-    response.success = True
-    return response
-
 
 
 rospy.init_node("vision")
 
 # Services
-rospy.Service("/inference_state", inferenceState, inference_state_handler)
-rospy.Service("/select_model", selectModel, select_model_handler)
+rospy.Service("/imageDetection", imageDetection, detection_state_handler)
 
 # Publishers
-detection_pub = rospy.Publisher("/yolo_detections", DetectionList, queue_size=1)
+detection_pub = rospy.Publisher("/detections", DetectionList, queue_size=1)
 
 # Create a CV bridge instance
 bridge = CvBridge()
@@ -58,11 +42,6 @@ bridge = CvBridge()
 # Use OpenCV to capture video (adjust device index as needed)
 cap = cv2.VideoCapture(0)
 rospy.sleep(2)  # Give time for the camera to warm up
-names = ['blue circle', 'blue plus', 'blue square', 'blue triangle', 
-        'green circle', 'green plus', 'green square', 'green triangle', 
-        'red circle', 'red plus', 'red square', 'red triangle',
-        'black balloon', 'green balloon', 'red balloon', 'yellow balloon',
-        'black plus', 'black triangle']
 
 while not rospy.is_shutdown():
     ret, frame = cap.read()
@@ -71,7 +50,7 @@ while not rospy.is_shutdown():
         continue
 
 
-    if detect_objects and model is not None: 
+    if detect_objects: 
         # YOLOv8 expects a BGR image (as provided by cv2.VideoCapture)
         results = model(frame)
         msg = DetectionList()
@@ -106,13 +85,6 @@ while not rospy.is_shutdown():
                 det_msg.class_id = class_id
 
                 msg.detections.append(det_msg)
-
-
-        rospy.loginfo(f"Detected {len(msg.detections)} objects")
-        for det in msg.detections:
-            rospy.loginfo(f"Class: {names[det.class_id]}, Confidence: {det.confidence:.2f}, "
-                        f"Center: ({det.x_center:.2f}, {det.y_center:.2f}), "
-                        f"Size: ({det.width:.2f}, {det.height:.2f})")
 
         detection_pub.publish(msg)
     

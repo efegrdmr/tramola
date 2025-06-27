@@ -1,42 +1,28 @@
 import rospy
 from tramola.vehicle import Vehicle
 from tramola.msg import DetectionList, Detection
-from tramola.srv import greenLightDetectionState, inferenceState, selectModel
+from tramola.srv import imageDetection
 
 class Task:
     def __init__(self, vehicle):
         assert rospy.core.is_initialized(), "ROS node is not initialized"
-        self.objects = {
-            "green_buoy": 0, "red_buoy": 1, "yellow_buoy": 2, "blue_buoy": 3, "black_buoy": 4,
-            "red_gate_buoy": 5, "green_gate_buoy": 6,
-            "orange_vessel": 7, "black_vessel": 8, 
-            "blue_triangle": 9, "red_triangle": 10, "green_triangle": 11, 
-            "blue_circle": 12, "red_circle": 13, "green_circle": 14,
-            "blue_square": 15, "red_square": 16, "green_square": 17,
-            "blue_plus": 18, "red_plus": 19, "green_plus": 20
-        }
-
+        
         self.subscriptions = []
         self.publications = []
         self.services = []
         self.timers = []
         self.vehicle = vehicle
-        self.add_subscription("yolo_detections", DetectionList, self.detection_callback)
+        self.add_subscription("/detections", DetectionList, self.detection_callback)
         self.status = "STARTED"
 
         # Add service proxies corresponding to vision.py services
-        rospy.wait_for_service("/inference_state")
+        rospy.wait_for_service("/imageDetection")
         self.inference_state_srv = rospy.ServiceProxy(
-            "/inference_state", inferenceState
-        )
-        rospy.wait_for_service("/select_model")
-        self.select_model_srv = rospy.ServiceProxy(
-            "/select_model", selectModel
+            "/imageDetection", imageDetection
         )
 
-        self.select_model("/home/tramola/catkin_ws/src/tramola/models/balon.pt")
-        self.set_inference_state(True)
-
+        # Subscribe to Lidar 
+    
         self.start()
     
     def add_timer(self, period, callback):
@@ -70,10 +56,7 @@ class Task:
             srv.shutdown()
         for timer in self.timers:
             timer.shutdown()
-        self.vehicle.set_mode("LOITER")
         self.status = "COMPLETED"
-
-        self.set_inference_state(False)
 
     # Functions wrapping the service proxies
 
@@ -113,14 +96,4 @@ class Task:
             rospy.logerr(f"Failed to set yellow detection state: {e}")
             return False
 
-    def select_model(self, model_path):
-        """
-        Select a YOLO model by path.
-        """
-        try:
-            response = self.select_model_srv(model_path=model_path)
-            rospy.loginfo(f"Model selected from: {model_path}")
-            return response.success
-        except rospy.ServiceException as e:
-            rospy.logerr(f"Failed to select model: {e}")
-            return False
+
