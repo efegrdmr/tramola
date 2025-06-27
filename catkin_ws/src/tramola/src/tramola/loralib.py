@@ -55,81 +55,107 @@ class Lora(object):
                 print("Error in receiver loop:", e)
             time.sleep(0.01)  # Small delay to prevent CPU hogging
 
-    def encode_message(self, message):
-        if isinstance(message, unicode):
-            return bytearray(message.encode('utf-8'))
-        return bytearray(message)
-    
-    def decode_message(self, message):
-        try:
-            return str(message)
-        except UnicodeDecodeError:
-            return None
         
+    def calculate_checksum(self, data):
+        """
+        Calculates a simple XOR-based checksum for the given data (str or bytearray).
+        Returns a 16-bit integer.
+        """
+        checksum = 0
+        # Ensure data is iterable of byte values
+        if isinstance(data, (str, unicode)):
+            data = bytearray(data)
+        for b in data:
+            checksum ^= b
+        return checksum & 0xFFFF
+
     def send_message(self, message):
         """
-        Sends data over the serial port without checksum verification.
-        The data should be a byte array.
+        Sends data over the serial port with an appended checksum.
+        Message is a str or unicode in Python 2.
+        Format: payload|<checksum>\n
+        Returns True on success, False on error.
         """
         try:
-            packet = self.encode_message(message)
-            # Just append newline - no checksum
-            packet.append(ord('\n'))
-            # Send the raw bytes
-            self.serial_port.write(bytes(packet))
-            print("message sent: " + message)
+            # Build payload string
+            if isinstance(message, unicode):
+                payload = message.encode('utf-8')
+            else:
+                payload = str(message)
+
+            # Calculate checksum over raw bytes
+            checksum = self.calculate_checksum(payload)
+            full_msg = payload + '|' + str(checksum) + '\n'
+
+            # Write to serial port
+            self.serial_port.write(full_msg)
+            print("message sent: %r" % full_msg)
             return True
         except Exception as e:
             print("Error sending message:", e)
             return False
-    
+
     def send_message_and_wait_for_response(self, message):
-        # Wait for response at most RESPONSE_TIMEOUT milliseconds
+        """
+        Sends a message and waits up to response_timeout for a response packet.
+        Returns decoded string or None on timeout/error.
+        """
         if not self.send_message(message):
             return None
-            
-        response = None
-        start_time = time.time()
-        while (time.time() - start_time) * 1000 < self.response_timeout:
-            response = self.read_packet()
-            if response:
-                break
-            time.sleep(0.01)  # Small delay to prevent CPU hogging
-        return response
-            
-    def calculate_checksum(self, data):
-        """
-        Calculates a simple XOR-based checksum for the given data.
-        """
-        checksum = 0
-        for byte in data:
-            checksum ^= byte
-        return checksum & 0xFFFF
-    
+
+        deadline = time.time() + (self.response_timeout / 1000.0)
+        while time.time() < deadline:
+            resp = self.read_packet()
+            if resp is not None:
+                return resp
+            time.sleep(0.01)
+        return None
+
     def read_packet(self):
         """
-        Reads from the serial port until a '\n' delimiter or timeout.
-        Returns the complete packet as a bytearray (excluding the '\n'),
-        or None on timeout or malformed data.
+        Reads from serial until '\n'. Expects format payload|<checksum>\n.
+        Verifies checksum, returning payload or None if invalid.
         """
         try:
             start = time.time()
-            buffer = bytearray()
+            timeout = self.serial_port.timeout
+            buffer = ''
 
-            while time.time() < start + self.serial_port.timeout:
-                if self.serial_port.inWaiting() < 1:
+            # Read until newline or timeout
+            while time.time() - start < timeout:
+                if self.serial_port.inWaiting() > 0:
+                    char = self.serial_port.read(1)
+                    if not char:
+                        continue
+                    if char == '\n':
+                        break
+                    buffer += char
+                else:
                     time.sleep(0.01)
-                    continue
-                byte = self.serial_port.read(1)
-                if byte == '\n' or byte == b'\n':
-                    # End-of-packet delimiter found
-                    break
-                buffer.append(ord(byte) if isinstance(byte, str) else byte)
 
-            # Return if we have any data
-            if len(buffer) > 0:
-                return self.decode_message(buffer)
-            return None
+            if not buffer:
+                return None
+
+            # Split payload and checksum
+            if '|' not in buffer:
+                return None
+            payload_str, checksum_str = buffer.rsplit('|', 1)
+            try:
+                recv_checksum = int(checksum_str)
+            except ValueError:
+                return None
+
+            # Verify checksum
+            calc_checksum = self.calculate_checksum(payload_str)
+            if recv_checksum != calc_checksum:
+                print("Checksum mismatch: received %d, calculated %d" % (recv_checksum, calc_checksum))
+                return None
+
+            # Return payload (utf-8 decode if needed)
+            try:
+                return payload_str.decode('utf-8')
+            except Exception:
+                return payload_str
         except Exception as e:
             print("Error reading packet:", e)
             return None
@@ -242,7 +268,7 @@ class LoraGCSClient(object):
                             print("Invalid yaw_requested format:", response)
             except Exception as e:
                 print("Error syncing data for %s: %s" % (message, e))
-            time.sleep(0.2)  # Small delay between requests to prevent flooding
+            time.sleep(0.5)  # Small delay between requests to prevent flooding
     
     def close(self):
         """Clean up resources"""
