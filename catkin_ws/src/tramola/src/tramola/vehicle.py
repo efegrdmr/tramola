@@ -12,7 +12,6 @@ from geographic_msgs.msg import GeoPoseStamped
 # MAVROS services
 from mavros_msgs.srv   import SetMode, SetModeRequest, WaypointPush, CommandBool, CommandBoolRequest
 
-
 class Vehicle:
     def __init__(self):
         assert rospy.core.is_initialized(), "ROS node is not initialized"  
@@ -51,6 +50,8 @@ class Vehicle:
         rospy.Subscriber("/mavros/actuator_output", ActuatorControl, self.actuator_output_cb)
         self.thrust_left = 0
         self.thrust_right = 0
+
+
                                         
         
     def actuator_output_cb(self, msg):

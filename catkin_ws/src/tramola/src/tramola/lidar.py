@@ -3,107 +3,121 @@ import rospy
 from sensor_msgs.msg import LaserScan
 from std_srvs.srv import Empty
 
+import numpy as np
 
-SCAN_DEGREE = 0.6
-ANGLE_GAP = math.radians(2) 
-DISTANCE_GAP  = 0.2 
-
-class Cluster:
-    """
-    Represents a sequence of points forming a cluster.
-    Tracks start/end beams, closest point, and horizontal distance.
-    """
-    def __init__(self, angle, distance):
-        self.start_angle = angle
-        self.start_dist = distance
-        self.end_angle = angle
-        self.end_dist = distance
-        # horizontal component for min distance
-        self.min_horiz_dist = distance * math.cos(angle)
-        self.min_dist = distance
-
-    def add(self, angle, distance):
-        # update end
-        self.end_angle = angle
-        self.end_dist = distance
-        # update horizontal
-        horizontal_dist = distance * math.cos(angle)
-        if horizontal_dist < self.min_horiz_dist:
-            self.min_horiz_dist = horizontal_dist
-        if distance < self.min_dist:
-            self.min_dist = distance
-
-    def __str__(self):
-        return (
-            "Cluster(start: {0:.3f} m @ {1:.3f} degree, "
-            "end: {2:.3f} m @ {3:.3f} degree, "
-            "horiz: {4:.3f} m"
-            "dist: {4:.3f} m)".format(
-                self.start_dist,
-                math.degrees(self.start_angle),
-                self.end_dist,
-                math.degrees(self.end_angle),
-                self.min_horiz_dist,
-                self.min_dist,
-            )
-        )
 
 class Lidar:
     def __init__(self):    
         assert rospy.core.is_initialized(), "ROS node is not initialized"  
-        self.scan_func = None
-        rospy.wait_for_service("stop_motor")
-        rospy.wait_for_service("start_motor")
-        self.stop_lidar = rospy.ServiceProxy("stop_motor", Empty)
-        self.stop_lidar()
-        self.start_lidar = rospy.ServiceProxy("start_motor", Empty)
-        rospy.Subscriber("/scan", LaserScan, self.scan_callback, queue_size=1)
-        self.half_cone = SCAN_DEGREE / 2.0
+        self.grid_size = 30
+        self.max_range = 12.0  # max distance lidar can detect
+        self.obstacle_max_distance = 1.0  # threshold for marking obstacles
+        self.origin = self.grid_size // 2  # Center of the grid (for y axis)
+        self.resolution = self.grid_size / self.obstacle_max_distance
+        self.max_scan_angle_from_front = math.degrees(math.acos(self.obstacle_max_distance / self.max_range))
 
-    def scan_callback(self, scan_msg):
-        ranges = scan_msg.ranges
-        angle = scan_msg.angle_min
-        prev_dist  = None
-        first_valid = True
-        clusters = []
-        current = None
-        prev_angle = None
+        # Now a 1D array for the "front" (y axis at a certain x)
+        self.objects_in_distance = np.zeros(self.grid_size + 1, dtype=int)
+        self.angles = np.zeros(self.grid_size + 1, dtype=float)  # List to store angles of detected obstacles
 
-        # Single-pass scan through beams
-        for r in ranges:
-            # compute angle
-            # note: angle starts at angle_min and increments each loop
-            if not (r > 0.0 and not math.isinf(r) and abs(angle) <= self.half_cone):
-                angle += scan_msg.angle_increment
+        self.left_min_dist = self.max_range
+        self.right_min_dist = self.max_range
+
+
+        self.stop_service = rospy.Service('/lidar/stop', Empty, self.stop)
+        self.start_service = rospy.Service('/lidar/start', Empty, self.start)
+        self.scan = None
+
+
+    def callback(self, scan):
+        self.scan = scan
+    
+    def print_obstacles(self):
+        # Print the 1D obstacle array as a line
+        line = ""
+        for val in self.objects_in_distance:
+            line += "#" if val else "."
+        print(line)
+
+    def find_free_angles(self, min_width=0.1):
+        free_spaces = []  # (start_angle, end_angle)
+        min_index_dist = int(min_width * self.resolution)
+        start = None
+        self.angles[0] = self.max_scan_angle_from_front
+        self.angles[self.grid_size] = -self.max_scan_angle_from_front
+
+        for i, val in enumerate(self.objects_in_distance):
+            if val:
+                if start is not None and i - start >= min_index_dist:
+                    free_spaces.append((self.angles[start], self.angles[i]))
+                start = i  # Start of next free space
+            elif start is None:
+                start = i  # Mark the start of a free space
+
+        # Check for free space at the end
+        if start is not None and self.grid_size + 1 - start >= min_index_dist:
+            free_spaces.append((self.angles[start], self.angles[self.grid_size]))
+
+        return free_spaces
+
+    def get_detections(self):
+        if self.scan is None:
+            return None
+        self.objects_in_distance.fill(0)
+        self.angles.fill(0) # Reset angles list
+        self.left_min_dist = self.max_range
+        self.right_min_dist = self.max_range
+
+        angle = self.scan.angle_min
+        for r in self.scan.ranges:
+            if not np.isfinite(r) or r < self.scan.range_min or r > self.scan.range_max:
+                angle += self.scan.angle_increment
                 continue
 
-            if first_valid:
-                # start first cluster
-                current = Cluster(angle, r)
-                first_valid = False
-            else:
-                # compute gaps
-                ang_gap  = angle - prev_angle
-                dist_gap = abs(r - prev_dist)
+            # Cartesian coordinates (in meters)
+            x = r * math.cos(angle)
+            y = r * math.sin(angle)
 
-                # same cluster only if both gaps are small
-                if ang_gap <= ANGLE_GAP and dist_gap <= DISTANCE_GAP:
-                    current.add(angle, r)
-                else:
-                    clusters.append(current)
-                    current = Cluster(angle, r)
+            ang_deg = (math.degrees(angle) + 360) % 360
 
-            prev_angle = angle
-            prev_dist = r
-            angle += scan_msg.angle_increment
+            # Convert y to 1D array index (centered)
+            j = int(y * self.resolution + self.origin)
+            if 0 <= j <= self.grid_size:
+                # Only consider obstacles in front (x > 0)
+                if 0 < x <= self.obstacle_max_distance:    
+                    self.objects_in_distance[j] = 1
+                    if ang_deg > 90:
+                        self.angles[j] = ang_deg - 360
+                    else:
+                        self.angles[j] = ang_deg
 
-        # finalize last cluster
-        if not first_valid and current is not None:
-            clusters.append(current)
-        elif first_valid:
-            self.scan_func([])
-            return
+            # For left/right min distances
+            if 45 < ang_deg < 135:
+                self.left_min_dist = min(self.left_min_dist, r)
+            elif 225 < ang_deg < 315:
+                self.right_min_dist = min(self.right_min_dist, r)
 
-        self.scan_func(clusters)
+            angle += self.scan.angle_increment
 
+        self.objects_in_distance = self.objects_in_distance[::-1]
+        self.angles = self.angles[::-1]
+        print('left_min: {:.2f}m   right_min: {:.2f}m'.format(self.left_min_dist, self.right_min_dist))
+        angles = self.find_free_angles()
+        print(angles)# Print the collected angles
 
+        return (angles, self.left_min_dist, self.right_min_dist)
+    
+
+    def stop(self):
+        self.stop_service()
+        self.sub.unregister()
+        self.sub = None
+        print("Lidar stopped")
+    
+    def start(self):
+        """
+        Start the Lidar 
+        """
+        print("Lidar started")
+        self.start_service()
+        self.sub = rospy.Subscriber('/scan', LaserScan, self.callback, queue_size=1)
