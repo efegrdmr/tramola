@@ -107,6 +107,7 @@ class Lora(object):
         while time.time() < deadline:
             resp = self.read_packet()
             if resp is not None:
+                print("got response")
                 return resp
             time.sleep(0.01)
         return None

@@ -6,24 +6,37 @@ from tramola.vehicle import Vehicle
 from tramola.goTo import GoTo
 from tramola.task3 import Task3
 import rospy
-
+import time
 
 class Control:
     def __init__(self):
         rospy.init_node("control", anonymous=True)
         self.vehicle = Vehicle()
-        self.lora = Lora(message_callback=self.lora_callback)
+        self.lora = None
+        self.init_lora()
         self.task = None
         self.vehicle.set_mode("HOLD")
         self.vehicle.arming(False)
         self.points = []
         self.state = "IDLE"
-        self.lora.start_receiver()
+        self.last_gcs_message_time = time.time()
+        
+        rospy.Timer(rospy.Duration(0.1), self.mission_callback)  # Call mission_callback every 100ms
 
-      
+    
+    def init_lora(self):
+        if self.lora:
+            self.lora.close()
+            time.sleep(3)
+        self.lora = Lora(message_callback=self.lora_callback)
+        self.lora.start_receiver()
+        self.last_gcs_message_time = time.time()
 
     # checks the status of a given task and get to the next one
-    def mission_callback(self):
+    def mission_callback(self, t):
+        if time.time() - self.last_gcs_message_time > 10:
+            self.init_lora()
+            print("No message received from GCS for a while, reinitializing LoRa")
         if self.state == "GOTO":
             if not self.task:
                 self.vehicle.arming(True)
@@ -45,9 +58,9 @@ class Control:
             
 
     def lora_callback(self, data):
+        self.last_gcs_message_time = time.time()
         data = data.split(",")
         command = data[0]
-        print("message came: " + str(data)) 
         if command == "speed_real":
             return str(self.vehicle.speed)
         elif command == "heading":
