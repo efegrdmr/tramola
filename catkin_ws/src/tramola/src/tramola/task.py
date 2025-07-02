@@ -22,14 +22,7 @@ class Task:
     def stop(self):
         if self.status == "COMPLETED":
             return
-        for sub in self.subscriptions:
-            sub.unregister()
-        for pub in self.publications:
-            pub.unregister()
-        for srv in self.services:
-            srv.shutdown()
-        for timer in self.timers:
-            timer.shutdown()
+        
         self.status = "COMPLETED"
         self.lidar.stop()
         self.mission_loop.shutdown()

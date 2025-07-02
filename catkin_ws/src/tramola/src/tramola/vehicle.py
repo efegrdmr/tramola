@@ -103,9 +103,13 @@ class Vehicle:
         else:
             rospy.logwarn("Failed to change mode to %s", mode)
         
-    def set_velocity(self, linear_speed, angular_speed):
-        self.linear_speed = linear_speed
-        self.angular_speed = angular_speed
+    def turn_inplace(self, angle):
+        """
+        Turn the vehicle in place by setting the angular speed.
+        Positive angle turns left, negative angle turns right.
+        """
+        self.angular_speed = angle / 180.0  # Normalize angle to [-1, 1] range
+        self.linear_speed = 0
 
     def publish_speed(self):
         cmd = Twist()
@@ -125,22 +129,44 @@ class Vehicle:
 
     def angle_between(self, lat, lon):
         """
-        Return angle between the vehicle and the point
+        Return the relative bearing from the vehicle's heading to the point.
+        Negative → turn right; Positive → turn left.
         """
-        
         # Convert degrees to radians
-        lat1_rad = math.radians(self.location[0])
-        lat2_rad = math.radians(lat)
-        delta_lon_rad = math.radians(lon - self.location[1])
+        a1 = math.radians(self.location[0])
+        a2 = math.radians(lat)
+        l = math.radians(lon - self.location[1])
 
-        x = math.sin(delta_lon_rad) * math.cos(lat2_rad)
-        y = math.cos(lat1_rad) * math.sin(lat2_rad) - \
-            math.sin(lat1_rad) * math.cos(lat2_rad) * math.cos(delta_lon_rad)
+        # compute true bearing 0–360°
+        x = math.sin(l) * math.cos(a2)
+        y = math.cos(a1) * math.sin(a2) - math.sin(a1) * math.cos(a2) * math.cos(l)
+        bearing = (math.degrees(math.atan2(x, y)) + 360) % 360
 
-        angle_rad = math.atan2(x, y)
-        bearing_deg = (math.degrees(angle_rad) + 360) % 360  # Normalize to 0-360 degrees
+        # compute relative: negative = turn right, positive = turn left
+        rel = ((self.heading - bearing + 540) % 360) - 180
+        return rel
 
-        return bearing_deg - self.heading
+    def distance(self, lat, lon, radius=6371000):
+        """
+        Return the great-circle distance (in meters) between the vehicle and (lat, lon).
+        radius is the Earth radius in meters (default 6371000m).
+        """
+        a1 = math.radians(self.location[0])
+        a2 = math.radians(lat)
+        d = a2 - a1
+        l = math.radians(lon - self.location[1])
+
+        a = math.sin(d/2)**2 + math.cos(a1) * math.cos(a2) * math.sin(l/2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+        return radius * c
+    
+    def reached(self, lat, lon, threshold=1.0):
+        """
+        Check if the vehicle is within a certain distance (threshold) from the target location.
+        """
+        dist = self.distance(lat, lon)
+        return dist <= threshold
 
     def __del__(self):
         self.timer.shutdown()

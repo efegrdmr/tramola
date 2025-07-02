@@ -88,12 +88,9 @@ class Control:
             self.vehicle.arming(False)
             return "OK"
         elif command == "add_waypoint":
-            last_added = self.points[len(self.points) - 1]
-            if last_added != (data[1], data[2]):
+            if len(self.points) < 1 or self.points[len(self.points) - 1] != (data[1], data[2]):
                 self.points.append((data[1], data[2]))
-
             return "OK"
-            
         else:
             rospy.logwarn("Unknown command received: %s" % command)
             return "ERR"

@@ -39,7 +39,7 @@ class Lidar:
             line += "#" if val else "."
         print(line)
 
-    def find_free_angles(self, min_width=0.1):
+    def _find_free_angles(self, min_width=0.1):
         free_spaces = []  # (start_angle, end_angle)
         min_index_dist = int(min_width * self.resolution)
         start = None
@@ -102,7 +102,7 @@ class Lidar:
         self.objects_in_distance = self.objects_in_distance[::-1]
         self.angles = self.angles[::-1]
         print('left_min: {:.2f}m   right_min: {:.2f}m'.format(self.left_min_dist, self.right_min_dist))
-        angles = self.find_free_angles()
+        angles = self._find_free_angles()
         print(angles)# Print the collected angles
 
         return (angles, self.left_min_dist, self.right_min_dist)
