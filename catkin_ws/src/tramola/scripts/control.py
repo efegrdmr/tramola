@@ -3,8 +3,10 @@
 import math
 from tramola.loralib import Lora
 from tramola.vehicle import Vehicle
+from tramola.lidar import Lidar
+from tramola.detection import Detection
 from tramola.goTo import GoTo
-from tramola.task3 import Task3
+from tramola.kamikaze import Kamikaze
 import rospy
 import time
 
@@ -12,6 +14,8 @@ class Control:
     def __init__(self):
         rospy.init_node("control", anonymous=True)
         self.vehicle = Vehicle()
+        self.lidar = Lidar()
+        self.detection = Detection()
         self.lora = None
         self.init_lora()
         self.task = None
@@ -36,25 +40,26 @@ class Control:
     def mission_callback(self, t):
         if time.time() - self.last_gcs_message_time > 10:
             self.init_lora()
-            print("No message received from GCS for a while, reinitializing LoRa")
+            rospy.logwarn("No message received from GCS for a while, reinitializing LoRa")
         if self.state == "GOTO":
             if not self.task:
                 self.vehicle.arming(True)
                 self.vehicle.set_mode("AUTO")
-                self.task = GoTo(self.points.pop(0))
+                self.vehicle.start_velocity_publisher()
+                self.task = GoTo(self.vehicle, self.lidar, self.points.pop(0))
             if self.task.status == "COMPLETED":
                 if len(self.points) == 0:
                     self.state = "KAMIKAZE"
                     self.task.stop()
-                    self.task = Task3()
+                    self.task = Kamikaze(self.vehicle, self.lidar, self.detection)
                 else:
                     self.task.stop()
                     self.task = self.points.pop(0)
-            
         elif self.state == "KAMIKAZE":
             if self.task.status == "COMPLETED":
                 self.task.stop()
                 self.vehicle.set_mode = "HOLD"
+                self.vehicle.stop_velocity_publisher()
             
 
     def lora_callback(self, data):
@@ -88,9 +93,12 @@ class Control:
             self.vehicle.arming(False)
             return "OK"
         elif command == "add_waypoint":
-            if len(self.points) < 1 or self.points[len(self.points) - 1] != (data[1], data[2]):
+            if len(self.points) == 0 or self.points[len(self.points) - 1] != (data[1], data[2]):
                 self.points.append((data[1], data[2]))
-            return "OK"
+                return "OK"
+            else:
+                return "ERR" 
+                
         else:
             rospy.logwarn("Unknown command received: %s" % command)
             return "ERR"

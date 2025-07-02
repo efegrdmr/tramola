@@ -60,12 +60,12 @@ class Vehicle:
 
 
     def start_velocity_publisher(self):
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
+        self.velocity_publisher_timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
 
     def stop_velocity_publisher(self):
-        if self.timer is not None:
-            self.timer.shutdown()
-            self.timer = None
+        if self.velocity_publisher_timer is not None:
+            self.velocity_publisher_timer.shutdown()
+            self.velocity_publisher_timer = None
 
     def emergency_stop(self):
         self.stop_rc_ovveride()
@@ -108,7 +108,7 @@ class Vehicle:
         Turn the vehicle in place by setting the angular speed.
         Positive angle turns left, negative angle turns right.
         """
-        self.angular_speed = angle / 180.0  # Normalize angle to [-1, 1] range
+        self.angular_speed = -angle
         self.linear_speed = 0
 
     def publish_speed(self):
@@ -146,7 +146,7 @@ class Vehicle:
         rel = ((self.heading - bearing + 540) % 360) - 180
         return rel
 
-    def distance(self, lat, lon, radius=6371000):
+    def distance(self, lat, lon):
         """
         Return the great-circle distance (in meters) between the vehicle and (lat, lon).
         radius is the Earth radius in meters (default 6371000m).
@@ -159,7 +159,7 @@ class Vehicle:
         a = math.sin(d/2)**2 + math.cos(a1) * math.cos(a2) * math.sin(l/2)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-        return radius * c
+        return 6371000 * c
     
     def reached(self, lat, lon, threshold=1.0):
         """
@@ -168,15 +168,4 @@ class Vehicle:
         dist = self.distance(lat, lon)
         return dist <= threshold
 
-    def __del__(self):
-        self.timer.shutdown()
-        self.stop()
-        self.velocity_pub.unregister()
-        self.mode_srv.shutdown()
-        self.compass_sub.unregister()
-        self.gps_sub.unregister()
-        self.speed_sub.unregister()
-        self.rc_override_pub.unregister()
-        self.arming_srv.shutdown()
-        self.location_pub.unregister()
         

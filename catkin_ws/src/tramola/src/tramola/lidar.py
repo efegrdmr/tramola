@@ -9,7 +9,7 @@ import numpy as np
 class Lidar:
     def __init__(self):    
         assert rospy.core.is_initialized(), "ROS node is not initialized"  
-        self.grid_size = 30
+        self.grid_size = 60
         self.max_range = 12.0  # max distance lidar can detect
         self.obstacle_max_distance = 1.0  # threshold for marking obstacles
         self.origin = self.grid_size // 2  # Center of the grid (for y axis)

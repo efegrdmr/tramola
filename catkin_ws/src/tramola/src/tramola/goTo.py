@@ -3,14 +3,14 @@ import rospy
 import numpy as np
 
 class GoTo(Task):
-    def __init__(self, vehicle, lidar, point, max_linear_speed=0.5, max_angular_speed=1.0, completion_threshold=1.0, safety_padding=5.0):
+    def __init__(self, vehicle, lidar, point, linear_speed=0.5, max_angular_speed=1.0, completion_threshold=1.0, safety_padding=5.0):
         super().__init__(vehicle, lidar, detection=None)
         self.point = point
-        self.max_linear_speed = max_linear_speed
+        self.linear_speed = linear_speed
         self.max_angular_speed = max_angular_speed
         self.completion_threshold = completion_threshold
         self.safety_padding = safety_padding  # degrees of padding for free angle edges
-        self.vehicle.linear_speed = self.max_linear_speed
+        self.max_angular_dist_to_point = 45
     
 
 
@@ -35,7 +35,7 @@ class GoTo(Task):
             
         target_angle = self.vehicle.angle_between(*self.point)
         
-        if self._target_outside_sensor_range(target_angle):
+        if self._target_out_of_angular_range(target_angle):
             self._turn_towards_target(target_angle)
             return
             
@@ -43,11 +43,13 @@ class GoTo(Task):
             self._move_to_target(target_angle)
         else:
             self._avoid_obstacles(target_angle, free_angles)
+        
+        self.vehicle.linear_speed = self.linear_speed
 
     def _check_completion(self):
         """Check if mission is complete."""
         if self.vehicle.reached(*self.point, threshold=self.completion_threshold):
-            self.status = "COMPLETED"
+            self.state = "COMPLETED"
             self.vehicle.linear_speed = 0
             self.vehicle.angular_speed = 0
             self.stop()
@@ -56,14 +58,16 @@ class GoTo(Task):
         return False
 
 
-    def _target_outside_sensor_range(self, target_angle):
+    def _target_out_of_angular_range(self, target_angle):
         """Check if target is outside lidar's field of view."""
-        return abs(target_angle) > self.lidar.max_scan_angle_from_front
+        return abs(target_angle) > self.max_angular_dist_to_point
+        
 
     def _turn_towards_target(self, target_angle):
         """Turn in place towards the target."""
-        self.vehicle.turn_inplace(target_angle)
+        self.vehicle.turn_inplace(self._normalize_angular_speed(target_angle))
         rospy.logdebug("Turning towards target: %.2f degrees", target_angle)
+  
 
     def _target_in_free_space(self, target_angle, free_angles):
         """Check if target direction is within any free angle range with safety padding."""
@@ -106,25 +110,16 @@ class GoTo(Task):
         best_angle = None
         best_score = float('inf')
         
-        for start_angle, end_angle in free_angles:
-            # Apply safety padding to the free space
-            padded_start = start_angle + self.safety_padding
-            padded_end = end_angle - self.safety_padding
-            
-            # Skip this free space if it's too narrow after padding
-            if padded_end <= padded_start:
-                continue
-                
-            width = padded_end - padded_start
+        for start_angle, end_angle in free_angles:     
+            width = end_angle - start_angle
             
             # Sample multiple points across the padded free space
             for offset in [0.2, 0.5, 0.8]:
-                angle = padded_start + offset * width
+                angle = start_angle + offset * width
                 angle_diff = abs(angle - target_angle)
                 
                 # Score combines proximity to target and passage width
-                # Wider passages get bonus points
-                score = angle_diff - width * 0.1
+                score = angle_diff
                 
                 if score < best_score:
                     best_score = score

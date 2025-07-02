@@ -9,7 +9,7 @@ class Task:
         assert rospy.core.is_initialized(), "ROS node is not initialized"
         
         self.vehicle = vehicle
-        self.status = "STARTED"
+        self.state = "STARTED"
         self.lidar = lidar
         self.detection = detection
 
@@ -20,10 +20,10 @@ class Task:
         raise NotImplementedError("The mission_callback method must be overridden in a subclass")
 
     def stop(self):
-        if self.status == "COMPLETED":
+        if self.state == "COMPLETED":
             return
         
-        self.status = "COMPLETED"
+        self.state = "COMPLETED"
         self.lidar.stop()
         self.mission_loop.shutdown()
 
