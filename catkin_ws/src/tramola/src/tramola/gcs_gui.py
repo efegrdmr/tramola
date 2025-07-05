@@ -615,7 +615,7 @@ class GCSApp(tk.Tk):
         self.lat_entry.grid(row=0, column=1, padx=5, pady=5)
 
         ttk.Label(waypoint_frame, text="Longitude:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
-        self.lon_entry = ttk.Entry(waypoint_frame, width=15,  textvariable=self.lat_entry_var)
+        self.lon_entry = ttk.Entry(waypoint_frame, width=15,  textvariable=self.lon_entry_var)
         self.lon_entry.grid(row=1, column=1, padx=5, pady=5)
 
         waypoint_btn_frame = ttk.Frame(waypoint_frame)
