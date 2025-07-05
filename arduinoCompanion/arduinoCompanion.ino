@@ -1,150 +1,69 @@
-#include <SPI.h>
-#include <LoRa.h>
+#include <SoftwareSerial.h>
+#include "EBYTE.h"
 
-#define LORA_BAND    433E6
-#define SS_PIN       10
-#define RST_PIN      9
-#define DIO0_PIN     2
+//—— LoRa module control pins ——
+#define PIN_M0    4
+#define PIN_M1    5
+#define PIN_AUX   6
 
-const int   BUFFER_SIZE = 256;
-byte        serialBuffer[BUFFER_SIZE];
-int         bufferIndex    = 0;
-unsigned long lastRxTime   = 0;
-const unsigned long TX_TIMEOUT = 200; // ms
-unsigned long lastHealthCheck = 0;
-const unsigned long HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
-bool transmissionFailed = false;
+//—— UART on D2 (TX) / D3 (RX) ——
+SoftwareSerial loraSerial(2, 3);
+
+// Subclass EBYTE so we can expose the protected read methods
+class ExposedEBYTE : public EBYTE {
+public:
+  ExposedEBYTE(Stream* serial, uint8_t m0, uint8_t m1, uint8_t aux)
+    : EBYTE(serial, m0, m1, aux) {}
+  bool  readParams()   { return ReadParameters(); }
+  void  printParams()  { PrintParameters(); }
+};
+
+ExposedEBYTE Transceiver(&loraSerial, PIN_M0, PIN_M1, PIN_AUX);
 
 void setup() {
+  // 1) configure M0/M1/AUX
+  pinMode(PIN_M0, OUTPUT);
+  pinMode(PIN_M1, OUTPUT);
+  pinMode(PIN_AUX, INPUT);
+
+  // 2) force CONFIG mode
+  digitalWrite(PIN_M0, HIGH);
+  digitalWrite(PIN_M1, HIGH);
+  delay(50);
+
+  // 3) start serials and init the library
   Serial.begin(9600);
-  
-  // Wait a moment for Serial to connect
-  delay(1000);
-  
-  initLoRa();
-  
-  // ensure we're listening
-  LoRa.receive();
-  lastRxTime = millis();
-  lastHealthCheck = millis();
-}
+  loraSerial.begin(9600);
+  Transceiver.init();
+  delay(100);
 
-void initLoRa() {
-  LoRa.setPins(SS_PIN, RST_PIN, DIO0_PIN);
-  
-  // Retry LoRa initialization if it fails
-  byte retries = 0;
-  while (!LoRa.begin(LORA_BAND)) {
-    delay(500);
-    if (++retries > 5) {
-      delay(1000);
-      // Reset the Arduino
-      asm volatile ("  jmp 0");
-    }
-  }
+  // 5) now set *your* new parameters:
+  Transceiver.SetUARTBaudRate(0x03);    // 0x03 = 9600 bps
+  Transceiver.SetAirDataRate(0x02);     // 0x02 = 2.4 kbps
+  Transceiver.SetChannel(23);           // channel 23
+  Transceiver.SetTransmitPower(OPT_TP10);// highest power your header defines
+  Transceiver.SetAddress(0x0001);       // network address
 
-  LoRa.setSyncWord(0x32);
-  LoRa.setSpreadingFactor(7);
-  LoRa.setSignalBandwidth(125E3);
-  LoRa.setCodingRate4(8);
-}
+  // 6) save to flash
+  Transceiver.SaveParameters(PERMANENT);
+  delay(100);
 
-bool sendPacket() {
+  // 7) return to transparent (UART) mode
+  digitalWrite(PIN_M0, LOW);
+  digitalWrite(PIN_M1, LOW);
+  delay(50);
 
-  
-  bool success = false;
-  byte attempts = 0;
-  
-  while (!success && attempts < 3) {
-    LoRa.beginPacket();
-    LoRa.write(serialBuffer, bufferIndex);
-    success = LoRa.endPacket(); // Returns 1 if successful
-    
-    if (!success) {
-      transmissionFailed = true;
-      delay(100 * attempts); // Increasing backoff
-      attempts++;
-    }
-  }
-  
-  LoRa.receive();  // go back into RX mode
-  bufferIndex = 0;
-  return success;
-}
-
-void performHealthCheck() {
-  // Instead of checking isTransmitting() which is private,
-  // we'll use a simple ping test and monitor our transmissionFailed flag
-  
-  
-  if (transmissionFailed) {
-    // Reset the LoRa module
-    LoRa.sleep();
-    delay(100);
-    initLoRa();
-    LoRa.receive();
-    transmissionFailed = false;
-  } else {
-    // Send a tiny ping packet as a health check
-    LoRa.beginPacket();
-    LoRa.write('P'); // Ping byte
-    bool pingSuccess = LoRa.endPacket();
-    
-    if (!pingSuccess) {
-      LoRa.sleep();
-      delay(100);
-      initLoRa();
-    }
-    
-    LoRa.receive(); // Go back to receive mode
-  }
-  
-  lastHealthCheck = millis();
 }
 
 void loop() {
-  // 1) Read from Serial
-  while (Serial.available()) {
-    byte b = Serial.read();
-    lastRxTime = millis();
-
-    // flush on CR, LF or overflow
-    if (b == '\n' || b == '\r' || bufferIndex >= BUFFER_SIZE) {
-      if (bufferIndex > 0) {
-        sendPacket();
-      }
-    } else {
-      serialBuffer[bufferIndex++] = b;
-    }
+  // — Serial → LoRa
+  if (Serial.available()) {
+    String out = Serial.readStringUntil('\n');
+    loraSerial.println(out);
   }
-
-  // enforce a timeout flush if user never sends newline
-  if (bufferIndex > 0 && millis() - lastRxTime > TX_TIMEOUT) {
-    sendPacket();
+  // — LoRa → Serial
+  if (loraSerial.available()) {
+    String in = loraSerial.readStringUntil('\n');
+    Serial.println(in);
   }
-
-  // 2) Receive LoRa packets - No delay before checking for packets
-  int packetSize = LoRa.parsePacket();
-  if (packetSize > 0) {
-
-    
-    while (LoRa.available()) {
-      byte rxByte = LoRa.read();
-      // Skip printing the ping byte
-      if (packetSize == 1 && rxByte == 'P') {
-        
-      } else {
-        Serial.write(rxByte);
-      }
-    }
-    Serial.write('\n');
-  }
-  
-  // Periodic health check
-  if (millis() - lastHealthCheck > HEALTH_CHECK_INTERVAL) {
-    performHealthCheck();
-  }
-  
-  // Single small delay to prevent CPU hogging
-  delay(10); // Reduced from 70ms to be more responsive
 }
