@@ -55,7 +55,8 @@ class TileDownloader(threading.Thread):
                         with open(filename, 'wb') as f:
                             f.write(data)
                     except Exception as e:
-                        print("Error saving tile to cache: {}".format(e))
+                        # Silently ignore cache save errors
+                        pass
 
                     # Load the image if PIL is available
                     if PIL_AVAILABLE:
@@ -70,7 +71,8 @@ class TileDownloader(threading.Thread):
                             self.last_callback_time = current_time
 
                 except Exception as e:
-                    print("Error downloading tile: {}".format(e))
+                    # Silently ignore download errors
+                    pass
 
                 # Mark this task as done
                 tile_download_queue.task_done()
@@ -132,7 +134,8 @@ class OfflineMapTile:
                 self.photo_image = ImageTk.PhotoImage(self.image)
                 return True
             except Exception as e:
-                print("Error loading cached tile: {}".format(e))
+                # Silently ignore cache save errors
+                pass
 
         # Queue for download if not already loading
         if not self.is_loading:
@@ -174,11 +177,9 @@ class SimpleMapCanvas(tk.Canvas):
         # Bind to configure event to handle resize
         self.bind("<Configure>", self.on_resize)
 
-
         # Bind mouse events for dragging
         self.bind("<ButtonPress-1>", self.clicked_position_and_on_mouse_down_method)
         self.bind("<B1-Motion>", self.on_mouse_drag)
-
 
         # Bind mouse wheel for zooming
         self.bind("<MouseWheel>", self.on_mouse_wheel)  # Windows
@@ -189,6 +190,7 @@ class SimpleMapCanvas(tk.Canvas):
         self.drag_offset_x = 0
         self.drag_offset_y = 0
         self.is_dragging = False
+
 
     def clicked_position_and_on_mouse_down_method(self, event):
 
@@ -211,6 +213,7 @@ class SimpleMapCanvas(tk.Canvas):
             app.lat_entry_var.set("{:.6f}".format(lat))
             app.lon_entry_var.set("{:.6f}".format(lon))
 
+
     def pixel_to_lat_lon(self, pixelx, pixely):
 
         width = self.winfo_width() or 600
@@ -229,6 +232,8 @@ class SimpleMapCanvas(tk.Canvas):
                                                self.mercator_factor())))
 
         return lat, lon
+
+
     def on_tile_downloaded(self):
         """Called when a tile has been downloaded"""
         self.schedule_redraw()
@@ -239,7 +244,11 @@ class SimpleMapCanvas(tk.Canvas):
             self.after_cancel(self._redraw_after_id)
         self._redraw_after_id = self.after(100, self.redraw)
 
-
+    def on_mouse_down(self, event):
+        """Handle mouse button press"""
+        self.last_x = event.x
+        self.last_y = event.y
+        self.is_dragging = True
 
     def on_mouse_drag(self, event):
         if not self.initialized:
@@ -253,13 +262,13 @@ class SimpleMapCanvas(tk.Canvas):
         self.drag_offset_x += dx
         self.drag_offset_y += dy
 
-
         self.redraw()
 
     def on_mouse_release(self, event):
         if not self.initialized or not self.is_dragging:
             return
         self.is_dragging = False
+
     def on_mouse_wheel(self, event):
         """Handle mouse wheel for zooming"""
         if not self.initialized:
@@ -405,11 +414,6 @@ class SimpleMapCanvas(tk.Canvas):
 
         self.schedule_redraw()
 
-    def clear_waypoints(self):
-        """Clear all waypoints"""
-        self.waypoints = []
-        self.schedule_redraw()
-
     def redraw(self):
         """Redraw the entire map"""
         # Skip redraw if canvas is not fully initialized
@@ -530,7 +534,7 @@ class GCSApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.title("Boat Ground Control Station")
-        self.geometry("1000x700")
+        self.geometry("1280x720")
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
         # Initialize LoRa connection (default values)
@@ -550,7 +554,7 @@ class GCSApp(tk.Tk):
     def create_widgets(self):
         # Create main frames
         left_frame = ttk.Frame(self)
-        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10, )
+        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         right_frame = ttk.Frame(self)
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=10, pady=10)
@@ -597,7 +601,7 @@ class GCSApp(tk.Tk):
 
         # Add position to status labels
         status_labels = ["Latitude", "Longitude", "Speed (Real)", "Speed (Req)",
-                         "Heading", "Yaw (Real)", "Yaw (Req)", "Thruster Power"]
+                         "Heading", "Yaw (Real)", "Yaw (Req)", "Thruster Left", "Thruster Right"]
         self.status_values = {}
 
         for i, label in enumerate(status_labels):
@@ -615,17 +619,14 @@ class GCSApp(tk.Tk):
         self.lat_entry.grid(row=0, column=1, padx=5, pady=5)
 
         ttk.Label(waypoint_frame, text="Longitude:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
-        self.lon_entry = ttk.Entry(waypoint_frame, width=15,  textvariable=self.lon_entry_var)
+        self.lon_entry = ttk.Entry(waypoint_frame, width=15, textvariable=self.lon_entry_var)
         self.lon_entry.grid(row=1, column=1, padx=5, pady=5)
 
         waypoint_btn_frame = ttk.Frame(waypoint_frame)
-        waypoint_btn_frame.grid(row=2, column=0, columnspan=2, pady=5)
+        waypoint_btn_frame.grid(row=2, column=0, columnspan=1, pady=5)
 
         self.add_wp_btn = ttk.Button(waypoint_btn_frame, text="Add Waypoint", command=self.add_waypoint)
         self.add_wp_btn.pack(side=tk.LEFT, padx=5)
-
-        self.clear_wp_btn = ttk.Button(waypoint_btn_frame, text="Clear Waypoints", command=self.clear_waypoints)
-        self.clear_wp_btn.pack(side=tk.LEFT, padx=5)
 
         # Mission control frame
         mission_frame = ttk.LabelFrame(right_frame, text="Mission Control")
@@ -744,18 +745,26 @@ class GCSApp(tk.Tk):
                 self.gcs_client = None
 
     def disconnect(self):
-        self.running = False
-        if self.update_thread:
-            self.update_thread.join(timeout=1.0)
+        self.log_message("Disconnecting...")
 
+        # First, stop the GUI update loop
+        self.running = False
+
+        # Stop the GCS client data requests first
         if self.gcs_client:
             self.gcs_client.close()
+            self.gcs_client = None
 
+        # Wait for the GUI update thread to finish
+        if self.update_thread:
+            self.update_thread.join(timeout=2.0)
+            self.update_thread = None
+
+        # Finally, close the LoRa connection
         if self.lora:
             self.lora.close()
+            self.lora = None
 
-        self.lora = None
-        self.gcs_client = None
         self.connected = False
         self.update_connection_status()
         self.log_message("Disconnected")
@@ -767,14 +776,12 @@ class GCSApp(tk.Tk):
             self.start_mission_btn.state(["!disabled"])
             self.emergency_btn.state(["!disabled"])
             self.add_wp_btn.state(["!disabled"])
-            self.clear_wp_btn.state(["!disabled"])
         else:
             self.status_label.config(text="Disconnected", foreground="red")
             self.connect_btn.config(text="Connect")
             self.start_mission_btn.state(["disabled"])
             self.emergency_btn.state(["disabled"])
-            self.add_wp_btn.state(["!disabled"])  # Still allow adding waypoints offline
-            self.clear_wp_btn.state(["!disabled"])  # Still allow clearing waypoints offline
+            self.add_wp_btn.state(["disabled"])
 
             # Reset status values
             for var in self.status_values.values():
@@ -799,12 +806,20 @@ class GCSApp(tk.Tk):
                 self.status_values["Heading"].set("{:.1f}°".format(self.gcs_client.heading))
                 self.status_values["Yaw (Real)"].set("{:.1f}°".format(self.gcs_client.yaw_real))
                 self.status_values["Yaw (Req)"].set("{:.1f}°".format(self.gcs_client.yaw_requested))
-                self.status_values["Thruster Power"].set("{:.1f}%".format(self.gcs_client.thruster_requested))
+
+                # Handle thruster values as tuple (left, right)
+                if isinstance(self.gcs_client.thruster_requested, tuple) and len(
+                        self.gcs_client.thruster_requested) >= 2:
+                    self.status_values["Thruster Left"].set("{:.1f}%".format(self.gcs_client.thruster_requested[0]))
+                    self.status_values["Thruster Right"].set("{:.1f}%".format(self.gcs_client.thruster_requested[1]))
+                else:
+                    self.status_values["Thruster Left"].set("N/A")
+                    self.status_values["Thruster Right"].set("N/A")
 
             except Exception as e:
                 self.log_message("Update error: {}".format(e))
 
-            time.sleep(0.5)  # Update at 2Hz
+            time.sleep(0.1)
 
     def log_message(self, message):
         """Add a message to the console"""
@@ -815,38 +830,25 @@ class GCSApp(tk.Tk):
 
     def add_waypoint(self):
         """Add a waypoint to the map and send to the boat"""
+        # If connected, send to boat
+        if not (self.connected and self.gcs_client):
+            self.log_message("Failed to send waypoint to boat")
+            return
         try:
             lat = float(self.lat_entry.get())
             lon = float(self.lon_entry.get())
 
-            # Add to local waypoint list
-            self.waypoints.append((lat, lon))
-            self.map_canvas.add_waypoint(lat, lon)
-
-            # If connected, send to boat
-            if self.connected and self.gcs_client:
-                response = self.gcs_client.add_waypoint(lat, lon)
-                if response:
-                    self.log_message("Waypoint added at {:.6f}, {:.6f}".format(lat, lon))
-                else:
-                    self.log_message("Failed to send waypoint to boat")
+            response = self.gcs_client.add_waypoint(lat, lon)
+            if response == "OK":
+                self.log_message("Waypoint added at {:.6f}, {:.6f}".format(lat, lon))
+                # Add to local waypoint list
+                self.waypoints.append((lat, lon))
+                self.map_canvas.add_waypoint(lat, lon)
             else:
-                self.log_message("Waypoint added locally at {:.6f}, {:.6f}".format(lat, lon))
+                self.log_message("Failed to send waypoint to boat")
 
         except ValueError:
             self.log_message("Invalid coordinates")
-
-    def clear_waypoints(self):
-        """Clear all waypoints"""
-        self.waypoints = []
-        self.map_canvas.clear_waypoints()
-        self.log_message("All waypoints cleared")
-
-        # If connected, send clear command to boat
-        if self.connected and self.gcs_client:
-            response = self.gcs_client.clear_waypoints()
-            if not response:
-                self.log_message("Failed to clear waypoints on boat")
 
     def start_mission(self):
         """Send start mission command to the boat"""
@@ -859,7 +861,7 @@ class GCSApp(tk.Tk):
             return
 
         response = self.gcs_client.start_mission()
-        if response:
+        if response == "OK":
             self.log_message("Mission started")
         else:
             self.log_message("Failed to start mission")
@@ -870,11 +872,8 @@ class GCSApp(tk.Tk):
             self.log_message("Not connected")
             return
 
-        response = self.gcs_client.emergency_shutdown()
-        if response:
-            self.log_message("EMERGENCY STOP SENT")
-        else:
-            self.log_message("Failed to send emergency stop")
+        self.log_message("EMERGENCY STOP SENT")
+        self.gcs_client.emergency_shutdown()
 
     def update_zoom(self, value):
         """Update the map zoom level"""
