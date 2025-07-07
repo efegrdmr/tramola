@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 import rospy
 import math
 
@@ -108,10 +108,10 @@ class Vehicle:
         Turn the vehicle in place by setting the angular speed.
         Positive angle turns left, negative angle turns right.
         """
-        self.angular_speed = -angle
+        self.angular_speed = angle
         self.linear_speed = 0
 
-    def publish_speed(self):
+    def publish_speed(self, t):
         cmd = Twist()
         cmd.linear.x = self.linear_speed
         cmd.angular.z = self.angular_speed
