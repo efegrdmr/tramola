@@ -8,7 +8,7 @@ import time
 import threading
 
 class Lora(object):
-    def __init__(self, port='/dev/ttyUSB0', baud_rate=9600, timeout=1.0, response_timeout=5000, message_callback=None):
+    def __init__(self, port="/dev/ttyUSB0", baud_rate=9600, timeout=1.0, response_timeout=5000, message_callback=None):
         try:
             self.serial_port = serial.Serial(port, baud_rate, timeout=timeout)
             self.response_timeout = response_timeout
@@ -18,7 +18,23 @@ class Lora(object):
             
         except serial.SerialException as e:
             raise Exception("Failed to open serial port: %s" % e)
-    
+
+        self.coding_of_messages = {
+            "start_mission": "0",
+            "emergency_shutdown": "1",
+            "add_waypoint": "2",
+            "location": "3",
+            "speed_real": "4",
+            "heading": "5",
+            "yaw_real": "6",
+            "thruster_requested": "7",
+            "speed_requested": "8",
+            "yaw_requested": "9",
+            "OK": "a",
+            "ERR": "b"}
+        
+        self.message_of_codings = {v: k for k, v in self.coding_of_messages.items()}
+
     def set_message_callback(self, callback):
         self.message_callback = callback
         
@@ -37,6 +53,15 @@ class Lora(object):
             self.receiver_thread.join(timeout=2.0)
             self.receiver_thread = None
     
+    def encode(self, message):
+        data = message.split(",")
+        data[0] = self.coding_of_messages.get(data[0], "unknown")
+        return ",".join(data)
+    def decode(self, message):
+        data = message.split(",")
+        data[0] = self.message_of_codings[data[0]]
+        return ",".join(data)
+
     def _receiver_loop(self):
         while self.running:
             try:
@@ -49,7 +74,6 @@ class Lora(object):
                     response = self.message_callback(packet)
                     if response:
                         # Send the result
-                        time.sleep(0.02)
                         self.send_message(response)
             except Exception as e:
                 print("Error in receiver loop:", e)
@@ -76,16 +100,18 @@ class Lora(object):
         Format: payload|<checksum>\n
         Returns True on success, False on error.
         """
+        # Encode message
+        message = self.encode(message)
         try:
             # Build payload string
             if isinstance(message, unicode):
-                payload = message.encode('utf-8')
+                payload = message.encode("utf-8")
             else:
                 payload = str(message)
 
             # Calculate checksum over raw bytes
             checksum = self.calculate_checksum(payload)
-            full_msg = payload + '|' + str(checksum) + '\n'
+            full_msg = payload + "|" + str(checksum) + "\n"
 
             # Write to serial port
             self.serial_port.write(full_msg)
@@ -114,13 +140,13 @@ class Lora(object):
 
     def read_packet(self):
         """
-        Reads from serial until '\n'. Expects format payload|<checksum>\n.
+        Reads from serial until "\n". Expects format payload|<checksum>\n.
         Verifies checksum, returning payload or None if invalid.
         """
         try:
             start = time.time()
             timeout = self.serial_port.timeout
-            buffer = ''
+            buffer = []
 
             # Read until newline or timeout
             while time.time() - start < timeout:
@@ -128,19 +154,22 @@ class Lora(object):
                     char = self.serial_port.read(1)
                     if not char:
                         continue
-                    if char == '\n':
+                    if char == "\n":
                         break
-                    buffer += char
+                    buffer.append(char)
                 else:
                     time.sleep(0.01)
 
             if not buffer:
                 return None
 
+            # Join the buffer only once, at the end
+            buffer_str = ''.join(buffer)
+
             # Split payload and checksum
-            if '|' not in buffer:
+            if "|" not in buffer_str:
                 return None
-            payload_str, checksum_str = buffer.rsplit('|', 1)
+            payload_str, checksum_str = buffer_str.rsplit("|", 1)
             try:
                 recv_checksum = int(checksum_str)
             except ValueError:
@@ -152,11 +181,12 @@ class Lora(object):
                 print("Checksum mismatch: received %d, calculated %d" % (recv_checksum, calc_checksum))
                 return None
 
+            # Decode payload
+            payload_str = self.decode(payload_str)
+
             # Return payload (utf-8 decode if needed)
-            try:
-                return payload_str.decode('utf-8')
-            except Exception:
-                return payload_str
+            
+            return payload_str
         except Exception as e:
             print("Error reading packet:", e)
             return None
@@ -191,14 +221,20 @@ class LoraGCSClient(object):
         return self.lora.send_message_and_wait_for_response(message)
         
     def start_mission(self):
-        return self.send_message("start_mission")
+        self.stop_data_requests()  # Ensure data requests are stopped before starting mission
+        res = self.send_message("start_mission")
+        self.start_data_requests()  # Start data requests after mission starts
+        return res
         
     def emergency_shutdown(self):
         return self.send_message("emergency_shutdown")
 
     def add_waypoint(self, latitude, longitude):
+        self.stop_data_requests()  # Ensure data requests are stopped before adding waypoint
         message = "add_waypoint,%f,%f" % (latitude, longitude)
-        return self.send_message(message)
+        res = self.send_message(message)
+        self.start_data_requests()  # Restart data requests after adding waypoint
+        return res
 
     def start_data_requests(self):
         """Start a thread to periodically request data updates"""
@@ -221,7 +257,6 @@ class LoraGCSClient(object):
         """Thread function to continuously request data updates"""
         while self.data_request_running:
             self.sync_data()
-            time.sleep(1.0)  # Request update every second
 
     def sync_data(self):
         """Request updates for all data values"""
