@@ -24,8 +24,13 @@ class Lidar:
         self.right_min_dist = self.max_range
 
 
-        self.stop_service = rospy.Service('/lidar/stop', Empty, self.stop)
-        self.start_service = rospy.Service('/lidar/start', Empty, self.start)
+
+        rospy.wait_for_service("/start_motor")
+        self.start_service = rospy.ServiceProxy("/start_motor", Empty)
+
+        rospy.wait_for_service("/stop_motor")
+        self.stop_service = rospy.ServiceProxy("/stop_motor", Empty)
+
         self.scan = None
 
 
@@ -116,7 +121,8 @@ class Lidar:
 
     def stop(self):
         self.stop_service()
-        self.sub.unregister()
+        if self.sub:
+            self.sub.unregister()
         self.sub = None
         print("Lidar stopped")
     

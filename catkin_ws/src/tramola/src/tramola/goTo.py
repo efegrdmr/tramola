@@ -4,13 +4,15 @@ import numpy as np
 
 class GoTo(Task):
     def __init__(self, vehicle, lidar, point, linear_speed=0.5, max_angular_speed=1.0, completion_threshold=1.0, safety_padding=5.0):
-        super().__init__(vehicle, lidar, detection=None)
+        super(GoTo, self).__init__(vehicle, lidar, detection=None)
         self.point = point
         self.linear_speed = linear_speed
         self.max_angular_speed = max_angular_speed
         self.completion_threshold = completion_threshold
         self.safety_padding = safety_padding  # degrees of padding for free angle edges
         self.max_angular_dist_to_point = 45
+        self.lidar.start()
+        self.vehicle.start_velocity_publisher()
     
 
 
@@ -18,6 +20,8 @@ class GoTo(Task):
         print("\033c")  # clear console
         """Main mission control loop."""
         if self._check_completion():
+            self.lidar.stop()
+            self.vehicle.stop_velocity_publisher()
             return
             
         detections = self.lidar.get_detections()
@@ -58,6 +62,7 @@ class GoTo(Task):
             self.vehicle.angular_speed = 0
             self.stop()
             rospy.loginfo("GoTo mission completed")
+            self.lidar.stop()
             return True
         return False
 

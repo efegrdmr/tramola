@@ -32,7 +32,7 @@ class Control:
         if self.lora:
             self.lora.close()
             time.sleep(3)
-        self.lora = Lora(message_callback=self.lora_callback)
+        self.lora = Lora(message_callback=self.lora_callback, port="/dev/ttyUSB1")
         self.lora.start_receiver()
         self.last_gcs_message_time = time.time()
 
@@ -89,12 +89,14 @@ class Control:
             return "OK"
 
         elif command == "emergency_shutdown":
+            rospy.logwarn("Emergency shutdown")
             self.vehicle.set_mode("HOLD")
             self.vehicle.arming(False)
             return "OK"
         elif command == "add_waypoint":
             if len(self.points) == 0 or self.points[len(self.points) - 1] != (data[1], data[2]):
-                self.points.append((data[1], data[2]))
+                self.points.append((float(data[1]), float(data[2])))
+                rospy.logwarn("waypoint added")
                 return "OK"
             else:
                 return "ERR" 

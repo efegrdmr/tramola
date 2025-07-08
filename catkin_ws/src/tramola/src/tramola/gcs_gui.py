@@ -858,7 +858,7 @@ class GCSApp(tk.Tk):
 
         if not self.waypoints:
             self.log_message("No waypoints set")
-            return
+            
 
         response = self.gcs_client.start_mission()
         if response == "OK":
