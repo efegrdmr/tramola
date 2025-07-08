@@ -227,7 +227,10 @@ class LoraGCSClient(object):
         return res
         
     def emergency_shutdown(self):
-        return self.send_message("emergency_shutdown")
+        self.stop_data_requests()  # Ensure data requests are stopped before starting mission
+        res = self.send_message("emergency_shutdown")
+        self.start_data_requests()  # Start data requests after mission starts
+        return res
 
     def add_waypoint(self, latitude, longitude):
         self.stop_data_requests()  # Ensure data requests are stopped before adding waypoint
