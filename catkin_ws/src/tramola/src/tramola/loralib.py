@@ -55,11 +55,11 @@ class Lora(object):
     
     def encode(self, message):
         data = message.split(",")
-        data[0] = self.coding_of_messages.get(data[0], "unknown")
+        data[0] = self.coding_of_messages.get(data[0], data[0])
         return ",".join(data)
     def decode(self, message):
         data = message.split(",")
-        data[0] = self.message_of_codings[data[0]]
+        data[0] = self.message_of_codings.get(data[0], data[0])
         return ",".join(data)
 
     def _receiver_loop(self):
@@ -67,10 +67,10 @@ class Lora(object):
             try:
                 # Read a packet from the serial port
                 packet = self.read_packet()
-                if packet:
-                    print(packet + "  came")
                 if packet and self.message_callback:
                     # Call the callback function with the processed response
+                    packet = self.decode(packet)
+                    print("message recieved: " + packet)
                     response = self.message_callback(packet)
                     if response:
                         # Send the result
@@ -100,8 +100,6 @@ class Lora(object):
         Format: payload|<checksum>\n
         Returns True on success, False on error.
         """
-        # Encode message
-        message = self.encode(message)
         try:
             # Build payload string
             if isinstance(message, unicode):
@@ -180,11 +178,6 @@ class Lora(object):
             if recv_checksum != calc_checksum:
                 print("Checksum mismatch: received %d, calculated %d" % (recv_checksum, calc_checksum))
                 return None
-
-            # Decode payload
-            payload_str = self.decode(payload_str)
-
-            # Return payload (utf-8 decode if needed)
             
             return payload_str
         except Exception as e:
@@ -218,6 +211,7 @@ class LoraGCSClient(object):
         self.data_request_thread = None
   
     def send_message(self, message):
+        message = self.lora.encode(message)
         return self.lora.send_message_and_wait_for_response(message)
         
     def start_mission(self):
@@ -265,7 +259,7 @@ class LoraGCSClient(object):
         """Request updates for all data values"""
         for message in self.requested_datas:
             try:
-                response = self.lora.send_message_and_wait_for_response(message)
+                response = self.send_message(message)
                 if response:
                     if message == "location":
                         parts = response.split(",")

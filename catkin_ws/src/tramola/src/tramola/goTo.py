@@ -62,6 +62,7 @@ class GoTo(Task):
             self.vehicle.angular_speed = 0
             self.stop()
             rospy.loginfo("GoTo mission completed")
+            self.vehicle.set_mode("HOLD")
             self.lidar.stop()
             return True
         return False

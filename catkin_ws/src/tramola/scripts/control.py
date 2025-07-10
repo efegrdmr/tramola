@@ -26,7 +26,7 @@ class Control:
         self.last_gcs_message_time = time.time()
         
         rospy.Timer(rospy.Duration(0.1), self.mission_callback)  # Call mission_callback every 100ms
-
+        self.init_lora()
     
     def init_lora(self):
         if self.lora:
@@ -35,12 +35,10 @@ class Control:
         self.lora = Lora(message_callback=self.lora_callback, port="/dev/ttyUSB1")
         self.lora.start_receiver()
         self.last_gcs_message_time = time.time()
+        
 
     # checks the status of a given task and get to the next one
     def mission_callback(self, t):
-        if time.time() - self.last_gcs_message_time > 10:
-            self.init_lora()
-            rospy.logwarn("No message received from GCS for a while, reinitializing LoRa")
         if self.state == "GOTO":
             if not self.task:
                 self.vehicle.arming(True)
@@ -54,7 +52,7 @@ class Control:
                     self.task = Kamikaze(self.vehicle, self.lidar, self.detection)
                 else:
                     self.task.stop()
-                    self.task = self.points.pop(0)
+                    self.task = GoTo(self.vehicle, self.lidar, self.points.pop(0))
         elif self.state == "KAMIKAZE":
             if self.task.status == "COMPLETED":
                 self.task.stop()
