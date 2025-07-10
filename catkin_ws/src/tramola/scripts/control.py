@@ -42,8 +42,6 @@ class Control:
         if self.state == "GOTO":
             if not self.task:
                 self.vehicle.arming(True)
-                self.vehicle.set_mode("AUTO")
-                self.vehicle.start_velocity_publisher()
                 self.task = GoTo(self.vehicle, self.lidar, self.points.pop(0))
             if self.task.status == "COMPLETED":
                 if len(self.points) == 0:

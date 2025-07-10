@@ -13,6 +13,7 @@ class GoTo(Task):
         self.max_angular_dist_to_point = 45
         self.lidar.start()
         self.vehicle.start_velocity_publisher()
+        self.vehicle.set_mode("AUTO")
     
 
 

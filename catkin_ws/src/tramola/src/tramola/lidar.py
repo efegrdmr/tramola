@@ -114,8 +114,8 @@ class Lidar:
         return (angles, self.left_min_dist, self.right_min_dist)
     
     def print_objects(self):
-        print(", ".join(
-            "." if a == 0 else "#"
+        print("".join(
+            " " if a == 0 else "#"
             for a in self.objects_in_distance
         ))
 
@@ -124,12 +124,10 @@ class Lidar:
         if self.sub:
             self.sub.unregister()
         self.sub = None
-        print("Lidar stopped")
     
     def start(self):
         """
         Start the Lidar 
         """
-        print("Lidar started")
         self.start_service()
         self.sub = rospy.Subscriber('/scan', LaserScan, self.callback, queue_size=1)
