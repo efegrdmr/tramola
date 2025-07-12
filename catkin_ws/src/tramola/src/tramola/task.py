@@ -4,12 +4,12 @@ from tramola.detection import Detection
 from tramola.lidar import Lidar
 
 
-class Task:
+class Task(object):
     def __init__(self, vehicle, lidar, detection=None):
         assert rospy.core.is_initialized(), "ROS node is not initialized"
         
         self.vehicle = vehicle
-        self.state = "STARTED"
+        self.status = "STARTED"
         self.lidar = lidar
         self.detection = detection
 
@@ -20,10 +20,10 @@ class Task:
         raise NotImplementedError("The mission_callback method must be overridden in a subclass")
 
     def stop(self):
-        if self.state == "COMPLETED":
+        if self.status == "COMPLETED":
             return
         
-        self.state = "COMPLETED"
+        self.status = "COMPLETED"
         self.lidar.stop()
         self.mission_loop.shutdown()
 

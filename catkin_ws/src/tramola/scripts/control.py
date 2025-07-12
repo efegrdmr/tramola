@@ -26,26 +26,22 @@ class Control:
         self.last_gcs_message_time = time.time()
         
         rospy.Timer(rospy.Duration(0.1), self.mission_callback)  # Call mission_callback every 100ms
-
+        self.init_lora()
     
     def init_lora(self):
         if self.lora:
             self.lora.close()
             time.sleep(3)
-        self.lora = Lora(message_callback=self.lora_callback)
+        self.lora = Lora(message_callback=self.lora_callback, port="/dev/ttyUSB1")
         self.lora.start_receiver()
         self.last_gcs_message_time = time.time()
+        
 
     # checks the status of a given task and get to the next one
     def mission_callback(self, t):
-        if time.time() - self.last_gcs_message_time > 10:
-            self.init_lora()
-            rospy.logwarn("No message received from GCS for a while, reinitializing LoRa")
         if self.state == "GOTO":
             if not self.task:
                 self.vehicle.arming(True)
-                self.vehicle.set_mode("AUTO")
-                self.vehicle.start_velocity_publisher()
                 self.task = GoTo(self.vehicle, self.lidar, self.points.pop(0))
             if self.task.status == "COMPLETED":
                 if len(self.points) == 0:
@@ -54,7 +50,7 @@ class Control:
                     self.task = Kamikaze(self.vehicle, self.lidar, self.detection)
                 else:
                     self.task.stop()
-                    self.task = self.points.pop(0)
+                    self.task = GoTo(self.vehicle, self.lidar, self.points.pop(0))
         elif self.state == "KAMIKAZE":
             if self.task.status == "COMPLETED":
                 self.task.stop()
@@ -89,12 +85,14 @@ class Control:
             return "OK"
 
         elif command == "emergency_shutdown":
+            rospy.logwarn("Emergency shutdown")
             self.vehicle.set_mode("HOLD")
             self.vehicle.arming(False)
             return "OK"
         elif command == "add_waypoint":
             if len(self.points) == 0 or self.points[len(self.points) - 1] != (data[1], data[2]):
-                self.points.append((data[1], data[2]))
+                self.points.append((float(data[1]), float(data[2])))
+                rospy.logwarn("waypoint added")
                 return "OK"
             else:
                 return "ERR" 

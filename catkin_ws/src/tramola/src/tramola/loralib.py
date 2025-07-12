@@ -8,7 +8,7 @@ import time
 import threading
 
 class Lora(object):
-    def __init__(self, port="/dev/ttyUSB0", baud_rate=9600, timeout=1.0, response_timeout=5000, message_callback=None):
+    def __init__(self, port="/dev/ttyUSB0", baud_rate=9600, timeout=1.0, response_timeout=2000, message_callback=None):
         try:
             self.serial_port = serial.Serial(port, baud_rate, timeout=timeout)
             self.response_timeout = response_timeout
@@ -55,11 +55,11 @@ class Lora(object):
     
     def encode(self, message):
         data = message.split(",")
-        data[0] = self.coding_of_messages.get(data[0], "unknown")
+        data[0] = self.coding_of_messages.get(data[0], data[0])
         return ",".join(data)
     def decode(self, message):
         data = message.split(",")
-        data[0] = self.message_of_codings[data[0]]
+        data[0] = self.message_of_codings.get(data[0], data[0])
         return ",".join(data)
 
     def _receiver_loop(self):
@@ -67,10 +67,10 @@ class Lora(object):
             try:
                 # Read a packet from the serial port
                 packet = self.read_packet()
-                if packet:
-                    print(packet + "  came")
                 if packet and self.message_callback:
                     # Call the callback function with the processed response
+                    packet = self.decode(packet)
+                    print("message recieved: " + packet)
                     response = self.message_callback(packet)
                     if response:
                         # Send the result
@@ -100,8 +100,6 @@ class Lora(object):
         Format: payload|<checksum>\n
         Returns True on success, False on error.
         """
-        # Encode message
-        message = self.encode(message)
         try:
             # Build payload string
             if isinstance(message, unicode):
@@ -180,11 +178,6 @@ class Lora(object):
             if recv_checksum != calc_checksum:
                 print("Checksum mismatch: received %d, calculated %d" % (recv_checksum, calc_checksum))
                 return None
-
-            # Decode payload
-            payload_str = self.decode(payload_str)
-
-            # Return payload (utf-8 decode if needed)
             
             return payload_str
         except Exception as e:
@@ -217,25 +210,29 @@ class LoraGCSClient(object):
         self.data_request_running = False
         self.data_request_thread = None
   
-    def send_message(self, message):
-        return self.lora.send_message_and_wait_for_response(message)
+    def send_message(self, message, retry_count=0):
+        message = self.lora.encode(message)
+        res = self.lora.send_message_and_wait_for_response(message)
+        if res is None and retry_count > 0:
+            res = self.send_message(message, retry_count-1)
+        return res
         
     def start_mission(self):
         self.stop_data_requests()  # Ensure data requests are stopped before starting mission
-        res = self.send_message("start_mission")
+        res = self.send_message("start_mission", 5)
         self.start_data_requests()  # Start data requests after mission starts
         return res
         
     def emergency_shutdown(self):
         self.stop_data_requests()  # Ensure data requests are stopped before starting mission
-        res = self.send_message("emergency_shutdown")
+        res = self.send_message("emergency_shutdown", 5)
         self.start_data_requests()  # Start data requests after mission starts
         return res
 
     def add_waypoint(self, latitude, longitude):
         self.stop_data_requests()  # Ensure data requests are stopped before adding waypoint
         message = "add_waypoint,%f,%f" % (latitude, longitude)
-        res = self.send_message(message)
+        res = self.send_message(message, 5)
         self.start_data_requests()  # Restart data requests after adding waypoint
         return res
 
@@ -253,7 +250,7 @@ class LoraGCSClient(object):
         """Stop the data request thread"""
         self.data_request_running = False
         if self.data_request_thread:
-            self.data_request_thread.join(timeout=2.0)
+            self.data_request_thread.join()
             self.data_request_thread = None
     
     def _data_request_loop(self):
@@ -264,8 +261,10 @@ class LoraGCSClient(object):
     def sync_data(self):
         """Request updates for all data values"""
         for message in self.requested_datas:
+            if not self.data_request_running:
+                return
             try:
-                response = self.lora.send_message_and_wait_for_response(message)
+                response = self.send_message(message)
                 if response:
                     if message == "location":
                         parts = response.split(",")
@@ -307,7 +306,6 @@ class LoraGCSClient(object):
                             print("Invalid yaw_requested format:", response)
             except Exception as e:
                 print("Error syncing data for %s: %s" % (message, e))
-            time.sleep(0.5)  # Small delay between requests to prevent flooding
     
     def close(self):
         """Clean up resources"""
