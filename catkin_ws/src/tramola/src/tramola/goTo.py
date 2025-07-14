@@ -3,7 +3,7 @@ import rospy
 import numpy as np
 
 class GoTo(Task):
-    def __init__(self, vehicle, lidar, point, linear_speed=0.5, max_angular_speed=1.0, completion_threshold=1.0, safety_padding=2.0):
+    def __init__(self, vehicle, lidar, point, linear_speed=0.5, max_angular_speed=1.0, completion_threshold=1.5, safety_padding=2.0):
         super(GoTo, self).__init__(vehicle, lidar, detection=None)
         self.point = point
         self.linear_speed = linear_speed
@@ -38,19 +38,16 @@ class GoTo(Task):
             
         free_angles, left_dist, right_dist = detections
         
-        # Emergency stop if too close to obstacles
-        if left_dist < 0.3 or right_dist < 0.3:
-            self.vehicle.linear_speed = 0
-            self.vehicle.angular_speed = 0
-            rospy.logwarn("Emergency stop: obstacle too close")
-            return
-            
         target_angle = self.vehicle.angle_between(*self.point)
         
         if self._target_out_of_angular_range(target_angle):
             rospy.logwarn("Target range {} is out of angular range {}".format(target_angle, self.max_angular_dist_to_point))
             self._turn_towards_target(target_angle)
             return
+        
+        # video update
+        self._move_to_target(target_angle)
+        return
             
         if self._target_in_free_space(target_angle, free_angles):
             rospy.logwarn("Target angle is in free space")
