@@ -582,7 +582,7 @@ class GCSApp(tk.Tk):
         ttk.Label(connection_frame, text="Port:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
         self.port_entry = ttk.Entry(connection_frame, width=15)
         self.port_entry.grid(row=0, column=1, padx=5, pady=5)
-        self.port_entry.insert(0, "/dev/ttyUSB0")
+        self.port_entry.insert(0, "/dev/ttyACM0")
 
         ttk.Label(connection_frame, text="Baud:").grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
         self.baud_entry = ttk.Entry(connection_frame, width=10)

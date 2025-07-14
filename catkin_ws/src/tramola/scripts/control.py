@@ -32,7 +32,7 @@ class Control:
         if self.lora:
             self.lora.close()
             time.sleep(3)
-        self.lora = Lora(message_callback=self.lora_callback, port="/dev/ttyUSB1")
+        self.lora = Lora(message_callback=self.lora_callback, port="/dev/ttyACM0")
         self.lora.start_receiver()
         self.last_gcs_message_time = time.time()
         
