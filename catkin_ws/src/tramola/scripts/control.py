@@ -41,21 +41,29 @@ class Control:
     def mission_callback(self, t):
         if self.state == "GOTO":
             if not self.task:
+                rospy.loginfo("GoTo mission Started")
                 self.vehicle.arming(True)
                 self.task = GoTo(self.vehicle, self.lidar, self.points.pop(0))
-            if self.task.status == "COMPLETED":
+                self.lidar.start()
+                self.vehicle.start_velocity_publisher()
+                self.vehicle.set_mode("AUTO")
+            if self.task.state == "COMPLETED":
+                rospy.loginfo("GoTo mission completed")
                 if len(self.points) == 0:
+                    rospy.loginfo("KAMIKAZE mission Started")
                     self.state = "KAMIKAZE"
-                    self.task.stop()
                     self.task = Kamikaze(self.vehicle, self.lidar, self.detection)
                 else:
-                    self.task.stop()
+                    rospy.loginfo("GoTo mission Started")
                     self.task = GoTo(self.vehicle, self.lidar, self.points.pop(0))
         elif self.state == "KAMIKAZE":
-            if self.task.status == "COMPLETED":
+            if self.task.state == "COMPLETED":
                 self.task.stop()
-                self.vehicle.set_mode = "HOLD"
+                self.vehicle.set_mode("MANUAL")
                 self.vehicle.stop_velocity_publisher()
+                rospy.loginfo("KAMIKAZE mission completed")
+
+
             
 
     def lora_callback(self, data):

@@ -9,7 +9,7 @@ class Task(object):
         assert rospy.core.is_initialized(), "ROS node is not initialized"
         
         self.vehicle = vehicle
-        self.status = "STARTED"
+        self.state = "STARTED"
         self.lidar = lidar
         self.detection = detection
 
@@ -22,8 +22,7 @@ class Task(object):
     def stop(self):
         if self.status == "COMPLETED":
             return
-        
-        self.status = "COMPLETED"
+        self.state = "COMPLETED"
         self.lidar.stop()
         self.mission_loop.shutdown()
 

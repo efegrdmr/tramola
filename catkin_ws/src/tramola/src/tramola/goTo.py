@@ -3,7 +3,7 @@ import rospy
 import numpy as np
 
 class GoTo(Task):
-    def __init__(self, vehicle, lidar, point, linear_speed=0.5, max_angular_speed=1.0, completion_threshold=1.5, safety_padding=2.0):
+    def __init__(self, vehicle, lidar, point, linear_speed=0.5, max_angular_speed=2.0, completion_threshold=1.5, safety_padding=2.0):
         super(GoTo, self).__init__(vehicle, lidar, detection=None)
         self.point = point
         self.linear_speed = linear_speed
@@ -11,24 +11,16 @@ class GoTo(Task):
         self.completion_threshold = completion_threshold
         self.safety_padding = safety_padding  # degrees of padding for free angle edges
         self.max_angular_dist_to_point = 45
-        self.lidar.start()
-        self.vehicle.start_velocity_publisher()
-        self.vehicle.set_mode("AUTO")
+        
     
-
-
     def mission_callback(self, t):
-        print("\033c")  # clear console
+        print("-- GoTo Mission Callback --")  
         """Main mission control loop."""
         if self._check_completion():
-            self.vehicle.stop_velocity_publisher()
             self.state = "COMPLETED"
             self.vehicle.linear_speed = 0
             self.vehicle.angular_speed = 0
             self.stop()
-            rospy.loginfo("GoTo mission completed")
-            self.vehicle.set_mode("HOLD")
-            self.lidar.stop()
             return
             
         detections = self.lidar.get_detections()
@@ -45,9 +37,8 @@ class GoTo(Task):
             self._turn_towards_target(target_angle)
             return
         
-        # video update
-        self._move_to_target(target_angle)
-        return
+        
+
             
         if self._target_in_free_space(target_angle, free_angles):
             rospy.logwarn("Target angle is in free space")
@@ -101,7 +92,7 @@ class GoTo(Task):
     def _move_to_target(self, target_angle):
         """Move directly towards the target."""
         self.vehicle.angular_speed = self._normalize_angular_speed(target_angle)
-        rospy.logwarn("Moving to target: angle=%.2f", target_angle)
+        rospy.logwarn("Moving to target: angle=%.2f speed=%.2f", target_angle, self.vehicle.linear_speed)
 
     def _avoid_obstacles(self, target_angle, free_angles):
         """Navigate around obstacles towards the target."""

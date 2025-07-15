@@ -70,7 +70,6 @@ class Lora(object):
                 if packet and self.message_callback:
                     # Call the callback function with the processed response
                     packet = self.decode(packet)
-                    print("message recieved: " + packet)
                     response = self.message_callback(packet)
                     if response:
                         # Send the result
@@ -113,7 +112,6 @@ class Lora(object):
 
             # Write to serial port
             self.serial_port.write(full_msg)
-            print("message sent: %r" % full_msg)
             return True
         except Exception as e:
             print("Error sending message:", e)
@@ -131,7 +129,6 @@ class Lora(object):
         while time.time() < deadline:
             resp = self.read_packet()
             if resp is not None:
-                print("got response")
                 return resp
             time.sleep(0.01)
         return None

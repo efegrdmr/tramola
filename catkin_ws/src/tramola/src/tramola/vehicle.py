@@ -4,13 +4,13 @@ import math
 
 # ROS messages
 from geometry_msgs.msg import Twist, TwistStamped
-from mavros_msgs.msg   import Waypoint, OverrideRCIn, WaypointReached, ActuatorControl
+from mavros_msgs.msg   import RCOut
 from std_msgs.msg      import Float64
 from sensor_msgs.msg   import NavSatFix
 from geographic_msgs.msg import GeoPoseStamped
 
 # MAVROS services
-from mavros_msgs.srv   import SetMode, SetModeRequest, WaypointPush, CommandBool, CommandBoolRequest
+from mavros_msgs.srv   import SetMode, SetModeRequest, CommandBool, CommandBoolRequest
 
 class Vehicle:
     def __init__(self):
@@ -26,7 +26,6 @@ class Vehicle:
         # Set mode service
         rospy.wait_for_service("/mavros/set_mode") 
         self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
-        self.current_mode = None
 
         # Real heading
         self.compass_sub = rospy.Subscriber("/mavros/global_position/compass_hdg", Float64, self.compass_callback)
@@ -37,7 +36,7 @@ class Vehicle:
         self.location = None
 
         # Real speed
-        self.speed_sub = rospy.Subscriber("/mavros/global_position/gp_vel", TwistStamped, self.speed_callback)
+        self.speed_sub = rospy.Subscriber("/mavros/global_position/raw/gps_vel", TwistStamped, self.speed_callback)
         self.speed = 0.0
         self.yaw = 0.0
 
@@ -47,17 +46,24 @@ class Vehicle:
         self.arming_srv.wait_for_service()
 
         # Get thrust
-        rospy.Subscriber("/mavros/actuator_output", ActuatorControl, self.actuator_output_cb)
+        rospy.Subscriber("/mavros/rc/out", RCOut, self.rc_out_cb)
         self.thrust_left = 0
         self.thrust_right = 0
 
 
                                         
         
-    def actuator_output_cb(self, msg):
-        self.thrust_left =  msg.controls[1] # ?????????
-        self.thrust_right = msg.controls[3]
+    def rc_out_cb(self, msg):
+        self.thrust_left =  self.pwm_to_percentage(msg.channels[1])# ?????????
+        self.thrust_right = self.pwm_to_percentage(msg.channels[2])
+        rospy.loginfo("values: %d %d", self.thrust_left, self.thrust_right)
 
+    def pwm_to_percentage(self, pwm_value):
+        """
+        Convert PWM value to percentage.
+        Assuming PWM range is 1000-2000, where 1000 is 0% and 2000 is 100%.
+        """
+        return (pwm_value - 1000) / 10.0
 
     def start_velocity_publisher(self):
         self.velocity_publisher_timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
@@ -82,6 +88,7 @@ class Vehicle:
 
     def speed_callback(self, data):
         self.speed = math.sqrt(data.twist.linear.x**2 + data.twist.linear.y**2)
+        rospy.loginfo("self.speed: %f", self.speed)
 
 
     def send_location(self, latitude, longitude):
@@ -91,14 +98,10 @@ class Vehicle:
         self.location_pub.publish(msg)
 
     def set_mode(self, mode):
-        if self.current_mode == mode:
-            return
-
         req = SetModeRequest()
         req.custom_mode = mode
         resp = self.mode_srv(req)
         if resp.mode_sent:
-            self.current_mode = mode
             rospy.loginfo("Mode changed to %s successfully", mode)
         else:
             rospy.logwarn("Failed to change mode to %s", mode)
