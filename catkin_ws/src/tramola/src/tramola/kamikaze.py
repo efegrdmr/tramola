@@ -12,4 +12,4 @@ class Kamikaze(Task):
         self.vehicle.linear_speed = self.max_linear_speed
 
     def mission_callback(self, t):
-        self.state = "COMPLETED"
+        self.stop()

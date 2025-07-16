@@ -3,7 +3,7 @@ import rospy
 import numpy as np
 
 class GoTo(Task):
-    def __init__(self, vehicle, lidar, point, linear_speed=0.5, max_angular_speed=2.0, completion_threshold=1.5, safety_padding=2.0):
+    def __init__(self, vehicle, lidar, point, linear_speed=0.7, max_angular_speed=2.0, completion_threshold=1.5, safety_padding=2.0):
         super(GoTo, self).__init__(vehicle, lidar, detection=None)
         self.point = point
         self.linear_speed = linear_speed
@@ -12,12 +12,11 @@ class GoTo(Task):
         self.safety_padding = safety_padding  # degrees of padding for free angle edges
         self.max_angular_dist_to_point = 45
         
-    
+        
     def mission_callback(self, t):
         print("-- GoTo Mission Callback --")  
         """Main mission control loop."""
         if self._check_completion():
-            self.state = "COMPLETED"
             self.vehicle.linear_speed = 0
             self.vehicle.angular_speed = 0
             self.stop()
@@ -37,9 +36,6 @@ class GoTo(Task):
             self._turn_towards_target(target_angle)
             return
         
-        
-
-            
         if self._target_in_free_space(target_angle, free_angles):
             rospy.logwarn("Target angle is in free space")
             self._move_to_target(target_angle)
@@ -58,6 +54,7 @@ class GoTo(Task):
 
     def _target_out_of_angular_range(self, target_angle):
         """Check if target is outside lidar's field of view."""
+        rospy.logwarn("target %.2f  max angular dist %.2f  is target out of angular range: %d", target_angle, self.max_angular_dist_to_point, abs(target_angle) > self.max_angular_dist_to_point)
         return abs(target_angle) > self.max_angular_dist_to_point
         
 
@@ -85,7 +82,8 @@ class GoTo(Task):
                 padded_end = end_angle - self.safety_padding
             
             # Only consider this free space if it's wide enough after padding
-            if padded_end > padded_start and padded_start <= target_angle <= padded_end:
+            rospy.logwarn("end %d, start %d, target %d", padded_end, padded_start, target_angle)
+            if padded_start > padded_end and padded_end < target_angle < padded_start:
                 return True
         return False
 

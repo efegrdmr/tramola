@@ -54,16 +54,17 @@ class Vehicle:
                                         
         
     def rc_out_cb(self, msg):
-        self.thrust_left =  self.pwm_to_percentage(msg.channels[1])# ?????????
+        self.thrust_left =  self.pwm_to_percentage(msg.channels[0])# ?????????
         self.thrust_right = self.pwm_to_percentage(msg.channels[2])
-        rospy.loginfo("values: %d %d", self.thrust_left, self.thrust_right)
 
     def pwm_to_percentage(self, pwm_value):
         """
         Convert PWM value to percentage.
-        Assuming PWM range is 1000-2000, where 1000 is 0% and 2000 is 100%.
+        Assuming PWM range is 1000-2000, where 1000 is -100% and 2000 is 100%.
         """
-        return (pwm_value - 1000) / 10.0
+        # Map 1000-2000 to -100 to 100
+        return (pwm_value - 1500) / 5
+        
 
     def start_velocity_publisher(self):
         self.velocity_publisher_timer = rospy.Timer(rospy.Duration(0.1), self.publish_speed)  # 10 Hz
@@ -88,7 +89,6 @@ class Vehicle:
 
     def speed_callback(self, data):
         self.speed = math.sqrt(data.twist.linear.x**2 + data.twist.linear.y**2)
-        rospy.loginfo("self.speed: %f", self.speed)
 
 
     def send_location(self, latitude, longitude):
@@ -112,7 +112,7 @@ class Vehicle:
         Positive angle turns left, negative angle turns right.
         """
         self.angular_speed = angle
-        self.linear_speed = 0
+        self.linear_speed = 0.1
 
     def publish_speed(self, t):
         cmd = Twist()

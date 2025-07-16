@@ -20,7 +20,7 @@ class Task(object):
         raise NotImplementedError("The mission_callback method must be overridden in a subclass")
 
     def stop(self):
-        if self.status == "COMPLETED":
+        if self.state == "COMPLETED":
             return
         self.state = "COMPLETED"
         self.lidar.stop()

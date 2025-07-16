@@ -601,7 +601,7 @@ class GCSApp(tk.Tk):
 
         # Add position to status labels
         status_labels = ["Latitude", "Longitude", "Speed (Real)", "Speed (Req)",
-                         "Heading", "Yaw (Real)", "Yaw (Req)", "Thruster Left", "Thruster Right"]
+                         "Heading", "Yaw Requested", "Thruster Left", "Thruster Right"]
         self.status_values = {}
 
         for i, label in enumerate(status_labels):
@@ -804,8 +804,7 @@ class GCSApp(tk.Tk):
                 self.status_values["Speed (Real)"].set("{:.2f} m/s".format(self.gcs_client.speed_real))
                 self.status_values["Speed (Req)"].set("{:.2f} m/s".format(self.gcs_client.speed_requested))
                 self.status_values["Heading"].set("{:.1f}°".format(self.gcs_client.heading))
-                self.status_values["Yaw (Real)"].set("{:.1f}°".format(self.gcs_client.yaw_real))
-                self.status_values["Yaw (Req)"].set("{:.1f}°".format(self.gcs_client.yaw_requested))
+                self.status_values["Yaw Requested"].set("{:.1f}°".format(self.gcs_client.yaw_requested))
 
                 # Handle thruster values as tuple (left, right)
                 if isinstance(self.gcs_client.thruster_requested, tuple) and len(
