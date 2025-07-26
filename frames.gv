@@ -1,0 +1,8 @@
+digraph G {
+"base_link" -> "imu_link"[label="Broadcaster: /imu_to_base\nAverage rate: 10.177 Hz\nMost recent transform: 111.851 ( -0.006 sec old)\nBuffer length: 4.815 sec\n"];
+"base_link" -> "gps_link"[label="Broadcaster: /gps_to_base\nAverage rate: 10.185 Hz\nMost recent transform: 111.848 ( -0.003 sec old)\nBuffer length: 4.811 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 111.845"[ shape=plaintext ] ;
+ }->"base_link";
+}

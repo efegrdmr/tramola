@@ -1,0 +1,135 @@
+<launch>
+    <!-- =================================================================== -->
+    <!-- Part 1: Your Existing Localization System                         -->
+    <!-- =================================================================== -->
+    <!-- This launches your existing EKF and navsat_transform_node setup -->
+    <include file="$(find tramola)/launch/localization.launch" />
+    <param name="/use_sim_time" value="true" />
+
+
+    <!-- This static transform for the lidar is correct and necessary -->
+    <node pkg="tf" type="static_transform_publisher" name="lidar_to_base"
+        args="0.5 0 1.5 0 0 0 base_link lidar_link 100" />
+
+    <!-- =================================================================== -->
+    <!--          THE "MAGIC FIX": Create a fake /map frame                  -->
+    <!-- =================================================================== -->
+    <!-- This node creates a '/map' frame that is identical to your '/odom' frame.
+         This satisfies move_base's requirement without changing your localization. -->
+    <node pkg="tf" type="static_transform_publisher" name="map_to_utm"
+        args="0 0 0 0 0 0 map odom 100" />
+
+
+
+    <!-- =================================================================== -->
+    <!-- Part 2: Your Custom Lat/Lon Goal Translator Node                    -->
+    <!-- =================================================================== -->
+    <!-- This node will now work because the '/map' frame it needs exists. -->
+    <node pkg="tramola" type="latlon_to_goal.py" name="latlon_to_goal" output="screen" />
+
+
+    <!-- =================================================================== -->
+    <!-- Part 3: move_base Node (Configured to use your LIDAR)               -->
+    <!-- =================================================================== -->
+    <!-- move_base with embedded costmap & DWA params -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+  <!-- ============ Global Costmap (in ODOM frame) ============ -->
+  <rosparam ns="global_costmap">
+    # Using odom frame with empty map and lidar data
+    global_frame: odom
+    robot_base_frame: base_link
+    update_frequency: 5.0
+    publish_frequency: 2.0
+    static_map: false
+    rolling_window: true
+    width: 300.0  # Reduced from 300m but kept large enough for planning
+    height: 300.0 # Reduced from 300m but kept large enough for planning
+    resolution: 0.5
+
+    plugins:
+      - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
+      - {name: inflation_layer,  type: "costmap_2d::InflationLayer"}
+
+    obstacle_layer:
+      observation_sources: laser_scan_sensor
+      laser_scan_sensor:
+        sensor_frame: lidar_link
+        data_type: LaserScan
+        topic: /scan_scaled
+        marking: true
+        clearing: true
+        max_obstacle_height: 2.0
+        min_obstacle_height: 0.0
+        obstacle_range: 9.0      # Maximum range to mark obstacles
+        raytrace_range: 10.0      # Range to clear obstacles
+
+    inflation_layer:
+      inflation_radius: 1.2      # Slightly increased for better safety
+      cost_scaling_factor: 5.0   # Controls inflation decay rate
+  </rosparam>
+
+  <!-- ============ Local Costmap (in ODOM frame) ============ -->
+  <rosparam ns="local_costmap">
+    global_frame: odom
+    robot_base_frame: base_link
+    update_frequency: 10.0
+    publish_frequency: 5.0
+    static_map: false
+    rolling_window: true
+    width: 15.0
+    height: 15.0
+    resolution: 0.1  # Finer resolution for local planning
+
+    plugins:
+      - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
+      - {name: inflation_layer,  type: "costmap_2d::InflationLayer"}
+
+    obstacle_layer:
+      observation_sources: laser_scan_sensor
+      laser_scan_sensor:
+        sensor_frame: lidar_link
+        data_type: LaserScan
+        topic: /scan_scaled
+        marking: true
+        clearing: true
+        max_obstacle_height: 2.0
+        min_obstacle_height: 0.0
+        obstacle_range: 9.0
+        raytrace_range: 10.0
+
+    inflation_layer:
+      inflation_radius: 1.0
+      cost_scaling_factor: 10.0  # Faster decay for local planning
+  </rosparam>
+
+  <!-- ============ DWA Planner ============ -->
+  <rosparam>
+    DWAPlannerROS:
+      acc_lim_x:          0.5
+      acc_lim_y:          0.0
+      acc_lim_theta:      0.2
+      max_vel_x:          0.9
+      min_vel_x:          0.1    # Reduced to allow slower movement
+      max_vel_theta:      0.3
+      min_vel_theta:     -0.3
+      path_distance_bias: 20.0   # Reduced to balance with obstacle avoidance
+      goal_distance_bias: 20.0
+      occdist_scale:      0.1    # Increased for better obstacle avoidance
+      sim_time:           2.0    # Increased for better path planning
+      vx_samples:         20
+      vy_samples:         0
+      vtheta_samples:     20     # Increased for better rotational sampling
+      
+      # Debug visualization settings
+      publish_cost_grid:  true
+      publish_traj_pc:    true
+      global_frame_id:    odom
+      debug: true
+  </rosparam>
+</node>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find tramola)/rviz/navigation.rviz" />
+  <node pkg="tramola" type="scale_scan.py" name="laser_scan_scaler" output="screen">
+    <param name="scale_factor" value="0.5"/>
+  </node>
+</launch>
