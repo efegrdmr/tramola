@@ -112,7 +112,8 @@ class Control:
                     self.task = None
                 self.move_base.cancel_goal()
                 self.vehicle.set_mode("HOLD")
-                self.vehicle.arming(False)
+                self.vehicle.stop_rc_override()
+                self.vehicle.stop_velocity_publisher()
                 self.state = "IDLE"
                 self.points = []
                 return "OK"
@@ -143,6 +144,7 @@ class Control:
                 self.points = []
                 self.state = "MANUAL"
                 self.move_base.cancel_goal()
+                self.vehicle.stop_velocity_publisher()
                 self.vehicle.start_rc_override()
                 rospy.loginfo("Manual mode activated")
                 return "OK"
@@ -186,6 +188,13 @@ class Control:
                     return "OK"
                 except ValueError:
                     return "ERR"
+
+            elif command == "clear_waypoints":
+                if self.state == "IDLE":
+                    self.points = []
+                    return "OK"
+                return "ERR"
+            
             else:
                 rospy.logwarn("Unknown command received: {}".format(command))
                 return "ERR"

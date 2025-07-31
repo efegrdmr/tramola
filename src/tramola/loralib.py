@@ -20,13 +20,13 @@ class Lora(object):
             raise Exception("Failed to open serial port: %s" % e)
 
         self.coding_of_messages = {
-            "start_mission": "0",
-            "emergency_shutdown": "1",
-            "add_waypoint": "2",
-            "location": "3",
+            "start_mission" : "0",
+            "emergency_shutdown" : "1",
+            "add_waypoint" : "2",
+            "location" : "3",
             "speed_real": "4",
             "heading": "5",
-
+            "clear_waypoints" : "6",
             "thruster_requested": "7",
             "speed_requested": "8",
             "yaw_requested": "9",
@@ -222,7 +222,7 @@ class LoraGCSClient(object):
         self.data_request_thread = None
         self.state = ""
 
-  
+        
     def send_message(self, message, retry_count=0):
         message = self.lora.encode(message)
         res = self.lora.send_message_and_wait_for_response(message)
@@ -230,24 +230,33 @@ class LoraGCSClient(object):
             res = self.send_message(message, retry_count-1)
         return res
     
+    def stop_sync_send_message(self, message):
+        prev_sync_state = self.data_request_running
+        print("stopping and sending the message " + message)
+        if self.data_request_running:
+            self.stop_data_requests()
+        res = self.send_message(message, 5)
+        if prev_sync_state:
+            self.start_data_requests()
+        return res
+
     def start_manual_mode(self):
         if self.state == "MANUAL":
             return "OK"
-        self.stop_data_requests()
-        self.state = "MANUAL"
-        res = self.send_message("start_manual_mode")
+        res = self.stop_sync_send_message("start_manual_mode")
         if res == "OK":
+            self.state = "MANUAL"
+            self.stop_data_requests()
             return res
-        self.start_data_requests()
         return "ERR"
 
-    def stop_manual_mode(self,):
+    def stop_manual_mode(self):
         if self.state != "MANUAL":
-            return "OK"
-        res = self.send_message("stop_manual_mode", 5)
+            return "ERR"
+        res = self.stop_sync_send_message("stop_manual_mode")
         if res == "OK":
             self.start_data_requests()
-            return "OK"
+            return res
         return "ERR"
 
     def send_manual_control_request(self, speed_normalized, yaw_normalized):
@@ -265,31 +274,19 @@ class LoraGCSClient(object):
         else:
             raise Exception("Error in color")
         
-        self.stop_data_requests()  # Ensure data requests are stopped before starting mission
-        res = self.send_message("set_color,%d" % color, 5)
-        self.start_data_requests()  # Start data requests after mission starts
-        return res
+        return self.stop_sync_send_message("set_color,%d" % color, 5)
 
-        
+    def clear_waypoints(self):
+        return self.stop_sync_send_message("clear_waypoints")
 
     def start_mission(self):
-        self.stop_data_requests()  # Ensure data requests are stopped before starting mission
-        res = self.send_message("start_mission", 5)
-        self.start_data_requests()  # Start data requests after mission starts
-        return res
+        return self.stop_sync_send_message("start_mission")
         
     def emergency_shutdown(self):
-        self.stop_data_requests()  # Ensure data requests are stopped before starting mission
-        res = self.send_message("emergency_shutdown", 5)
-        self.start_data_requests()  # Start data requests after mission starts
-        return res
+        return self.stop_sync_send_message("emergency_shutdown")
 
     def add_waypoint(self, latitude, longitude):
-        self.stop_data_requests()  # Ensure data requests are stopped before adding waypoint
-        message = "add_waypoint,%f,%f" % (latitude, longitude)
-        res = self.send_message(message, 5)
-        self.start_data_requests()  # Restart data requests after adding waypoint
-        return res
+        return self.stop_sync_send_message("add_waypoint,%f,%f" % (latitude, longitude))
 
     def start_data_requests(self):
         """Start a thread to periodically request data updates"""
@@ -303,6 +300,8 @@ class LoraGCSClient(object):
     
     def stop_data_requests(self):
         """Stop the data request thread"""
+        if not self.data_request_running:
+            return 
         self.data_request_running = False
         if self.data_request_thread:
             self.data_request_thread.join()

@@ -762,7 +762,7 @@ class GCSApp(tk.Tk):
         self.add_wp_btn = ttk.Button(wp_buttons, text="Add WP", command=self.add_waypoint, width=8)
         self.add_wp_btn.pack(side=tk.LEFT, padx=2)
         
-        self.clear_wp_btn = ttk.Button(wp_buttons, text="Clear WPs", command=self.clear_waypoints, width=8)
+        self.clear_wp_btn = ttk.Button(wp_buttons, text="Clear WPs", command=self.clear_waypoints_vehicle, width=8)
         self.clear_wp_btn.pack(side=tk.RIGHT, padx=2)
         
         # Target Color Selection 
@@ -960,8 +960,7 @@ class GCSApp(tk.Tk):
         response = self.gcs_client.start_manual_mode()
         if response == "OK":
             # Clear waypoints when entering manual mode
-            self.clear_waypoints()
-            
+     
             self.in_manual_mode = True
             self.manual_status_var.set("Manual Mode: ACTIVE")
             self.log_message("Manual control mode activated")
@@ -1063,6 +1062,11 @@ class GCSApp(tk.Tk):
         self.waypoints = []
         self.map_canvas.clear_waypoints()
         self.log_message("All waypoints cleared")
+
+    def clear_waypoints_vehicle(self):
+        self.gcs_client.clear_waypoints()
+        self.clear_waypoints()
+
 
     def update_loop(self):
         """Thread to update GUI with latest data from the LoRa client"""
