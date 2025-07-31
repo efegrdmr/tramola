@@ -1,4 +1,13 @@
 <launch>
+    <node pkg="tramola" type="serial_sim.sh" name="socat_node" output="screen"/>
+    <node pkg="tramola" type="gcs_gui.py" name="gcs_gui_node" output="screen">
+      <param name="port" value="/tmp/port1" />
+    </node>
+    <include file="$(find tramola)/launch/dummy_mavros.launch" />
+    <node pkg="tramola" type="control.py" name="control_node" output="screen">
+      <param name="port" value="/tmp/port2" />
+    </node>
+
     <!-- =================================================================== -->
     <!-- Part 1: Your Existing Localization System                         -->
     <!-- =================================================================== -->
@@ -11,12 +20,6 @@
     <node pkg="tf" type="static_transform_publisher" name="lidar_to_base"
         args="0.5 0 1.5 0 0 0 base_link lidar_link 100" />
 
-    <!-- =================================================================== -->
-    <!-- Part 2: Your Custom Lat/Lon Goal Translator Node                    -->
-    <!-- =================================================================== -->
-    <!-- This node will now work because the '/map' frame it needs exists. -->
-    <node pkg="tramola" type="latlon_to_goal.py" name="latlon_to_goal" output="screen" />
-
 
     <!-- =================================================================== -->
     <!-- Part 3: move_base Node (Configured to use your LIDAR)               -->
@@ -28,8 +31,7 @@
         # Goal Tolerance Parameters
         # Defines how close the robot must be to the goal to succeed.
         # Values are in meters and radians.
-        xy_goal_tolerance: 1.0
-        yaw_goal_tolerance: 0.087
+
 
         # You could add other general move_base parameters here too,
         # for example:
@@ -110,31 +112,33 @@
       <!-- ============ DWA Planner ============ -->
       <rosparam>
         DWAPlannerROS:
-          acc_lim_x:          0.3
-          acc_lim_y:          0.3
-          acc_lim_theta:      0.05
-          max_vel_x:          0.9
-          min_vel_x:          0.0    # Reduced to allow slower movement
-          max_vel_theta:      0.3
-          min_vel_theta:     -0.3
-          path_distance_bias: 20.0   # Reduced to balance with obstacle avoidance
-          goal_distance_bias: 20.0
-          occdist_scale:      0.1    # Increased for better obstacle avoidance
-          sim_time:           2.0    # Increased for better path planning
-          vx_samples:         20
-          vy_samples:         0
-          vtheta_samples:     20     # Increased for better rotational sampling
-          
-          # Debug visualization settings
-          publish_cost_grid:  true
-          publish_traj_pc:    true
-          global_frame_id:    odom
-          debug: true
-      </rosparam>
+          # Tight, latched tolerances
+          xy_goal_tolerance:      2.0
+          yaw_goal_tolerance:     3.14
+          latch_xy_goal_tolerance: true
+
+          trans_stopped_vel:      10.0
+          rot_stopped_vel:        10.0
+          stop_time_buffer:       0.0
+
+          acc_lim_x:          0.1
+          acc_lim_theta:      0.5
+          max_vel_x:          0.3
+          max_vel_theta:      0.5
+          path_distance_bias: 20.0
+          goal_distance_bias: 30.0
+          occdist_scale:      0.1
+          oscillation_timeout:    3.0
+          oscillation_distance:   0.20
+        </rosparam>
     </node>
 
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find tramola)/rviz/navigation.rviz" />
   <node pkg="tramola" type="scale_scan.py" name="laser_scan_scaler" output="screen">
     <param name="scale_factor" value="0.5"/>
   </node>
+  <node pkg="tramola" type="cmd_vel_to_thrusters.py"
+        name="cmd_vel_to_thrusters" output="screen">
+    <param name="wheel_separation" value="1.2" />
+</node>
 </launch>

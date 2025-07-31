@@ -25,10 +25,12 @@ class Control:
         self.points = []
         self.state = "IDLE"
         self.objective_color = None  # Initialize with None instead of -1 for clarity
+        self.port_name = rospy.get_param("~port")
         
         # Call mission_callback every 100ms
         rospy.Timer(rospy.Duration(0.1), self.mission_callback)
         self.init_lora()
+        print("lora initted port: " + self.port_name)
     
     def init_lora(self):
         if self.lora:
@@ -37,11 +39,11 @@ class Control:
             time.sleep(1)  # Reduced wait time from 3 seconds
         
         try:
-            self.lora = Lora(message_callback=self.lora_callback, port="/dev/ttyACM0")
+            self.lora = Lora(message_callback=self.lora_callback, port=self.port_name)
             self.lora.start_receiver()
             rospy.loginfo("LoRa initialized successfully")
         except Exception as e:
-            rospy.logerr(f"Failed to initialize LoRa: {e}")
+            rospy.logerr("Failed to initialize LoRa: {}".format(e))
 
     # Checks the status of a given task and moves to the next one
     def mission_callback(self, t):
@@ -81,19 +83,17 @@ class Control:
                 return str(self.vehicle.speed)
             elif command == "heading":
                 return str(self.vehicle.heading)
-            elif command == "yaw_real":
-                return str(self.vehicle.yaw)
             elif command == "thruster_requested":
-                return f"{self.vehicle.thrust_left:.6f},{self.vehicle.thrust_right:.6f}"
+                return "{:.6f},{:.6f}".format(self.vehicle.thrust_left, self.vehicle.thrust_right)
             elif command == "speed_requested":
                 return str(self.vehicle.last_sent_linear_speed)
             elif command == "yaw_requested":
                 return str(self.vehicle.last_sent_angular_speed)
             elif command == "location":
-                return f"{self.vehicle.location[0]:.6f},{self.vehicle.location[1]:.6f}"
+                return "{:.6f},{:.6f}".format(self.vehicle.location[0], self.vehicle.location[1])
             elif command == "state":
                 if self.state == "GOTO":
-                    return f"GOTO,{self.move_base.get_state_num()}"
+                    return "GOTO,{}".format(self.move_base.get_state_num())
                 return self.state
             
             # Control commands
@@ -126,7 +126,7 @@ class Control:
                     # Only add if different from the last point
                     if not self.points or self.points[-1] != new_point:
                         self.points.append(new_point)
-                        rospy.loginfo(f"Waypoint added: {new_point}")
+                        rospy.loginfo("Waypoint added: {}".format(new_point))
                         return "OK"
                     else:
                         return "ERR"
@@ -135,10 +135,12 @@ class Control:
             
             # Manual control
             elif command == "start_manual_mode":
+                if self.state == "MANUAL":
+                    return "OK"
                 if self.task:
                     self.task.stop()
                     self.task = None
-                    self.points = []
+                self.points = []
                 self.state = "MANUAL"
                 self.move_base.cancel_goal()
                 self.vehicle.start_rc_override()
@@ -146,10 +148,11 @@ class Control:
                 return "OK"
             
             elif command == "stop_manual_mode":
-                if self.state == "MANUAL":
-                    self.vehicle.stop_rc_override()
-                    self.state = "IDLE"
-                    rospy.loginfo("Manual mode deactivated")
+                if self.state != "MANUAL":
+                    return "OK"
+                self.vehicle.stop_rc_override()
+                self.state = "IDLE"
+                rospy.loginfo("Manual mode deactivated")
                 return "OK"
             
             elif command == "manual":
@@ -179,17 +182,17 @@ class Control:
                     else:
                         return "ERR"
                     
-                    rospy.loginfo(f"Target color set to {self.objective_color}")
+                    rospy.loginfo("Target color set to {}".format(self.objective_color))
                     return "OK"
                 except ValueError:
                     return "ERR"
             
             else:
-                rospy.logwarn(f"Unknown command received: {command}")
+                rospy.logwarn("Unknown command received: {}".format(command))
                 return "ERR"
                 
         except Exception as e:
-            rospy.logerr(f"Error in lora_callback: {e}")
+            rospy.logerr("Error in lora_callback: {}".format(e))
             return "ERR"
 
 

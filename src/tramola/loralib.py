@@ -26,7 +26,7 @@ class Lora(object):
             "location": "3",
             "speed_real": "4",
             "heading": "5",
-            "yaw_real": "6",
+
             "thruster_requested": "7",
             "speed_requested": "8",
             "yaw_requested": "9",
@@ -42,7 +42,11 @@ class Lora(object):
 
     def set_message_callback(self, callback):
         self.message_callback = callback
-        
+
+    def reset_serial(self):
+        self.serial_port.flushInput()
+        self.serial_port.flushOutput()
+
     def start_receiver(self):
         if self.receiver_thread and self.running:
             return  # Already running
@@ -55,7 +59,7 @@ class Lora(object):
     def stop_receiver(self):
         self.running = False
         if self.receiver_thread:
-            self.receiver_thread.join(timeout=2.0)
+            self.receiver_thread.join()
             self.receiver_thread = None
     
     def encode(self, message):
@@ -119,6 +123,8 @@ class Lora(object):
             self.serial_port.write(full_msg)
             return True
         except Exception as e:
+            if isinstance(e, serial.SerialException):
+                raise e
             print("Error sending message:", e)
             return False
 
@@ -129,7 +135,6 @@ class Lora(object):
         """
         if not self.send_message(message):
             return None
-
         deadline = time.time() + (self.response_timeout / 1000.0)
         while time.time() < deadline:
             resp = self.read_packet()
@@ -196,7 +201,7 @@ class Lora(object):
 from actionlib_msgs.msg import GoalStatus
 class LoraGCSClient(object):
     def __init__(self, lora):
-        self.requested_datas = {"speed_real", "heading", "yaw_real", "thruster_requested",
+        self.requested_datas = {"speed_real", "heading", "thruster_requested",
                            "speed_requested", "yaw_requested", "location", "state"}
         
         self.location = None
@@ -223,6 +228,8 @@ class LoraGCSClient(object):
         return res
     
     def start_manual_mode(self):
+        if self.state == "MANUAL":
+            return "OK"
         self.stop_data_requests()
         self.state = "MANUAL"
         res = self.send_message("start_manual_mode")
@@ -232,6 +239,8 @@ class LoraGCSClient(object):
         return "ERR"
 
     def stop_manual_mode(self,):
+        if self.state != "MANUAL":
+            return "OK"
         res = self.send_message("stop_manual_mode", 5)
         if res == "OK":
             self.start_data_requests()
@@ -239,8 +248,9 @@ class LoraGCSClient(object):
         return "ERR"
 
     def send_manual_control_request(self, speed_normalized, yaw_normalized):
-        message = f"manual,%.2f,%.2f" % speed_normalized, yaw_normalized
-        self.lora.send_message(message)
+        message = "manual,%.2f,%.2f" % (speed_normalized, yaw_normalized)
+        res = self.send_message(message)
+        return res
     
     def set_objective_color(self, color):
         if color == "RED":
@@ -253,7 +263,7 @@ class LoraGCSClient(object):
             raise Exception("Error in color")
         
         self.stop_data_requests()  # Ensure data requests are stopped before starting mission
-        res = self.send_message(f"set_color,%d" % color, 5)
+        res = self.send_message("set_color,%d" % color, 5)
         self.start_data_requests()  # Start data requests after mission starts
         return res
 
@@ -297,11 +307,11 @@ class LoraGCSClient(object):
 
     def _process_state_message(self, message):
         data = message.split(",")
-        if data[0] != "GOTO":
+        if data[0] == "GOTO":
             return message + " " + self._get_status_text(int(data[1]))
 
 
-    def _get_status_text(status_int):
+    def _get_status_text(self, status_int):
         """Converts an actionlib status integer to its string representation."""
         status_map = {
             GoalStatus.PENDING: "PENDING",
@@ -333,49 +343,26 @@ class LoraGCSClient(object):
                 if response:
                     if message == "location":
                         parts = response.split(",")
-                        if len(parts) >= 2:
-                            try:
-                                self.location = (float(parts[0]), float(parts[1]))
-                            except ValueError:
-                                print("Invalid location format:", response)
+                        self.location = (float(parts[0]), float(parts[1]))
                     elif message == "speed_real":
-                        try:
-                            self.speed_real = float(response)
-                        except ValueError:
-                            print("Invalid speed_real format:", response)
+                        self.speed_real = float(response)
                     elif message == "heading":
-                        try:
-                            self.heading = float(response)
-                        except ValueError:
-                            print("Invalid heading format:", response)
-                    elif message == "yaw_real":
-                        try:
-                            self.yaw_real = float(response)
-                        except ValueError:
-                            print("Invalid yaw_real format:", response)
+                        self.heading = float(response)
                     elif message == "thruster_requested":
-                        try:
-                            data = response.split(",")
-                            self.thruster_requested = (float(data[0]), float(data[1]))
-                        except ValueError:
-                            print("Invalid thruster_requested format:", response)
+                        data = response.split(",")
+                        self.thruster_requested = (float(data[0]), float(data[1]))
+                        
                     elif message == "speed_requested":
-                        try:
-                            self.speed_requested = float(response)
-                        except ValueError:
-                            print("Invalid speed_requested format:", response)
+                        self.speed_requested = float(response)
                     elif message == "yaw_requested":
-                        try:
-                            self.yaw_requested = float(response)
-                        except ValueError:
-                            print("Invalid yaw_requested format:", response)
+                        self.yaw_requested = float(response)
                     elif message == "state":
-                        try:
-                            self.state = self._process_state_message(response)
-                        except ValueError:
-                            print("Invalid state message")
+                        self.state = self._process_state_message(response)
+                        
             except Exception as e:
-                print("Error syncing data for %s: %s" % (message, e))
+                print("Error syncing data for %s: %s response: %s" % (message, e, response))
+                time.sleep(1)
+                self.lora.reset_serial()
     
     def close(self):
         """Clean up resources"""

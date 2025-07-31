@@ -1,8 +1,5 @@
 <launch> 
-<node pkg="tramola" type="cmd_vel_to_thrusters.py"
-        name="cmd_vel_to_thrusters" output="screen">
-    <param name="wheel_separation" value="1.2" />
-  </node>
+
 <param name="/use_sim_time" value="true" />
 
   <!-- Transform from base_link to sensor frames -->
@@ -51,7 +48,7 @@
     <param name="broadcast_cartesian_transform" value="true"/>
     <param name="wait_for_datum" value="true"/>
     <param name="publish_filtered_gps" value="true"/>
-    <remap from="/gps/fix" to="/wamv/sensors/gps/gps/fix"/>
+    <remap from="/gps/fix" to="/mavros/global_position/global"/>
     <remap from="/odometry/gps" to="/my_robot/odometry/gps"/>
     <rosparam param="datum">[-33.722, 150.674, 0]</rosparam>
 

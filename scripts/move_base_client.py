@@ -7,7 +7,7 @@ from tf.transformations import quaternion_from_euler
 from pyproj import Proj, transform
 import tf2_ros
 import tf2_geometry_msgs
-from actionlib_msgs.msg import GoalStatusArray, GoalID
+from actionlib_msgs.msg import GoalStatusArray, GoalID, GoalStatus
 
 class MoveBaseClient(object):
     """
@@ -160,7 +160,7 @@ if __name__ == '__main__':
         rospy.init_node('move_base_gps_client_topics_py')
 
         # Instantiate the client once
-        move_base_client = MoveBaseClientGPS_Odom_Topics(utm_zone=56, is_southern_hemisphere=True)
+        move_base_client = MoveBaseClient(utm_zone=56, is_southern_hemisphere=True)
 
         # Loop to continuously ask for new goals
         while not rospy.is_shutdown():

@@ -1,0 +1,22 @@
+<!-- launch/dummy_mavros.launch -->
+<launch>
+    <!-- 
+        This launch file starts a "dummy" MAVROS node.
+        It's for development when you don't have a flight controller connected.
+        It will advertise all topics and services, but the /mavros/state
+        topic will show connected: false.
+    -->
+    <include file="$(find mavros)/launch/apm.launch">
+        <!-- 
+            This is the key part. We override the connection URL.
+            By setting it to a UDP listening port, MAVROS will start but will
+            not actively try to connect to a serial device. It will just wait
+            for a connection that will never come.
+        -->
+        <arg name="fcu_url" value="udp://0.0.0.0:14550@" />
+        
+        <!-- You can also override other arguments if needed -->
+        <!-- For example, to load a custom config file: -->
+        <!-- <arg name="config_yaml" value="$(find tramola)/config/my_mavros_config.yaml" /> -->
+    </include>
+</launch>

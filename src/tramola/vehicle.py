@@ -7,6 +7,9 @@ from geometry_msgs.msg import Twist, TwistStamped
 from mavros_msgs.msg   import RCOut, OverrideRCIn
 from std_msgs.msg      import Float64
 from sensor_msgs.msg   import NavSatFix
+from nav_msgs.msg import Odometry
+import tf
+
 
 # MAVROS services
 from mavros_msgs.srv   import SetMode, SetModeRequest, CommandBool, CommandBoolRequest
@@ -27,25 +30,21 @@ class Vehicle:
         self.last_sent_angular_speed = 0
         
         # Set mode service
-        rospy.wait_for_service("/mavros/set_mode") 
+        # rospy.wait_for_service("/mavros/set_mode") 
         self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
-
-        # Real heading
-        self.compass_sub = rospy.Subscriber("/mavros/global_position/compass_hdg", Float64, self.compass_callback)
-        self.heading = None
-
+        
         # GPS
         self.gps_sub = rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.gps_callback)
-        self.location = None
+        self.location = (0.0, 0.0) 
 
-        # Real speed
-        self.speed_sub = rospy.Subscriber("/mavros/global_position/raw/gps_vel", TwistStamped, self.speed_callback)
+        # EKF 
+        rospy.Subscriber("/odometry/filtered", Odometry, self.ekf_callback)
+        self.heading = 0
         self.speed = 0.0
-        self.yaw = 0.0
 
         # Arming
         self.arming_srv = rospy.ServiceProxy("/mavros/cmd/arming", CommandBool)
-        self.arming_srv.wait_for_service()
+        # self.arming_srv.wait_for_service()
 
         # Get thrust
         rospy.Subscriber("/mavros/rc/out", RCOut, self.rc_out_callback)
@@ -91,7 +90,7 @@ class Vehicle:
             
             # Send a release message (set channels to 0 to release)
             release_msg = OverrideRCIn()
-            release_msg.channels = [0] * 8  # 0 means release channel
+            release_msg.channels = [0] * 18  # 0 means release channel
             self.rc_override_pub.publish(release_msg)
             rospy.loginfo("RC override stopped")
 
@@ -132,7 +131,7 @@ class Vehicle:
         Publish RC override values for speed and yaw control.
         """
         msg = OverrideRCIn()
-        msg.channels = [0] * 8  # Initialize all channels to 0 (no override)
+        msg.channels = [0] * 18  # Initialize all channels to 0 (no override)
         
         # Set speed and yaw channels
         msg.channels[self.RC_CHANNEL_SPEED] = self.rc_speed_value
@@ -154,15 +153,11 @@ class Vehicle:
         self.arming(False)
         self.linear_speed = 0.0
         self.angular_speed = 0.0
-        self.publish_speed(None)
 
     def arming(self, arm):
         req = CommandBoolRequest()
         req.value = arm
         self.arming_srv(req)
-
-    def speed_callback(self, data):
-        self.speed = math.sqrt(data.twist.linear.x**2 + data.twist.linear.y**2)
 
     def set_mode(self, mode):
         req = SetModeRequest()
@@ -189,9 +184,6 @@ class Vehicle:
         self.last_sent_linear_speed = self.linear_speed
         self.last_sent_angular_speed = self.angular_speed
 
-    def compass_callback(self, msg):
-        # 0 and 360 North 90 East 180 South 270 West
-        self.heading = float(msg.data)
 
     def gps_callback(self, msg):
         self.location = (msg.latitude, msg.longitude)
@@ -236,3 +228,30 @@ class Vehicle:
         """
         dist = self.distance(lat, lon)
         return dist <= threshold
+
+    def ekf_callback(self, msg):
+        """Process the EKF odometry data to extract speed and heading"""
+        # Extract linear velocity components
+        vx = msg.twist.twist.linear.x
+        vy = msg.twist.twist.linear.y
+        vz = msg.twist.twist.linear.z
+        
+        # Calculate speed (magnitude of velocity vector)
+        self.speed = math.sqrt(vx**2 + vy**2 + vz**2)
+        
+        # Extract orientation quaternion
+        q = msg.pose.pose.orientation
+        quaternion = [q.x, q.y, q.z, q.w]
+        
+        # Convert quaternion to Euler angles
+        (roll, pitch, self.heading_rad) = tf.transformations.euler_from_quaternion(quaternion)
+        
+        # Convert heading to degrees (ROS yaw - where 0 is East, CCW positive)
+        self.ros_yaw = math.degrees(self.heading_rad)
+        
+        # Normalize ROS yaw to 0-360 degrees
+        if self.ros_yaw < 0:
+            self.ros_yaw += 360.0
+        
+        # Convert from ROS yaw to compass heading (0=North, 90=East, etc.)
+        self.heading = (90 - self.ros_yaw) % 360
