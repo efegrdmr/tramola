@@ -93,7 +93,7 @@ class Control:
                 return "{:.6f},{:.6f}".format(self.vehicle.location[0], self.vehicle.location[1])
             elif command == "state":
                 if self.state == "GOTO":
-                    return "GOTO,{}".format(self.move_base.get_state_num())
+                    return self.task.state
                 return self.state
             
             # Control commands
@@ -186,7 +186,6 @@ class Control:
                     return "OK"
                 except ValueError:
                     return "ERR"
-            
             else:
                 rospy.logwarn("Unknown command received: {}".format(command))
                 return "ERR"

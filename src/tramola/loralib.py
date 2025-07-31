@@ -36,7 +36,11 @@ class Lora(object):
             "stop_manual_mode" : "d",
             "manual" : "e",
             "state" : "f",
-            "set_color" : "g"}
+            "set_color" : "g",
+            "IDLE" : "i",
+            "MOVE_BASE_CONTROL" : "k",
+            "STRAIGHT_TO_POINT" : "l",
+            "MANUAL" : "m"}
         
         self.message_of_codings = {v: k for k, v in self.coding_of_messages.items()}
 
@@ -198,7 +202,6 @@ class Lora(object):
             self.serial_port.close()
 
 
-from actionlib_msgs.msg import GoalStatus
 class LoraGCSClient(object):
     def __init__(self, lora):
         self.requested_datas = {"speed_real", "heading", "thruster_requested",
@@ -305,29 +308,6 @@ class LoraGCSClient(object):
             self.data_request_thread.join()
             self.data_request_thread = None
 
-    def _process_state_message(self, message):
-        data = message.split(",")
-        if data[0] == "GOTO":
-            return message + " " + self._get_status_text(int(data[1]))
-
-
-    def _get_status_text(self, status_int):
-        """Converts an actionlib status integer to its string representation."""
-        status_map = {
-            GoalStatus.PENDING: "PENDING",
-            GoalStatus.ACTIVE: "ACTIVE",
-            GoalStatus.PREEMPTED: "PREEMPTED",
-            GoalStatus.SUCCEEDED: "SUCCEEDED",
-            GoalStatus.ABORTED: "ABORTED",
-            GoalStatus.REJECTED: "REJECTED",
-            GoalStatus.PREEMPTING: "PREEMPTING",
-            GoalStatus.RECALLING: "RECALLING",
-            GoalStatus.RECALLED: "RECALLED",
-            GoalStatus.LOST: "LOST",
-        }
-        return status_map.get(status_int, "UNKNOWN_STATUS")
-
-    
     def _data_request_loop(self):
         """Thread function to continuously request data updates"""
         while self.data_request_running:
@@ -357,7 +337,7 @@ class LoraGCSClient(object):
                     elif message == "yaw_requested":
                         self.yaw_requested = float(response)
                     elif message == "state":
-                        self.state = self._process_state_message(response)
+                        self.state = response
                         
             except Exception as e:
                 print("Error syncing data for %s: %s response: %s" % (message, e, response))
