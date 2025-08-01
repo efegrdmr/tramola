@@ -15,8 +15,7 @@
   <arg name="wamv_locked" default="false" />
   <!-- Start paused? -->
   <arg name="paused" default="false"/>
-  <!-- Acoustic pinger position(s) -->
-  <arg name="pinger_params" default="$(find vrx_gazebo)/config/pinger.yaml"/>
+
 
   <!-- Initial USV location and attitude-->
   <arg name="x" default="-532" />
@@ -76,7 +75,7 @@
   <arg if="$(arg t_config)" name="urdf" default="$(find tramola)/urdf/wamv_gazebo.urdf.xacro"/>
 
   <param name="$(arg namespace)/robot_description"
-         command="$(find xacro)/xacro &#x002D;&#x002D;inorder '$(arg urdf)'
+         command="$(find xacro)/xacro &#x002D;&#x002D;inorder '$(find tramola)/urdf/wamv_gazebo.urdf.xacro'
          locked:=$(arg wamv_locked)		   
          thruster_config:=$(arg thrust_config)
          vrx_sensors_enabled:=$(arg vrx_sensors_enabled)
