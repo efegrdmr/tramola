@@ -1,0 +1,23 @@
+<launch>
+    <!-- TODO imu_link to base_link correct the calues of the lidar -->
+    <node pkg="tf" type="static_transform_publisher" name="lidar_to_base"
+        args="0.5 0 1.5 0 0 0 base_link lidar_link 100" />
+
+    <node pkg="mavros" type="mavros_node" name="mavros" output="screen"> 
+        <param name="fcu_url" value="/dev/ttyACM0:57600" /> 
+        <param name="gcs_url" value="udp://@127.0.0.1:14550" /> 
+        <param name="tgt_system" value="1" /> 
+        <param name="tgt_component" value="1" /> 
+    </node> 
+    <include file="$(find tramola)/launch/localization.launch" />
+
+    <node pkg="tramola" type="control.py" name="control_node" output="screen">
+      <param name="port" value=*********/>
+    </node>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+      <remap from="cmd_vel" to="/mavros/setpoint_velocity/cmd_vel_unstamped" />
+      <rosparam file="$(find tramola)/config/move_base.yaml" command="load" />
+    </node>
+    
+</launch>

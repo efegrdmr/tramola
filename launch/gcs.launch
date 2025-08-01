@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="tramola" type="gcs_gui.py" name="gcs_gui_node" output="screen">
+      <param name="port" value="/tmp/port1" />
+    </node>
+</launch>
