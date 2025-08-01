@@ -4,9 +4,9 @@
   <!-- Gazebo world to load -->
   <arg name="world" default="$(find vrx_gazebo)/worlds/example_course.world" />
   <!-- If true, run gazebo GUI -->
-  <arg name="gui" default="true" />
+  <arg name="gui" default="false" />
   <!-- If true, run gazebo in verbose mode -->
-  <arg name="verbose" default="false"/>
+  <arg name="verbose" default="true"/>
   <!-- Set various other gazebo arguments-->
   <arg name="extra_gazebo_args" default=""/>
   <!-- Start in a default namespace -->
