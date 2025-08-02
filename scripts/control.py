@@ -7,7 +7,7 @@ from tramola.lidar import Lidar
 from tramola.detection import Detection
 from tramola.goTo import GoTo
 from tramola.kamikaze import Kamikaze
-from tramola.move_base_client import MoveBaseClient
+from tramola.move_base import MoveBaseClient
 import rospy
 import time
 
@@ -24,7 +24,7 @@ class Control:
         self.vehicle.arming(True)
         self.points = []
         self.state = "IDLE"
-        self.objective_color = None  # Initialize with None instead of -1 for clarity
+        self.objective_color_code = None  # Initialize with None instead of -1 for clarity
         self.port_name = rospy.get_param("~port")
         
         # Call mission_callback every 100ms
@@ -62,7 +62,7 @@ class Control:
                 if len(self.points) == 0:
                     rospy.loginfo("KAMIKAZE mission started")
                     self.state = "KAMIKAZE"
-                    self.task = Kamikaze(self.vehicle, self.lidar, self.detection)
+                    self.task = Kamikaze(self.vehicle, self.lidar, self.detection, self.objective_color_code, self.default_bearing)
                 else:
                     self.task = None
                     self.state = "GOTO"
@@ -103,6 +103,7 @@ class Control:
                 if len(self.points) == 0:
                     return "ERR"
                 self.state = "GOTO"
+                self.default_bearing = self.vehicle.calculate_bearing(self.points[-2], self.points[-1])
                 return "OK"
             
             elif command == "emergency_shutdown":
@@ -175,16 +176,8 @@ class Control:
             elif command == "set_color":
                 try:
                     color_code = int(data[1])
-                    if color_code == 0:
-                        self.objective_color = "RED"
-                    elif color_code == 1:
-                        self.objective_color = "GREEN"
-                    elif color_code == 2:
-                        self.objective_color = "BLACK"
-                    else:
-                        return "ERR"
-                    
-                    rospy.loginfo("Target color set to {}".format(self.objective_color))
+                    self.objective_color_code = color_code
+                    rospy.loginfo("Target color set to {}".format(self.objective_color_code))
                     return "OK"
                 except ValueError:
                     return "ERR"

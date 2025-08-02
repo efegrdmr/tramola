@@ -274,7 +274,7 @@ class LoraGCSClient(object):
         else:
             raise Exception("Error in color")
         
-        return self.stop_sync_send_message("set_color,%d" % color, 5)
+        return self.stop_sync_send_message("set_color,%d" % color)
 
     def clear_waypoints(self):
         return self.stop_sync_send_message("clear_waypoints")

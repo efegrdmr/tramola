@@ -29,7 +29,7 @@ class GoTo(Task):
             return
 
         target_angle = self.vehicle.angle_between(*self.point)
-        if self._target_out_of_angular_range(target_angle, 45):
+        if self._target_out_of_angular_range(target_angle, 10):
             self._turn_towards_target(target_angle)
         else:
             self._move_to_target(target_angle)
@@ -44,7 +44,7 @@ class GoTo(Task):
     def _normalize_angular_speed(self, angle):
         """Normalize angle to proper angular speed range [-1, 1]."""
         # Clamp to reasonable range and normalize
-        normalized = np.clip(angle / 180.0, -self.max_angular_speed, self.max_angular_speed)
+        normalized = np.clip(angle / 90.0, -self.max_angular_speed, self.max_angular_speed)
         return normalized
 
     def _move_to_target(self, target_angle):

@@ -22,6 +22,6 @@
       <remap from="cmd_vel" to="/mavros/setpoint_velocity/cmd_vel_unstamped" />
       <rosparam file="$(find tramola)/config/move_base.yaml" command="load" />
     </node>
-    <node pkg="tramola" type="detection.py" name="detection" output="screen"/>
+    <node pkg="tramola" type="detection_node.py" name="detection" output="screen"/>
     <include file="$(find tramola)/launch/monitor.launch" />
 </launch>

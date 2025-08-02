@@ -193,19 +193,21 @@ class Vehicle:
         Return the relative bearing from the vehicle"s heading to the point.
         Negative → turn right; Positive → turn left.
         """
+        bearing = self.calculate_bearing(self.location, (lat, lon))
+        # compute relative: negative = turn right, positive = turn left
+        rel = ((self.heading - bearing + 540) % 360) - 180
+        return rel
+
+    def calculate_bearing(self, p1, p2):
         # Convert degrees to radians
-        a1 = math.radians(self.location[0])
-        a2 = math.radians(lat)
-        l = math.radians(lon - self.location[1])
+        a1 = math.radians(p1[0])
+        a2 = math.radians(p2[0])
+        l = math.radians(p2[1] - p1[1])
 
         # compute true bearing 0–360°
         x = math.sin(l) * math.cos(a2)
         y = math.cos(a1) * math.sin(a2) - math.sin(a1) * math.cos(a2) * math.cos(l)
-        bearing = (math.degrees(math.atan2(x, y)) + 360) % 360
-
-        # compute relative: negative = turn right, positive = turn left
-        rel = ((self.heading - bearing + 540) % 360) - 180
-        return rel
+        return (math.degrees(math.atan2(x, y)) + 360) % 360
 
     def distance(self, lat, lon):
         """
