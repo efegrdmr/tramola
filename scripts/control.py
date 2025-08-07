@@ -30,7 +30,6 @@ class Control:
         # Call mission_callback every 100ms
         rospy.Timer(rospy.Duration(0.1), self.mission_callback)
         self.init_lora()
-        print("lora initted port: " + self.port_name)
     
     def init_lora(self):
         if self.lora:

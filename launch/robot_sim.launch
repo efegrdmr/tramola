@@ -1,5 +1,10 @@
 <launch>
     <param name="/use_sim_time" value="true" />
+      <!-- Transform from base_link to sensor frames -->
+    <node pkg="tf" type="static_transform_publisher" name="imu_to_base"
+          args="0.3 -0.2 1.3 0 0 0 base_link imu_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="gps_to_base"
+          args="0.5 0 1.5 0 0 0 base_link gps_link 100" />
 
     <node pkg="tramola" type="serial_sim.sh" name="socat_node" output="screen"/>
     <include file="$(find tramola)/launch/dummy_mavros.launch" />

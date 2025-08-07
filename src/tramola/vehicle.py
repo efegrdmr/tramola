@@ -30,7 +30,7 @@ class Vehicle:
         self.last_sent_angular_speed = 0
         
         # Set mode service
-        # rospy.wait_for_service("/mavros/set_mode") 
+        rospy.wait_for_service("/mavros/set_mode") 
         self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
         
         # GPS
@@ -43,8 +43,8 @@ class Vehicle:
         self.speed = 0.0
 
         # Arming
+        rospy.wait_for_service("/mavros/cmd/arming") 
         self.arming_srv = rospy.ServiceProxy("/mavros/cmd/arming", CommandBool)
-        # self.arming_srv.wait_for_service()
 
         # Get thrust
         rospy.Subscriber("/mavros/rc/out", RCOut, self.rc_out_callback)

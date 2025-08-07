@@ -1,6 +1,6 @@
 import rospy
 from tramola.msg import DetectionList, Detection
-from tramola.srv import imageDetection
+from tramola.srv import ImageDetection
 
 class Detection:
     def __init__(self):
@@ -11,7 +11,7 @@ class Detection:
         # Add service proxies corresponding to vision.py services
         # rospy.wait_for_service("/imageDetection")
         self.inference_state_srv = rospy.ServiceProxy(
-            "/toggle_detection", imageDetection
+            "/toggle_detection", ImageDetection
         )
         self.detections = []
 
