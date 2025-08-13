@@ -16,7 +16,7 @@ class MoveBaseClient(object):
     in the 'odom' frame and sends it to move_base via the /move_base_simple/goal topic.
     """
 
-    def __init__(self, utm_zone=56, is_southern_hemisphere=True):
+    def __init__(self, utm_zone=36, is_southern_hemisphere=False):
         """
         Initializes the client and all necessary tools for coordinate conversion.
         """

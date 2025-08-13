@@ -1,15 +1,13 @@
 <launch>
     <!-- LIDAR: 15 cm forward of base_link -->
     <node pkg="tf" type="static_transform_publisher" name="lidar_to_base"
-          args="0.15 0.0 1.50 0 0 0 base_link lidar_link 100"/>
+          args="0.15 0.0 1.50 0 0 0 base_link laser 100"/>
 
-    <!-- GPS: 20 cm behind base_link -->
-    <node pkg="tf" type="static_transform_publisher" name="gps_to_base"
-          args="-0.20 0.0 1.50 0 0 0 base_link gps_link 100"/>
-
-    <!-- IMU: co-located with base_link in x,y; adjust z if needed -->
-    <node pkg="tf" type="static_transform_publisher" name="imu_to_base"
-          args="0.00 0.0 1.50 0 0 0 base_link imu_link 100"/>
+    <node pkg="tramola" type="lidar_filter.py" name="lidar_filter" output="screen">
+      <param name="input_topic" value="/scan"/>
+      <param name="output_topic" value="/scan_filtered"/>
+      <param name="keep_ranges" value="[[-90, +90]]"/>
+    </node>
 
     <include file="$(find tramola)/launch/localization.launch" />
 

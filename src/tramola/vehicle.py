@@ -30,11 +30,11 @@ class Vehicle:
         self.last_sent_angular_speed = 0
         
         # Set mode service
-        rospy.wait_for_service("/mavros/set_mode") 
-        self.mode_srv = rospy.ServiceProxy("/mavros/set_mode", SetMode)
+        #rospy.wait_for_service("/mavros/mavros/set_mode") 
+        self.mode_srv = rospy.ServiceProxy("/mavros/mavros/set_mode", SetMode)
         
         # GPS
-        self.gps_sub = rospy.Subscriber("/mavros/global_position/global", NavSatFix, self.gps_callback)
+        self.gps_sub = rospy.Subscriber("/mavros/mavros/global_position/global", NavSatFix, self.gps_callback)
         self.location = (0.0, 0.0) 
 
         # EKF 
@@ -43,16 +43,16 @@ class Vehicle:
         self.speed = 0.0
 
         # Arming
-        rospy.wait_for_service("/mavros/cmd/arming") 
-        self.arming_srv = rospy.ServiceProxy("/mavros/cmd/arming", CommandBool)
+        #rospy.wait_for_service("/mavros/mavros/cmd/arming") 
+        self.arming_srv = rospy.ServiceProxy("/mavros/mavros/cmd/arming", CommandBool)
 
         # Get thrust
-        rospy.Subscriber("/mavros/rc/out", RCOut, self.rc_out_callback)
+        rospy.Subscriber("/mavros/mavros/rc/out", RCOut, self.rc_out_callback)
         self.thrust_left = 0
         self.thrust_right = 0
 
         # RC Override
-        self.rc_override_pub = rospy.Publisher("/mavros/rc/override", OverrideRCIn, queue_size=1)
+        self.rc_override_pub = rospy.Publisher("/mavros/mavros/rc/override", OverrideRCIn, queue_size=1)
         self.rc_speed_value = 1500  # Default mid-position
         self.rc_yaw_value = 1500    # Default mid-position
         self.rc_override_timer = None

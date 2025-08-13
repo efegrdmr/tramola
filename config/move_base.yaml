@@ -1,18 +1,17 @@
-# General move_base parameters (optional, can be added here)
-# controller_frequency: 10.0
-# planner_patience: 5.0
-
-# ============ Global Costmap (in ODOM frame) ============
+# ============ Global Costmap (katamaran tuned) ============
 global_costmap:
-  global_frame: odom
+  global_frame: odom          # change to map if using global localization (AMCL/SLAM)
   robot_base_frame: base_link
-  update_frequency: 5.0
-  publish_frequency: 2.0
+  update_frequency: 2.0       # global planning doesn't need to be as frequent
+  publish_frequency: 1.0
   static_map: false
   rolling_window: true
-  width: 300.0
-  height: 300.0
+
+  # reasonable extents for a marine environment (tweak to mission)
+  width: 200.0
+  height: 200.0
   resolution: 0.5
+  transform_tolerance: 0.8    # be tolerant of TF/odom jitter, but not huge
 
   plugins:
     - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
@@ -21,31 +20,33 @@ global_costmap:
   obstacle_layer:
     observation_sources: laser_scan_sensor
     laser_scan_sensor:
-      sensor_frame: lidar_link
+      sensor_frame: laser
       data_type: LaserScan
-      topic: /scan_scaled
+      topic: /scan_filtered
       marking: true
       clearing: true
-      max_obstacle_height: 2.0
+      max_obstacle_height: 2.5
       min_obstacle_height: 0.0
-      obstacle_range: 9.0
-      raytrace_range: 10.0
+      obstacle_range: 12.0     # <= lidar range_max
+      raytrace_range: 12.0
 
   inflation_layer:
-    inflation_radius: 1.2
-    cost_scaling_factor: 5.0
+    inflation_radius: 1.5     # larger to account for drift & stopping margin
+    cost_scaling_factor: 4.0
 
-# ============ Local Costmap (in ODOM frame) ============
+# ============ Local Costmap (katamaran tuned) ============
 local_costmap:
   global_frame: odom
   robot_base_frame: base_link
+  # local must update near sensor rate (your lidar ~7-8Hz)
   update_frequency: 10.0
-  publish_frequency: 5.0
+  publish_frequency: 6.0
   static_map: false
   rolling_window: true
-  width: 15.0
-  height: 15.0
+  width: 40.0                 # larger local window helps when drifting
+  height: 40.0
   resolution: 0.1
+  transform_tolerance: 0.5
 
   plugins:
     - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
@@ -54,36 +55,42 @@ local_costmap:
   obstacle_layer:
     observation_sources: laser_scan_sensor
     laser_scan_sensor:
-      sensor_frame: lidar_link
+      sensor_frame: laser
       data_type: LaserScan
-      topic: /scan_scaled
+      topic: /scan_filtered
       marking: true
       clearing: true
-      max_obstacle_height: 2.0
+      max_obstacle_height: 2.5
       min_obstacle_height: 0.0
-      obstacle_range: 9.0
-      raytrace_range: 10.0
+      obstacle_range: 12.0
+      raytrace_range: 12.0
 
   inflation_layer:
-    inflation_radius: 1.0
-    cost_scaling_factor: 10.0
+    inflation_radius: 1.5
+    cost_scaling_factor: 6.0
 
-# ============ DWA Planner ============
+# ============ DWA Planner (katamaran tuned) ============
 DWAPlannerROS:
-  xy_goal_tolerance:      2.0
-  yaw_goal_tolerance:     3.14
+  # Accept larger goal tolerance on water (drift & currents)
+  xy_goal_tolerance:      1.0    # try 0.5–1.5 depending on mission
+  yaw_goal_tolerance:     0.5    # orientation less-critical; larger allowed
   latch_xy_goal_tolerance: true
 
-  trans_stopped_vel:      10.0
-  rot_stopped_vel:        10.0
-  stop_time_buffer:       0.0
+  # stopped thresholds (must be small but consider sensor noise)
+  trans_stopped_vel:      0.03   # if below ~3 cm/s considered stopped
+  rot_stopped_vel:        0.05   # rad/s
+  stop_time_buffer:       0.8    # allow time to actually stop/signal settle
 
-  acc_lim_x:          0.1
-  acc_lim_theta:      0.5
-  max_vel_x:          0.3
-  max_vel_theta:      0.5
-  path_distance_bias: 20.0
-  goal_distance_bias: 30.0
-  occdist_scale:      0.1
-  oscillation_timeout:    3.0
-  oscillation_distance:   0.20
+  # dynamics - make them conservative for heavy boat
+  acc_lim_x:          0.02    # very slow acceleration
+  acc_lim_theta:      0.08
+  max_vel_x:          0.4     # set to your measured safe forward speed (m/s)
+  max_vel_theta:      0.4
+
+  # objective tuning: keep reasonable bias to follow path but respect obstacles
+  path_distance_bias: 12.0
+  goal_distance_bias: 25.0
+  occdist_scale:      0.25    # higher than wheeled robot to avoid collisions
+
+  oscillation_timeout:    12.0    # boat may oscillate while correcting drift; allow more time
+  oscillation_distance:   0.5

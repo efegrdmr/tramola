@@ -33,7 +33,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Image
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -68,21 +68,9 @@ Visualization Manager:
         All Enabled: false
         base_link:
           Value: true
-        base_link_frd:
-          Value: true
-        gps_link:
-          Value: true
-        imu_link:
-          Value: true
-        lidar_link:
-          Value: true
-        map:
-          Value: true
-        map_ned:
+        laser:
           Value: true
         odom:
-          Value: true
-        odom_ned:
           Value: true
         utm:
           Value: true
@@ -92,21 +80,10 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          map_ned:
-            {}
         odom:
           base_link:
-            base_link_frd:
+            laser:
               {}
-            gps_link:
-              {}
-            imu_link:
-              {}
-            lidar_link:
-              {}
-          odom_ned:
-            {}
           utm:
             {}
       Update Interval: 0
@@ -128,7 +105,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 100
       Name: Odometry
       Position Tolerance: 0.10000000149011612
@@ -144,7 +121,7 @@ Visualization Manager:
         Value: Arrow
       Topic: /odometry/filtered
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -168,7 +145,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.10000000149011612
       Style: Flat Squares
-      Topic: /scan_scaled
+      Topic: /scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -187,12 +164,12 @@ Visualization Manager:
       Class: rviz/Map
       Color Scheme: map
       Draw Behind: false
-      Enabled: true
+      Enabled: false
       Name: Map
       Topic: /move_base/global_costmap/costmap
       Unreliable: false
       Use Timestamp: false
-      Value: true
+      Value: false
     - Class: rviz/Image
       Enabled: true
       Image Topic: /camera/image_raw
@@ -245,7 +222,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10.096569061279297
+      Distance: 30.998430252075195
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -260,10 +237,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0047968626022339
+      Pitch: 0.4797968864440918
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.1117684841156006
+      Yaw: 1.9467685222625732
     Saved: ~
 Window Geometry:
   Displays:
@@ -283,5 +260,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1908
-  X: 216
-  Y: -37
+  X: 90
+  Y: 155

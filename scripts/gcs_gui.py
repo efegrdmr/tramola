@@ -12,7 +12,6 @@ import urllib2
 import base64
 import io
 import Queue  # Python 2's Queue
-import rospy
 
 try:
     from PIL import Image, ImageTk
@@ -658,7 +657,7 @@ class GCSApp(tk.Tk):
         ttk.Label(conn_settings, text="Port:").grid(row=0, column=0, padx=2, pady=2, sticky=tk.W)
         self.port_entry = ttk.Entry(conn_settings, width=8)
         self.port_entry.grid(row=0, column=1, padx=2, pady=2)
-        port = rospy.get_param("~port")
+        port = "/dev/ttyACM0"
         self.port_entry.insert(0, port)
 
         ttk.Label(conn_settings, text="Baud:").grid(row=0, column=2, padx=2, pady=2, sticky=tk.W)
@@ -1005,7 +1004,6 @@ class GCSApp(tk.Tk):
         """Send manual control values to the boat"""
         if self.connected and self.gcs_client and self.in_manual_mode:
             self.gcs_client.send_manual_control_request(self.manual_speed, self.manual_yaw)
-            rospy.loginfo("mnaul control sent")
             self.update_manual_display()
             
     def update_manual_display(self):
@@ -1210,6 +1208,5 @@ class GCSApp(tk.Tk):
 
 
 if __name__ == "__main__":
-    rospy.init_node('gcs_gui_node', anonymous=True)
     app = GCSApp()
     app.mainloop()
