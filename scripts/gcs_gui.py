@@ -14,14 +14,17 @@ import io
 import Queue  # Python 2's Queue
 
 try:
-    from PIL import Image, ImageTk
-
-    PIL_AVAILABLE = True
+    from tramola.loralib import Lora, LoraGCSClient
 except ImportError:
-    PIL_AVAILABLE = False
-    print("PIL not available. Install with: pip install pillow")
+    import sys
+    sys.path.append("/home/efe/Desktop/catkin_ws/src/tramolaSLAM/src/tramola")
+    from loralib import Lora, LoraGCSClient
 
-from tramola.loralib import Lora, LoraGCSClient
+
+from PIL import Image, ImageTk
+PIL_AVAILABLE = True
+
+
 
 # Create a global queue for tile download requests
 tile_download_queue = Queue.Queue()
