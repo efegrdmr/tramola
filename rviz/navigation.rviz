@@ -33,7 +33,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -80,10 +80,10 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
+        base_link:
+          laser:
+            {}
         odom:
-          base_link:
-            laser:
-              {}
           utm:
             {}
       Update Interval: 0
@@ -145,7 +145,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.10000000149011612
       Style: Flat Squares
-      Topic: /scan
+      Topic: /scan_filtered
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -260,5 +260,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1908
-  X: 90
-  Y: 155
+  X: -32
+  Y: -32

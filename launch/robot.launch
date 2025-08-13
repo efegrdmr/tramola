@@ -6,7 +6,7 @@
     <node pkg="tramola" type="lidar_filter.py" name="lidar_filter" output="screen">
       <param name="input_topic" value="/scan"/>
       <param name="output_topic" value="/scan_filtered"/>
-      <rosparam param="keep_ranges">[[-90.0, 90.0]]</rosparam>
+      <rosparam param="keep_ranges">[[-120.0, 120.0]]</rosparam>
     </node>
 
     <include file="$(find tramola)/launch/localization.launch" />

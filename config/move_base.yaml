@@ -8,10 +8,10 @@ global_costmap:
   rolling_window: true
 
   # reasonable extents for a marine environment (tweak to mission)
-  width: 200.0
-  height: 200.0
+  width: 500.0
+  height: 500.0
   resolution: 0.5
-  transform_tolerance: 0.8    # be tolerant of TF/odom jitter, but not huge
+  transform_tolerance: 1.0    # be tolerant of TF/odom jitter, but not huge
 
   plugins:
     - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
@@ -43,10 +43,10 @@ local_costmap:
   publish_frequency: 6.0
   static_map: false
   rolling_window: true
-  width: 40.0                 # larger local window helps when drifting
-  height: 40.0
+  width: 12.0                 # larger local window helps when drifting
+  height: 12.0
   resolution: 0.1
-  transform_tolerance: 0.5
+  transform_tolerance: 1.0
 
   plugins:
     - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
