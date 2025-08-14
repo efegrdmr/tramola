@@ -14,7 +14,7 @@ class GoTo(Task):
 
     
     def mission_callback(self, t):
-        if (not self._distance_less_than(5)) and self.state == "MOVE_BASE_CONTROL":
+        if (not self._distance_less_than(2)) and self.state == "MOVE_BASE_CONTROL":
             return
         
         if self.state == "MOVE_BASE_CONTROL":
@@ -23,7 +23,7 @@ class GoTo(Task):
             self.state = "STRAIGHT_TO_POINT"
             self.vehicle.start_velocity_publisher()
         
-        if self._distance_less_than(3.0):
+        if self._distance_less_than(1.0):
             self.stop()
             rospy.loginfo("reached to the point")
             return

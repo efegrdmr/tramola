@@ -146,6 +146,7 @@ class Control:
                 self.move_base.cancel_goal()
                 self.vehicle.stop_velocity_publisher()
                 self.vehicle.start_rc_override()
+                self.vehicle.set_mode("MANUAL")
                 rospy.loginfo("Manual mode activated")
                 return "OK"
             
@@ -154,6 +155,7 @@ class Control:
                     return "OK"
                 self.vehicle.stop_rc_override()
                 self.state = "IDLE"
+                self.vehicle.set_mode("MANUAL")
                 rospy.loginfo("Manual mode deactivated")
                 return "OK"
             

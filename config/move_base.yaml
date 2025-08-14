@@ -1,17 +1,25 @@
-# ============ Global Costmap (katamaran tuned) ============
+# move_base_katamaran.yaml
+# Katamaran-tuned move_base params (anti-oscillation version)
+
+# top-level move_base params
+controller_frequency: 10.0      # lower to avoid overreacting
+planner_frequency: 1.0          # global planner stays low for marine
+planner_patience: 5.0
+max_planning_retries: -1
+
+# ============ Global Costmap ============
 global_costmap:
-  global_frame: odom          # change to map if using global localization (AMCL/SLAM)
+  global_frame: odom
   robot_base_frame: base_link
-  update_frequency: 2.0       # global planning doesn't need to be as frequent
+  update_frequency: 1.0
   publish_frequency: 1.0
   static_map: false
   rolling_window: true
 
-  # reasonable extents for a marine environment (tweak to mission)
   width: 500.0
   height: 500.0
-  resolution: 0.5
-  transform_tolerance: 1.0    # be tolerant of TF/odom jitter, but not huge
+  resolution: 1.0
+  transform_tolerance: 1.0
 
   plugins:
     - {name: obstacle_layer,   type: "costmap_2d::ObstacleLayer"}
@@ -27,23 +35,24 @@ global_costmap:
       clearing: true
       max_obstacle_height: 2.5
       min_obstacle_height: 0.0
-      obstacle_range: 12.0     # <= lidar range_max
+      obstacle_range: 12.0
       raytrace_range: 12.0
 
   inflation_layer:
-    inflation_radius: 1.5     # larger to account for drift & stopping margin
+    inflation_radius: 1.5
     cost_scaling_factor: 4.0
 
-# ============ Local Costmap (katamaran tuned) ============
+# ============ Local Costmap ============
 local_costmap:
   global_frame: odom
   robot_base_frame: base_link
-  # local must update near sensor rate (your lidar ~7-8Hz)
-  update_frequency: 10.0
-  publish_frequency: 6.0
+
+  update_frequency: 10.0       # match controller_frequency
+  publish_frequency: 5.0
   static_map: false
   rolling_window: true
-  width: 12.0                 # larger local window helps when drifting
+
+  width: 12.0
   height: 12.0
   resolution: 0.1
   transform_tolerance: 1.0
@@ -66,31 +75,43 @@ local_costmap:
       raytrace_range: 12.0
 
   inflation_layer:
-    inflation_radius: 1.5
-    cost_scaling_factor: 6.0
+    inflation_radius: 2.0       # more smoothing
+    cost_scaling_factor: 3.0
 
-# ============ DWA Planner (katamaran tuned) ============
+# ============ DWA Planner ============
 DWAPlannerROS:
-  # Accept larger goal tolerance on water (drift & currents)
-  xy_goal_tolerance:      1.0    # try 0.5–1.5 depending on mission
-  yaw_goal_tolerance:     0.5    # orientation less-critical; larger allowed
+  xy_goal_tolerance:      1.0
+  yaw_goal_tolerance:     1.0
   latch_xy_goal_tolerance: true
 
-  # stopped thresholds (must be small but consider sensor noise)
-  trans_stopped_vel:      0.03   # if below ~3 cm/s considered stopped
-  rot_stopped_vel:        0.05   # rad/s
-  stop_time_buffer:       0.8    # allow time to actually stop/signal settle
+  trans_stopped_vel:      0.03
+  rot_stopped_vel:        0.08
+  stop_time_buffer:       0.8
 
-  # dynamics - make them conservative for heavy boat
-  acc_lim_x:          0.02    # very slow acceleration
-  acc_lim_theta:      0.08
-  max_vel_x:          0.4     # set to your measured safe forward speed (m/s)
-  max_vel_theta:      0.4
+  acc_lim_x:          0.05
+  acc_lim_theta:      0.03
+  max_vel_x:          0.35
+  min_vel_x:          0.0
+  max_vel_theta:      0.20
 
-  # objective tuning: keep reasonable bias to follow path but respect obstacles
-  path_distance_bias: 12.0
-  goal_distance_bias: 25.0
-  occdist_scale:      0.25    # higher than wheeled robot to avoid collisions
+  sim_time:           4.0     # longer horizon for smoother paths
+  sim_granularity:    0.1
+  vx_samples:         6
+  vtheta_samples:     20
 
-  oscillation_timeout:    12.0    # boat may oscillate while correcting drift; allow more time
-  oscillation_distance:   0.5
+  # Smoothing-focused biases
+  path_distance_bias: 8.0
+  goal_distance_bias: 15.0
+  occdist_scale:      0.5
+
+  oscillation_timeout:    10.0
+  oscillation_distance:   1.0
+
+  forward_point_distance: 0.325
+  pdist_scale: 0.6
+  gdist_scale: 0.8
+  heading_lookahead: 2.0   # look further ahead for heading
+
+# Footprint
+footprint: [[0.6, 0.6], [0.6, -0.6], [-0.6, -0.6], [-0.6, 0.6]]
+footprint_padding: 0.05

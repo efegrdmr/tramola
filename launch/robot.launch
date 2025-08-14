@@ -13,10 +13,14 @@
 
     <node pkg="tramola" type="control.py" name="control_node" output="screen" >
       <param name="port" value="/dev/ttyACM0"/>
+      <!-- Remap goal topic so this node publishes to a private goal channel -->
+      <remap from="/move_base_simple/goal" to="/tramola/goal"/>
     </node>
 
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-      <remap from="cmd_vel" to="/mavros/setpoint_velocity/cmd_vel_unstamped" />
+      <remap from="cmd_vel" to="/mavros/mavros/setpoint_velocity/cmd_vel_unstamped" />
+      <!-- Remap move_base's simple goal subscription to our private goal topic -->
+      <remap from="/move_base_simple/goal" to="/tramola/goal"/>
       <rosparam file="$(find tramola)/config/move_base.yaml" command="load" />
     </node>
     

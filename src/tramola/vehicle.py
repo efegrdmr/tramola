@@ -19,11 +19,11 @@ class Vehicle:
         assert rospy.core.is_initialized(), "ROS node is not initialized"  
 
         # Define RC channel constants
-        self.RC_CHANNEL_SPEED = 0  # Channel for speed control
-        self.RC_CHANNEL_YAW = 2    # Channel for yaw/steering control
+        self.RC_CHANNEL_SPEED = 2  # Channel for speed control
+        self.RC_CHANNEL_YAW = 0    # Channel for yaw/steering control
 
         # Velocity publisher 
-        self.velocity_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel_unstamped", Twist, queue_size=1)
+        self.velocity_pub = rospy.Publisher("/mavros/mavros/setpoint_velocity/cmd_vel_unstamped", Twist, queue_size=1)
         self.linear_speed = 0.0 # max 1.0
         self.angular_speed = 0.0 # max 1.0
         self.last_sent_linear_speed = 0

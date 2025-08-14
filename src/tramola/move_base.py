@@ -118,6 +118,7 @@ class MoveBaseClient(object):
             return
 
         rospy.loginfo("Sending goal to /move_base_simple/goal topic.")
+        print("Goal: Lat=%.6f, Lon=%.6f, Yaw=%.2f frame=%s" % (latitude, longitude, yaw_degrees, odom_pose.header.frame_id))
         self.goal_pub.publish(odom_pose)
 
     def cancel_goal(self):
