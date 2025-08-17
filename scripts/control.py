@@ -202,6 +202,7 @@ if __name__ == "__main__":
     try:
         control = Control()
         rospy.loginfo("Control system initialized")
+        control.detection.start()
         rospy.spin()
     except rospy.ROSInterruptException:
         rospy.loginfo("Control system terminated")

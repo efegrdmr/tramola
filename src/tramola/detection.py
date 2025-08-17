@@ -9,7 +9,7 @@ class Detection:
 
         self.sub = rospy.Subscriber("/color_detections", DetectionList, self.detection_callback, queue_size=1)
         # Add service proxies corresponding to vision.py services
-        # rospy.wait_for_service("/imageDetection")
+        rospy.wait_for_service("/toggle_detection")
         self.inference_state_srv = rospy.ServiceProxy(
             "/toggle_detection", ImageDetection
         )

@@ -23,5 +23,11 @@
       <remap from="/move_base_simple/goal" to="/tramola/goal"/>
       <rosparam file="$(find tramola)/config/move_base.yaml" command="load" />
     </node>
-    
+    <node pkg="tramola" type="detection_node.py" name="detection" output="screen"/>
+    <node pkg="tramola" type="camera_publisher.py" name="camera_publisher" output="screen"/>
+    <!-- MAVROS node -->
+    <include file="$(find mavros)/launch/apm.launch"/>
+
+    <include file="$(find rplidar_ros)/launch/rplidar_a1.launch"/>
+
 </launch>
