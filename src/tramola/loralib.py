@@ -261,8 +261,8 @@ class LoraGCSClient(object):
 
     def send_manual_control_request(self, speed_normalized, yaw_normalized):
         message = "manual,%.2f,%.2f" % (speed_normalized, yaw_normalized)
-        res = self.send_message(message)
-        return res
+        res = self.lora.send_message(message)
+        return "OK"
     
     def set_objective_color(self, color):
         if color == "RED":

@@ -10,6 +10,8 @@ from tramola.kamikaze import Kamikaze
 from tramola.move_base import MoveBaseClient
 import rospy
 import time
+import Jetson.GPIO as GPIO
+
 
 class Control:
     def __init__(self):
@@ -24,12 +26,19 @@ class Control:
         self.vehicle.arming(True)
         self.points = []
         self.state = "IDLE"
-        self.objective_color_code = None  # Initialize with None instead of -1 for clarity
+        self.objective_color_code = None 
         self.port_name = rospy.get_param("~port")
+        self.last_manual_control_message = time.time() 
         
         # Call mission_callback every 100ms
         rospy.Timer(rospy.Duration(0.1), self.mission_callback)
         self.init_lora()
+
+        # GPIO setup for emergency shutdown
+        self.pin = 11
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.output(self.pin, GPIO.LOW)
     
     def init_lora(self):
         if self.lora:
@@ -71,6 +80,11 @@ class Control:
                 rospy.loginfo("KAMIKAZE mission completed")
                 self.state = "IDLE"
                 self.task = None
+        elif self.state == "MANUAL":
+            if time.time() - self.last_manual_control_message > 5:
+                self.vehicle.set_rc_speed(0)
+                self.vehicle.set_rc_yaw(0)
+
 
     def lora_callback(self, data):
         try:
@@ -116,6 +130,7 @@ class Control:
                 self.vehicle.stop_velocity_publisher()
                 self.state = "IDLE"
                 self.points = []
+                GPIO.output(self.pin, GPIO.LOW)
                 return "OK"
             
             # Waypoint management
@@ -163,15 +178,16 @@ class Control:
                 if self.state != "MANUAL":
                     return "ERR"
 
+                self.last_manual_control_message = time.time()
                 try:
                     # Use first parameter for speed, second for yaw instead of left/right thrusters
                     speed = float(data[1])
                     yaw = float(data[2])
                     self.vehicle.set_rc_speed(speed)
                     self.vehicle.set_rc_yaw(yaw)
-                    return "OK"
+                    return None
                 except ValueError:
-                    return "ERR"
+                    return None
             
             # Color objective setting
             elif command == "set_color":
