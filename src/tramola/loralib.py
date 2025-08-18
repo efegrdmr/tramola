@@ -255,6 +255,7 @@ class LoraGCSClient(object):
             return "ERR"
         res = self.stop_sync_send_message("stop_manual_mode")
         if res == "OK":
+            self.lora.reset_serial()
             self.start_data_requests()
             return res
         return "ERR"
