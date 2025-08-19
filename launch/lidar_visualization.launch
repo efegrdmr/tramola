@@ -1,0 +1,28 @@
+<launch>
+  <!-- Oynatılacak rosbag dosyası -->
+  <arg name="bag_file" default="" doc="Tam yolu ile oynatılacak rosbag dosyası"/>
+  
+  <!-- Hata kontrolü - bag_file parametresi boş ise hata ver -->
+  <node pkg="rostopic" type="rostopic" name="check_bag_file" 
+        args="echo WARNING: Lütfen bag_file argümanı belirtin! Örnek: roslaunch tramola play_lidar.launch bag_file:=/path/to/your.bag" 
+        if="$(eval bag_file == '')">
+  </node>
+  
+  <!-- RViz yapılandırma dosyası -->
+  <arg name="rviz_config" default="$(find tramola)/rviz/lidar_timestamp.rviz"/>
+  
+  <!-- Eğer bag_file parametresi verilmişse -->
+  <group if="$(eval bag_file != '')">
+    <!-- Zaman görselleştirici düğüm -->
+    <node pkg="tramola" type="timestamp_visualizer.py" name="timestamp_visualizer" output="screen"/>
+    
+    <!-- RViz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" output="screen"/>
+    
+    <!-- Rosbag oynat -->
+    <node pkg="rosbag" type="play" name="rosbag_player" 
+          args="--clock $(arg bag_file)" 
+          output="screen">
+    </node>
+  </group>
+</launch>

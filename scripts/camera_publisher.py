@@ -39,7 +39,11 @@ def safe_close_writer(vw):
 def make_segment_path(output_dir, base_name, segment_index):
     timestamp = time.strftime("%Y%m%d-%H%M%S", time.localtime())
     # include segment index to guarantee unique filename if multiple segments created same second
-    return os.path.join(output_dir, "{}_seg{:03d}_{}".format(timestamp, segment_index, base_name))
+    filename = "{}_seg{:03d}_{}".format(timestamp, segment_index, base_name)
+    # Ensure it has .mp4 extension
+    if not filename.lower().endswith('.mp4'):
+        filename = os.path.splitext(filename)[0] + '.mp4'
+    return os.path.join(output_dir, filename)
 
 def camera_recorder():
     global latest_detections, last_detection_time
@@ -51,13 +55,12 @@ def camera_recorder():
     annotated_topic = rospy.get_param('~annotated_topic', image_topic + '_annotated')
     detections_topic = rospy.get_param('~detections_topic', '/detections')
     output_dir = rospy.get_param('~output_dir', '/home/tramola/video')
-    raw_name = rospy.get_param('~output_video_name_raw', 'output_raw.avi')
-    annotated_name_base = rospy.get_param('~output_video_name_annotated', 'output_annotated.avi')
+    output_video_name = rospy.get_param('~output_video_name', 'output_video.mp4')
     camera_index = rospy.get_param('~camera_index', 0)
     publish_rate = rospy.get_param('~publish_rate', 30)
     detection_timeout = rospy.get_param('~detection_timeout', 1.0)  # seconds
     record_param_default = rospy.get_param('~record', False)
-    segment_seconds = rospy.get_param('~segment_seconds', 30)  # default 5 seconds per segment
+    segment_seconds = rospy.get_param('~segment_seconds', 30)  # default 30 seconds per segment
 
     # Ensure output dir exists
     if not os.path.exists(output_dir):
@@ -81,7 +84,9 @@ def camera_recorder():
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 640)
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 480)
     video_size = (frame_width, frame_height)
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    
+    # Use MP4 codec
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Using MP4V codec for MP4 format
     fps = float(publish_rate)
 
     rate = rospy.Rate(publish_rate)
@@ -89,18 +94,17 @@ def camera_recorder():
     rospy.loginfo("Camera recorder node started. initial record=%s, segment_seconds=%s",
                   record_param_default, segment_seconds)
 
-    # Video writers and segment state
-    vw_raw = None
-    vw_annot = None
+    # Video writer and segment state
+    video_writer = None
     recording_active = False
     initial_record_request = bool(record_param_default)
 
-    raw_segment_index = 0
-    annot_segment_index = 0
-    raw_segment_start = None
-    annot_segment_start = None
-    raw_path = None
-    annot_path = None
+    segment_index = 0
+    segment_start = None
+    video_path = None
+    
+    # For timestamp display
+    start_time = time.time()
 
     try:
         while not rospy.is_shutdown():
@@ -110,34 +114,30 @@ def camera_recorder():
             except Exception:
                 requested_record = initial_record_request
 
-            # Start recording: create raw writer immediately when requested (first segment)
+            # Start recording: create writer immediately when requested (first segment)
             if requested_record and not recording_active:
-                raw_segment_index = 0
-                raw_segment_start = time.time()
-                raw_path = make_segment_path(output_dir, raw_name, raw_segment_index)
-                rospy.loginfo("Recording enabled; opening raw video file: %s", raw_path)
-                vw_raw = create_video_writer(raw_path, fourcc, fps, video_size)
-                if vw_raw:
+                segment_index = 0
+                segment_start = time.time()
+                start_time = time.time()  # Reset start time when recording begins
+                video_path = make_segment_path(output_dir, output_video_name, segment_index)
+                rospy.loginfo("Recording enabled; opening video file: %s", video_path)
+                video_writer = create_video_writer(video_path, fourcc, fps, video_size)
+                if video_writer:
                     recording_active = True
                 else:
-                    rospy.logerr("Raw VideoWriter failed to open; recording not started.")
-                    vw_raw = None
+                    rospy.logerr("VideoWriter failed to open; recording not started.")
+                    video_writer = None
                     recording_active = False
 
-            # Stop recording: close any open writers
+            # Stop recording: close any open writer
             if (not requested_record) and recording_active:
-                rospy.loginfo("Recording disabled; closing video files.")
-                safe_close_writer(vw_raw)
-                safe_close_writer(vw_annot)
-                vw_raw = None
-                vw_annot = None
+                rospy.loginfo("Recording disabled; closing video file.")
+                safe_close_writer(video_writer)
+                video_writer = None
                 recording_active = False
-                raw_segment_index = 0
-                annot_segment_index = 0
-                raw_segment_start = None
-                annot_segment_start = None
-                raw_path = None
-                annot_path = None
+                segment_index = 0
+                segment_start = None
+                video_path = None
 
             ret, frame = cap.read()
             if not ret:
@@ -154,10 +154,23 @@ def camera_recorder():
 
             # Prepare annotated frame if detections are recent
             current_time = time.time()
-            detections_valid = (latest_detections is not None and (current_time - last_detection_time) <= detection_timeout)
+            detections_valid = (latest_detections is not None and 
+                               (current_time - last_detection_time) <= detection_timeout)
+
+            # Frame to record - either annotated or raw based on detection availability
+            frame_to_record = frame.copy()  # Create a copy to always add timestamp
+
+            # Get current ROS time with only seconds
+            ros_time = rospy.Time.now()
+            seconds_only = ros_time.secs
+            timestamp_text = "{}".format(seconds_only)
+            
+            # Add timestamp to the frame_to_record
+            cv2.putText(frame_to_record, timestamp_text, (10, frame_height - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
             if detections_valid:
-                annotated_frame = frame.copy()
+                # If detections are valid, add bounding boxes to the frame_to_record
                 for detection in latest_detections:
                     x_center = int(detection.x_center * frame_width)
                     y_center = int(detection.y_center * frame_height)
@@ -169,74 +182,47 @@ def camera_recorder():
                     x2 = min(frame_width - 1, int(x_center + width / 2))
                     y2 = min(frame_height - 1, int(y_center + height / 2))
 
-                    cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.rectangle(frame_to_record, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     label = "ID: {} Conf: {:.2f}".format(detection.class_id, detection.confidence)
-                    cv2.putText(annotated_frame, label, (x1, max(0, y1 - 10)),
+                    cv2.putText(frame_to_record, label, (x1, max(0, y1 - 10)),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-                timestamp_text = "Time: {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                
+                # Copy to annotated_frame for publishing
+                annotated_frame = frame_to_record.copy()
+            else:
+                # Just timestamp for annotated frame when no detections
+                annotated_frame = frame.copy()
                 cv2.putText(annotated_frame, timestamp_text, (10, frame_height - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
-                # If recording is active and annotated writer not created yet, create it now (first segment)
-                if recording_active and vw_annot is None:
-                    annot_segment_index = 0
-                    annot_segment_start = time.time()
-                    annot_path = make_segment_path(output_dir, annotated_name_base, annot_segment_index)
-                    rospy.loginfo("First detection seen; creating annotated video file: %s", annot_path)
-                    vw_annot = create_video_writer(annot_path, fourcc, fps, video_size)
-                    if vw_annot is None:
-                        rospy.logerr("Annotated VideoWriter failed to open; annotated frames will not be saved.")
-            else:
-                annotated_frame = frame
-
-            # Publish annotated topic always (annotated when detections exist)
+            # Publish annotated topic always
             try:
                 annotated_msg = bridge.cv2_to_imgmsg(annotated_frame, "bgr8")
                 annotated_pub.publish(annotated_msg)
             except CvBridgeError as e:
                 rospy.logerr("CvBridge error (annotated publish): %s", str(e))
 
-            # Handle segment rotation for raw (if recording)
-            if recording_active and vw_raw:
-                # Write raw frame
+            # Handle recording and segment rotation
+            if recording_active and video_writer:
+                # Write frame (either annotated or raw depending on detection availability)
                 try:
-                    vw_raw.write(frame)
+                    video_writer.write(frame_to_record)
                 except Exception as e:
-                    rospy.logwarn("Error writing raw frame to video: %s", str(e))
+                    rospy.logwarn("Error writing frame to video: %s", str(e))
 
-                # rotate raw segment if elapsed
-                if raw_segment_start and (time.time() - raw_segment_start >= float(segment_seconds)):
-                    rospy.loginfo("Rotating raw segment (index %d)...", raw_segment_index)
-                    safe_close_writer(vw_raw)
-                    raw_segment_index += 1
-                    raw_segment_start = time.time()
-                    raw_path = make_segment_path(output_dir, raw_name, raw_segment_index)
-                    rospy.loginfo("Opening new raw segment: %s", raw_path)
-                    vw_raw = create_video_writer(raw_path, fourcc, fps, video_size)
-                    if vw_raw is None:
-                        rospy.logerr("Failed to open new raw segment writer; stopping raw writes.")
-                        vw_raw = None
-
-            # Handle annotated write & segmentation: only write when detections_valid and vw_annot exists
-            if detections_valid and vw_annot:
-                try:
-                    vw_annot.write(annotated_frame)
-                except Exception as e:
-                    rospy.logwarn("Error writing annotated frame to video: %s", str(e))
-
-                # rotate annotated segment if elapsed
-                if annot_segment_start and (time.time() - annot_segment_start >= float(segment_seconds)):
-                    rospy.loginfo("Rotating annotated segment (index %d)...", annot_segment_index)
-                    safe_close_writer(vw_annot)
-                    annot_segment_index += 1
-                    annot_segment_start = time.time()
-                    annot_path = make_segment_path(output_dir, annotated_name_base, annot_segment_index)
-                    rospy.loginfo("Opening new annotated segment: %s", annot_path)
-                    vw_annot = create_video_writer(annot_path, fourcc, fps, video_size)
-                    if vw_annot is None:
-                        rospy.logerr("Failed to open new annotated segment writer; stopping annotated writes.")
-                        vw_annot = None
+                # rotate segment if elapsed
+                if segment_start and (time.time() - segment_start >= float(segment_seconds)):
+                    rospy.loginfo("Rotating video segment (index %d)...", segment_index)
+                    safe_close_writer(video_writer)
+                    segment_index += 1
+                    segment_start = time.time()
+                    video_path = make_segment_path(output_dir, output_video_name, segment_index)
+                    rospy.loginfo("Opening new video segment: %s", video_path)
+                    video_writer = create_video_writer(video_path, fourcc, fps, video_size)
+                    if video_writer is None:
+                        rospy.logerr("Failed to open new video segment writer; stopping recording.")
+                        video_writer = None
+                        recording_active = False
 
             rate.sleep()
 
@@ -247,8 +233,7 @@ def camera_recorder():
             cap.release()
         except Exception:
             pass
-        safe_close_writer(vw_raw)
-        safe_close_writer(vw_annot)
+        safe_close_writer(video_writer)
         cv2.destroyAllWindows()
         rospy.loginfo("Camera recorder node exiting.")
 

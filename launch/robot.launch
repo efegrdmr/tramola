@@ -29,5 +29,14 @@
     <include file="$(find mavros)/launch/apm.launch"/>
 
     <include file="$(find rplidar_ros)/launch/rplidar_a1.launch"/>
+    <node name="rosbag_record" pkg="rosbag" type="record" output="screen"
+      args="-O $(env HOME)/bags/local_costmap_$(date +%Y-%m-%d-%H-%M-%S).bag
+            /scan_filtered /tf /tf_static
+            /move_base/local_costmap/costmap
+            /move_base/local_costmap/costmap_updates"/>
 
+    <node pkg="mavros_telemetry" type="mavros_telemetry_logger.py" name="mavros_telemetry_logger" output="screen">
+      <param name="log_rate" value="1.0" />
+      <param name="output_dir" value="$(env HOME)/telemetry_logs" />
+    </node>
 </launch>
