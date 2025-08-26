@@ -1,9 +1,9 @@
 <launch>
     <!-- LIDAR: 15 cm forward of base_link -->
     <node pkg="tf" type="static_transform_publisher" name="lidar_to_base"
-          args="0.15 0.0 1.50 0 0 0 base_link laser 100"/>
+          args="0.15 0.0 1.50 0 0 0 base_link laser 100" respawn="true" respawn_delay="5"/>
 
-    <node pkg="tramola" type="lidar_filter.py" name="lidar_filter" output="screen">
+    <node pkg="tramola" type="lidar_filter.py" name="lidar_filter" output="screen" respawn="true" respawn_delay="5">
       <param name="input_topic" value="/scan"/>
       <param name="output_topic" value="/scan_filtered"/>
       <rosparam param="keep_ranges">[[-120.0, 120.0]]</rosparam>
@@ -11,27 +11,29 @@
 
     <include file="$(find tramola)/launch/localization.launch" />
 
-    <node pkg="tramola" type="control.py" name="control_node" output="screen" >
+    <node pkg="tramola" type="control.py" name="control_node" output="screen" respawn="true" respawn_delay="5">
       <param name="port" value="/dev/ttyACM0"/>
       <!-- Remap goal topic so this node publishes to a private goal channel -->
       <remap from="/move_base_simple/goal" to="/tramola/goal"/>
     </node>
 
-    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen" respawn_delay="5">
       <remap from="cmd_vel" to="/mavros/mavros/setpoint_velocity/cmd_vel_unstamped" />
       <!-- Remap move_base's simple goal subscription to our private goal topic -->
       <remap from="/move_base_simple/goal" to="/tramola/goal"/>
       <rosparam file="$(find tramola)/config/move_base.yaml" command="load" />
     </node>
-    <node pkg="tramola" type="detection_node.py" name="detection" output="screen"/>
-    <node pkg="tramola" type="camera_publisher.py" name="camera_publisher" output="screen"/>
+    <node pkg="tramola" type="detection_node.py" name="detection" output="screen" respawn="true" respawn_delay="5"/>
+    <node pkg="tramola" type="camera_publisher.py" name="camera_publisher" output="screen" respawn="true" respawn_delay="5"/>
     <!-- MAVROS node -->
     <include file="$(find mavros)/launch/apm.launch"/>
 
     <node name="rplidarNode"
         pkg="rplidar_ros"
         type="rplidarNode"
-        output="screen">
+        output="screen"
+        respawn="true" 
+        respawn_delay="5">
 
     <!-- USB port (check with: ls /dev/ttyUSB*) -->
     <param name="serial_port" type="string" value="/dev/ttyUSB0"/>
@@ -53,9 +55,10 @@
       args="-O $(env HOME)/bags/local_costmap_$(arg stamp).bag --split --duration=5m
             /scan_filtered /tf /tf_static
             /move_base/local_costmap/costmap
-            /move_base/local_costmap/costmap_updates"/>
+            /move_base/local_costmap/costmap_updates"
+      respawn="true" respawn_delay="5"/>
 
-    <node pkg="tramola" type="telemetry_logger.py" name="telemetry_logger" output="screen">
+    <node pkg="tramola" type="telemetry_logger.py" name="telemetry_logger" output="screen" respawn="true" respawn_delay="5">
       <param name="log_rate" value="1.0" />
       <param name="output_dir" value="$(env HOME)/telemetry_logs" />
     </node>
