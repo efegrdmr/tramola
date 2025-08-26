@@ -16,6 +16,15 @@ import Jetson.GPIO as GPIO
 class Control:
     def __init__(self):
         rospy.init_node("control", anonymous=True)
+
+        # GPIO setup for emergency shutdown
+        self.pin = 11
+        GPIO.setwarnings(False)  # Disable warnings
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.output(self.pin, GPIO.LOW)
+
+
         self.vehicle = Vehicle()
         self.lidar = Lidar()
         self.detection = Detection()
@@ -34,11 +43,7 @@ class Control:
         rospy.Timer(rospy.Duration(0.1), self.mission_callback)
         self.init_lora()
 
-        # GPIO setup for emergency shutdown
-        self.pin = 11
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(self.pin, GPIO.OUT)
-        GPIO.output(self.pin, GPIO.LOW)
+        
     
     def init_lora(self):
         if self.lora:
@@ -117,6 +122,7 @@ class Control:
                     return "ERR"
                 self.state = "GOTO"
                 self.default_bearing = self.vehicle.calculate_bearing(self.points[-2], self.points[-1])
+                GPIO.output(self.pin, GPIO.LOW)
                 return "OK"
             
             elif command == "emergency_shutdown":
@@ -130,7 +136,7 @@ class Control:
                 self.vehicle.stop_velocity_publisher()
                 self.state = "IDLE"
                 self.points = []
-                GPIO.output(self.pin, GPIO.LOW)
+                GPIO.output(self.pin, GPIO.HIGH)
                 return "OK"
             
             # Waypoint management
@@ -163,6 +169,7 @@ class Control:
                 self.vehicle.start_rc_override()
                 self.vehicle.set_mode("MANUAL")
                 rospy.loginfo("Manual mode activated")
+                GPIO.output(self.pin, GPIO.LOW)
                 return "OK"
             
             elif command == "stop_manual_mode":

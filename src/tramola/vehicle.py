@@ -30,15 +30,16 @@ class Vehicle:
         self.last_sent_angular_speed = 0
         
         # Set mode service
-        #rospy.wait_for_service("/mavros/mavros/set_mode") 
+        rospy.wait_for_service("/mavros/mavros/set_mode") 
         self.mode_srv = rospy.ServiceProxy("/mavros/mavros/set_mode", SetMode)
         
         # GPS
         self.gps_sub = rospy.Subscriber("/mavros/mavros/global_position/global", NavSatFix, self.gps_callback)
         self.location = (0.0, 0.0) 
 
-        # EKF 
-        rospy.Subscriber("/odometry/filtered", Odometry, self.ekf_callback)
+        # Get vehicle velocity and heading from MAVROS
+        rospy.Subscriber("/mavros/mavros/global_position/compass_hdg", Float64, self.heading_callback)
+        rospy.Subscriber("/mavros/mavros/local_position/velocity_body", TwistStamped, self.velocity_callback)
         self.heading = 0
         self.speed = 0.0
 
@@ -231,29 +232,21 @@ class Vehicle:
         dist = self.distance(lat, lon)
         return dist <= threshold
 
-    def ekf_callback(self, msg):
-        """Process the EKF odometry data to extract speed and heading"""
+    def heading_callback(self, msg):
+        """
+        Process compass heading data from MAVROS
+        The compass_hdg topic already gives heading in degrees (0-360, where 0 is North)
+        """
+        self.heading = msg.data
+    
+    def velocity_callback(self, msg):
+        """
+        Process velocity data from MAVROS
+        """
         # Extract linear velocity components
-        vx = msg.twist.twist.linear.x
-        vy = msg.twist.twist.linear.y
-        vz = msg.twist.twist.linear.z
+        vx = msg.twist.linear.x
+        vy = msg.twist.linear.y
+        vz = msg.twist.linear.z
         
         # Calculate speed (magnitude of velocity vector)
         self.speed = math.sqrt(vx**2 + vy**2 + vz**2)
-        
-        # Extract orientation quaternion
-        q = msg.pose.pose.orientation
-        quaternion = [q.x, q.y, q.z, q.w]
-        
-        # Convert quaternion to Euler angles
-        (roll, pitch, self.heading_rad) = tf.transformations.euler_from_quaternion(quaternion)
-        
-        # Convert heading to degrees (ROS yaw - where 0 is East, CCW positive)
-        self.ros_yaw = math.degrees(self.heading_rad)
-        
-        # Normalize ROS yaw to 0-360 degrees
-        if self.ros_yaw < 0:
-            self.ros_yaw += 360.0
-        
-        # Convert from ROS yaw to compass heading (0=North, 90=East, etc.)
-        self.heading = (90 - self.ros_yaw) % 360

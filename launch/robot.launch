@@ -28,14 +28,34 @@
     <!-- MAVROS node -->
     <include file="$(find mavros)/launch/apm.launch"/>
 
-    <include file="$(find rplidar_ros)/launch/rplidar_a1.launch"/>
+    <node name="rplidarNode"
+        pkg="rplidar_ros"
+        type="rplidarNode"
+        output="screen">
+
+    <!-- USB port (check with: ls /dev/ttyUSB*) -->
+    <param name="serial_port" type="string" value="/dev/ttyUSB0"/>
+
+    <!-- A1M8 baudrate -->
+    <param name="serial_baudrate" type="int" value="115200"/>
+
+    <!-- TF frame id -->
+    <param name="frame_id" type="string" value="laser"/>
+
+    <!-- if your LiDAR is mounted upside down, set to true -->
+    <param name="inverted" type="bool" value="false"/>
+
+    <!-- enable angle compensation for smoother scans -->
+    <param name="angle_compensate" type="bool" value="true"/>
+  </node>
+
     <node name="rosbag_record" pkg="rosbag" type="record" output="screen"
-      args="-O $(env HOME)/bags/local_costmap_$(date +%Y-%m-%d-%H-%M-%S).bag
+      args="-O $(env HOME)/bags/local_costmap_$(arg stamp).bag --split --duration=5m
             /scan_filtered /tf /tf_static
             /move_base/local_costmap/costmap
             /move_base/local_costmap/costmap_updates"/>
 
-    <node pkg="mavros_telemetry" type="mavros_telemetry_logger.py" name="mavros_telemetry_logger" output="screen">
+    <node pkg="tramola" type="telemetry_logger.py" name="telemetry_logger" output="screen">
       <param name="log_rate" value="1.0" />
       <param name="output_dir" value="$(env HOME)/telemetry_logs" />
     </node>

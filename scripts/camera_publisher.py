@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 import rospy
 import cv2
 import time
@@ -54,12 +55,12 @@ def camera_recorder():
     image_topic = rospy.get_param('~image_topic', 'camera/image_raw')
     annotated_topic = rospy.get_param('~annotated_topic', image_topic + '_annotated')
     detections_topic = rospy.get_param('~detections_topic', '/detections')
-    output_dir = rospy.get_param('~output_dir', '/home/tramola/video')
+    output_dir = rospy.get_param('~output_dir', '/home/tramola/videos')
     output_video_name = rospy.get_param('~output_video_name', 'output_video.mp4')
     camera_index = rospy.get_param('~camera_index', 0)
     publish_rate = rospy.get_param('~publish_rate', 30)
     detection_timeout = rospy.get_param('~detection_timeout', 1.0)  # seconds
-    record_param_default = rospy.get_param('~record', False)
+    record_param_default = rospy.get_param('~record', True)
     segment_seconds = rospy.get_param('~segment_seconds', 30)  # default 30 seconds per segment
 
     # Ensure output dir exists
