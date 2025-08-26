@@ -80,11 +80,13 @@ class Control:
                     self.task = None
                     self.state = "GOTO"
         
-        elif self.state == "KAMIKAZE":
+        elif self.state.startswith("KAMIKAZE"):
             if self.task and self.task.state == "COMPLETED":
                 rospy.loginfo("KAMIKAZE mission completed")
                 self.state = "IDLE"
                 self.task = None
+            elif self.task:
+                self.state = "KAMIKAZE_" + self.task.state
         elif self.state == "MANUAL":
             if time.time() - self.last_manual_control_message > 5:
                 self.vehicle.set_rc_speed(0)
