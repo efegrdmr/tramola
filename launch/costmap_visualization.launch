@@ -1,25 +1,3 @@
 <launch>
-  <!-- Oynatılacak rosbag dosyası (zorunlu parametre) -->
-  <arg name="bag_file" doc="Oynatılacak rosbag dosyasının tam yolu"/>
-  
-  <!-- RViz yapılandırma dosyası -->
-  <arg name="rviz_config" default="$(find tramola)/rviz/local_costmap.rviz"/>
-  
-  <!-- Hata kontrolü - bag_file parametresi verilmediyse hata ver -->
-  <node pkg="rostopic" type="rostopic" name="check_bag_file" 
-        args="echo 'HATA: bag_file parametresi eksik! Örnek: roslaunch lidar_recorder view_local_costmap.launch bag_file:=/path/to/your.bag'" 
-        unless="$(eval arg('bag_file') != '')">
-  </node>
-  
-  <!-- Bag dosyası verilmişse RViz ve rosbag player'ı başlat -->
-  <group if="$(eval arg('bag_file') != '')">
-    <!-- RViz düğümünü başlat -->
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" output="screen"/>
-    
-    <!-- Rosbag oynatıcıyı başlat -->
-    <node pkg="rosbag" type="play" name="rosbag_player" 
-          args="--clock $(arg bag_file)" 
-          output="screen">
-    </node>
-  </group>
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find tramola)/rviz/costmap.rviz" output="screen"/>
 </launch>
