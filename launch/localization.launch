@@ -40,7 +40,7 @@
     <param name="publish_filtered_gps" value="true"/>
     <remap from="/gps/fix" to="/mavros/mavros/global_position/raw/fix"/>
     <remap from="/odometry/gps" to="/my_robot/odometry/gps"/>
-    <rosparam param="datum">[39.9208, 32.8541, 0]</rosparam>
+    <rosparam param="datum">[40.8631, 29.2598, 0]</rosparam>
 
 </node>
 </launch>
