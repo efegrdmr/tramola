@@ -1,2 +1,176 @@
-# ROS bag alias
-alias playbags='rosparam set use_sim_time true && rosbag play --clock *.bag -r 3.0'
+# Tramola Autonomous Surface Vessel
+
+Tramola is a ROS-based autonomy stack for a small unmanned surface vessel. It blends localization, LiDAR obstacle perception, color-based visual detection, and a LoRa ground-control link to execute waypoint missions and interdiction tasks on water. The repository packs the catkin package, launch profiles for hardware and simulation, mission logic, communication drivers, and operator tooling.
+
+---
+
+## Features
+- **End-to-end ROS integration** with `move_base`, `robot_localization`, MAVROS, and custom nodes for navigation, sensing, and logging.
+- **Waypoint navigation and pursuit missions** that transition from GPS guidance to color-tracking intercept behavior.
+- **LoRa ground control station** providing offline map tiles, waypoint management, and manual override support.
+- **Maritime-tuned vision pipeline** publishing rich detection messages and annotated camera streams.
+- **Sensor utilities and tooling** for LiDAR filtering, thruster conversion, rosbag visualization, telemetry capture, and video recording.
+
+---
+
+## Repository Layout
+```
+tramola/
+├── CMakeLists.txt        # Catkin build configuration (messages, services, python setup)
+├── package.xml           # Package metadata and dependencies
+├── config/               # Move base tuning for marine navigation
+├── launch/               # Launch files for robot, simulation, GCS, RViz, visualizers
+├── msg/                  # Custom ROS messages (Detection, DetectionList)
+├── srv/                  # Custom ROS service (ImageDetection)
+├── scripts/              # Executable nodes and utility scripts (Python / Bash)
+├── src/tramola/          # Python modules used by ROS nodes
+├── rviz/                 # RViz configurations
+├── urdf/                 # WAM-V robot description components for Gazebo/VRX
+└── start_ros.sh          # Convenience script for Jetson-based hardware startup
+```
+
+---
+
+## Prerequisites
+### Software
+- ROS Melodic with a sourced catkin workspace.
+- Python 2.7 environment on the robot/Jetson for legacy nodes (`Tkinter`, `urllib2`, etc.).
+- MAVROS (`ros-melodic-mavros`, `ros-melodic-mavros-extras`).
+- `robot_localization`, `rplidar_ros`, `move_base`, `tf`, `actionlib_msgs` packages.
+- Python packages: `pyproj`, `Pillow`, `numpy`, `opencv-python`, `cv_bridge` (ROS pkg), `serial`.
+- `Jetson.GPIO` on NVIDIA Jetson hardware.
+
+### Hardware
+- Jetson-class onboard computer with access to `/dev/ttyACM0` (LoRa) and `/dev/ttyTHS1` (thrusters) as configured in launch/start scripts.
+- MAVLink-capable FCU (Pixhawk/ArduPilot) reachable by MAVROS.
+- LiDAR (e.g., RPLIDAR A1/A2) providing `/scan` topic.
+- RGB camera publishing `/camera/image_raw`.
+- LoRa transceiver for ground-station communication.
+
+---
+
+## Building the Package
+1. Clone the repository into your catkin workspace `src/` directory:
+   ```bash
+   cd ~/catkin_ws/src
+   git clone <repo-url> tramola
+   ```
+2. Install ROS dependencies (example for Melodic):
+   ```bash
+   sudo apt install ros-melodic-robot-localization ros-melodic-move-base \
+                    ros-melodic-rplidar-ros ros-melodic-mavros ros-melodic-mavros-extras
+   ```
+3. Make sure Python dependencies are available (`pip`, virtualenv, or Jetson packages).
+4. Build and source the workspace:
+   ```bash
+   cd ~/catkin_ws
+   catkin_make
+   source devel/setup.bash
+   ```
+
+---
+
+## Launching Tramola
+### Onboard Robot (Jetson)
+- Preferred entry point is the helper script that prepares the environment, adjusts device permissions, enables cooling, and launches the stack:
+  ```bash
+  ./start_ros.sh
+  ```
+  The script ultimately runs `roslaunch tramola robot.launch stamp:=<timestamp>`.
+
+- To launch manually from a sourced workspace:
+  ```bash
+  roslaunch tramola robot.launch
+  ```
+  This brings up the following nodes:
+  - `tramola/control.py` – mission orchestration, LoRa link, MAVROS integration
+  - `tramola/lidar_filter.py` – forward-sector filtering of `/scan`
+  - `tramola/detection_node.py` / `tramola/camera_publisher.py`
+  - `move_base` with marine-tuned costmaps and planners
+  - `robot_localization` EKF + navsat transform (`launch/localization.launch` include)
+  - `rplidar_ros` driver
+  - `tramola/telemetry_logger.py` and rosbag recorder for costmap topics
+
+### Simulation / Development
+- **Robot simulation & dummy MAVROS** (LoRa simulated via `socat` pseudo-tty):
+  ```bash
+  roslaunch tramola robot_sim.launch
+  ```
+- **Ground Control Station GUI** (Tkinter + offline map tiles):
+  ```bash
+  roslaunch tramola gcs.launch
+  ```
+- **RViz dashboards**:
+  - Navigation: `roslaunch tramola rviz.launch`
+  - LiDAR-only: `roslaunch tramola lidar_visualization.launch`
+  - Costmap playback (with rosbag helpers in `scripts/costmap_visulization.sh`).
+
+---
+
+## Core Nodes & Modules
+### Control Node (`scripts/control.py`)
+- Initializes ROS, GPIO failsafes, and core modules (`Vehicle`, `Lidar`, `Detection`, `MoveBaseClient`).
+- Manages the mission state machine (`IDLE` → `GOTO` → `KAMIKAZE_*` / `MANUAL`).
+- Interfaces with LoRa via the `Lora` class, handling commands:
+  - Mission control: `start_mission`, `emergency_shutdown`, `add_waypoint`, `clear_waypoints`.
+  - Manual override: `start_manual_mode`, `manual,<speed>,<yaw>`, `stop_manual_mode`.
+  - Telemetry queries: `speed_real`, `heading`, `location`, `state`, thruster feedback.
+- Bridges task logic:
+  - **GoTo** (`src/tramola/goTo.py`): issues GPS goals via `MoveBaseClient`, then tightens final approach with direct velocity control.
+  - **Kamikaze** (`src/tramola/kamikaze.py`): switches to vision-guided pursuit based on detection confidence and color class.
+
+### Vehicle Interface (`src/tramola/vehicle.py`)
+- Wraps MAVROS topics/services for velocity commands, RC override, mode switching, arming, and telemetry.
+- Provides helpers for bearing/distance calculations, `turn_inplace`, and PWM conversions.
+
+### Perception
+- **Color detection node** (`scripts/detection_node.py`): Maritime-tuned HSV segmentation with glare/water masking, debug image topics, and `/toggle_detection` service.
+- **Detection client** (`src/tramola/detection.py`): Caches the latest `DetectionList` and exposes `start/stop` via service proxy.
+- **Camera recorder** (`scripts/camera_publisher.py`): Publishes raw/annotated video streams, records MP4 segments with bounding boxes and timestamps.
+
+### Navigation & Localization
+- `MoveBaseClient` (`src/tramola/move_base.py`): Converts GPS goals into the `odom` frame using `pyproj` and TF2, monitors `GoalStatusArray`.
+- `config/move_base.yaml`: Marine-tuned costmaps and DWA planner parameters for catamaran dynamics.
+- `launch/localization.launch`: Fuses IMU and GPS with `robot_localization` and `navsat_transform_node` (configurable datum).
+
+### Sensor Utilities & Support Scripts
+- LiDAR filtering (`scripts/lidar_filter.py`), scan scaling for simulation (`scripts/scale_scan.py`).
+- Thruster conversion (`scripts/cmd_vel_to_thrusters.py`) mapping `Twist` or RC override to twin-thruster setpoints.
+- Telemetry logging (`scripts/telemetry_logger.py`) to CSV with setpoint prediction.
+- Rosbag/RViz helper scripts for visualization and playback (`scripts/*visulization.sh`).
+- Serial port emulator (`scripts/serial_sim.sh`) for LoRa link testing without hardware.
+
+### LoRa Communication (`src/tramola/loralib.py`)
+- Serial driver with checksum framing, command/code dictionaries, asynchronous receiver thread, and callback interface.
+- Supports request-response cycles compatible with both the control node and GUI clients.
+
+### Ground Control Station (`src/tramola/gcs_gui.py`)
+- Tkinter-based GUI featuring offline OpenStreetMap tiles, waypoint editing, live telemetry, and LoRa messaging.
+- Background tile downloader caches imagery to support field operations without reliable internet.
+
+---
+
+## Custom Messages & Services
+- `Detection.msg`: Normalized bounding box, confidence, class ID.
+- `DetectionList.msg`: Array of detections published on `/color_detections`.
+- `ImageDetection.srv`: `bool on` request toggles the detection node subscription; responds with `bool success`.
+
+Rebuild (`catkin_make`) and re-source your workspace whenever message/service definitions change.
+
+---
+
+## Mission Workflow
+1. **Prepare mission**: Operator uses the Ground Control Station (GCS) to send waypoint commands; the control node queues them.
+2. **Start mission**: Issue `set_color,<class_id>` to select target color, then `start_mission` to arm and enter `GOTO` state.
+3. **Waypoint following**: Control node advances through queued GPS points using `move_base` plus direct velocity control for final meters.
+4. **Interception**: After the last waypoint, the `Kamikaze` task engages to track color detections; it aborts after prolonged loss.
+5. **Manual override / safety**: At any time send `manual,<speed>,<yaw>` (range [-1,1]) or `emergency_shutdown` to halt, disarm, and trigger the emergency shutdown system.
+
+---
+
+## Data Products
+- **Telemetry logs**: CSV files under `~/telemetry_logs` summarizing position, velocity, attitude, and setpoints.
+- **Costmap bags**: Stored in `~/bags` via the rosbag recorder launched in `robot.launch`.
+- **Video segments**: Default output directory `/home/tramola/videos` (configurable via ROS params).
+
+---
